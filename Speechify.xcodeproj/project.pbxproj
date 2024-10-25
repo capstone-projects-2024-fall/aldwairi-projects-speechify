@@ -3,26 +3,66 @@
 	archiveVersion = 1;
 	classes = {
 	};
-	objectVersion = 56;
+	objectVersion = 77;
 	objects = {
 
-/* Begin PBXBuildFile section */
-		2207417F2CB5B4C5004CDBF8 /* SpeechifyApp.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2207417E2CB5B4C5004CDBF8 /* SpeechifyApp.swift */; };
-		220741812CB5B4C5004CDBF8 /* ContentView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 220741802CB5B4C5004CDBF8 /* ContentView.swift */; };
-		220741832CB5B4C6004CDBF8 /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 220741822CB5B4C6004CDBF8 /* Assets.xcassets */; };
-		220741862CB5B4C6004CDBF8 /* Preview Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 220741852CB5B4C6004CDBF8 /* Preview Assets.xcassets */; };
-/* End PBXBuildFile section */
+/* Begin PBXContainerItemProxy section */
+		D35BBF7C2CCAA3D30090B021 /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = D35BBF632CCAA3D00090B021 /* Project object */;
+			proxyType = 1;
+			remoteGlobalIDString = D35BBF6A2CCAA3D00090B021;
+			remoteInfo = Speechify;
+		};
+		D35BBF862CCAA3D30090B021 /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = D35BBF632CCAA3D00090B021 /* Project object */;
+			proxyType = 1;
+			remoteGlobalIDString = D35BBF6A2CCAA3D00090B021;
+			remoteInfo = Speechify;
+		};
+/* End PBXContainerItemProxy section */
 
 /* Begin PBXFileReference section */
-		2207417B2CB5B4C5004CDBF8 /* Speechify.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = Speechify.app; sourceTree = BUILT_PRODUCTS_DIR; };
-		2207417E2CB5B4C5004CDBF8 /* SpeechifyApp.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SpeechifyApp.swift; sourceTree = "<group>"; };
-		220741802CB5B4C5004CDBF8 /* ContentView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ContentView.swift; sourceTree = "<group>"; };
-		220741822CB5B4C6004CDBF8 /* Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Assets.xcassets; sourceTree = "<group>"; };
-		220741852CB5B4C6004CDBF8 /* Preview Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = "Preview Assets.xcassets"; sourceTree = "<group>"; };
+		D35BBF6B2CCAA3D00090B021 /* Speechify.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = Speechify.app; sourceTree = BUILT_PRODUCTS_DIR; };
+		D35BBF7B2CCAA3D30090B021 /* SpeechifyTests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = SpeechifyTests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
+		D35BBF852CCAA3D30090B021 /* SpeechifyUITests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = SpeechifyUITests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
 /* End PBXFileReference section */
 
+/* Begin PBXFileSystemSynchronizedRootGroup section */
+		D35BBF6D2CCAA3D00090B021 /* Speechify */ = {
+			isa = PBXFileSystemSynchronizedRootGroup;
+			path = Speechify;
+			sourceTree = "<group>";
+		};
+		D35BBF7E2CCAA3D30090B021 /* SpeechifyTests */ = {
+			isa = PBXFileSystemSynchronizedRootGroup;
+			path = SpeechifyTests;
+			sourceTree = "<group>";
+		};
+		D35BBF882CCAA3D30090B021 /* SpeechifyUITests */ = {
+			isa = PBXFileSystemSynchronizedRootGroup;
+			path = SpeechifyUITests;
+			sourceTree = "<group>";
+		};
+/* End PBXFileSystemSynchronizedRootGroup section */
+
 /* Begin PBXFrameworksBuildPhase section */
-		220741782CB5B4C5004CDBF8 /* Frameworks */ = {
+		D35BBF682CCAA3D00090B021 /* Frameworks */ = {
+			isa = PBXFrameworksBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		D35BBF782CCAA3D30090B021 /* Frameworks */ = {
+			isa = PBXFrameworksBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		D35BBF822CCAA3D30090B021 /* Frameworks */ = {
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
@@ -32,123 +72,208 @@
 /* End PBXFrameworksBuildPhase section */
 
 /* Begin PBXGroup section */
-		220741722CB5B4C5004CDBF8 = {
+		D35BBF622CCAA3D00090B021 = {
 			isa = PBXGroup;
 			children = (
-				2207417D2CB5B4C5004CDBF8 /* Speechify */,
-				2207417C2CB5B4C5004CDBF8 /* Products */,
+				D35BBF6D2CCAA3D00090B021 /* Speechify */,
+				D35BBF7E2CCAA3D30090B021 /* SpeechifyTests */,
+				D35BBF882CCAA3D30090B021 /* SpeechifyUITests */,
+				D35BBF6C2CCAA3D00090B021 /* Products */,
 			);
 			sourceTree = "<group>";
 		};
-		2207417C2CB5B4C5004CDBF8 /* Products */ = {
+		D35BBF6C2CCAA3D00090B021 /* Products */ = {
 			isa = PBXGroup;
 			children = (
-				2207417B2CB5B4C5004CDBF8 /* Speechify.app */,
+				D35BBF6B2CCAA3D00090B021 /* Speechify.app */,
+				D35BBF7B2CCAA3D30090B021 /* SpeechifyTests.xctest */,
+				D35BBF852CCAA3D30090B021 /* SpeechifyUITests.xctest */,
 			);
 			name = Products;
-			sourceTree = "<group>";
-		};
-		2207417D2CB5B4C5004CDBF8 /* Speechify */ = {
-			isa = PBXGroup;
-			children = (
-				2207417E2CB5B4C5004CDBF8 /* SpeechifyApp.swift */,
-				220741802CB5B4C5004CDBF8 /* ContentView.swift */,
-				220741822CB5B4C6004CDBF8 /* Assets.xcassets */,
-				220741842CB5B4C6004CDBF8 /* Preview Content */,
-			);
-			path = Speechify;
-			sourceTree = "<group>";
-		};
-		220741842CB5B4C6004CDBF8 /* Preview Content */ = {
-			isa = PBXGroup;
-			children = (
-				220741852CB5B4C6004CDBF8 /* Preview Assets.xcassets */,
-			);
-			path = "Preview Content";
 			sourceTree = "<group>";
 		};
 /* End PBXGroup section */
 
 /* Begin PBXNativeTarget section */
-		2207417A2CB5B4C5004CDBF8 /* Speechify */ = {
+		D35BBF6A2CCAA3D00090B021 /* Speechify */ = {
 			isa = PBXNativeTarget;
-			buildConfigurationList = 220741892CB5B4C6004CDBF8 /* Build configuration list for PBXNativeTarget "Speechify" */;
+			buildConfigurationList = D35BBF8F2CCAA3D30090B021 /* Build configuration list for PBXNativeTarget "Speechify" */;
 			buildPhases = (
-				220741772CB5B4C5004CDBF8 /* Sources */,
-				220741782CB5B4C5004CDBF8 /* Frameworks */,
-				220741792CB5B4C5004CDBF8 /* Resources */,
+				D35BBF672CCAA3D00090B021 /* Sources */,
+				D35BBF682CCAA3D00090B021 /* Frameworks */,
+				D35BBF692CCAA3D00090B021 /* Resources */,
 			);
 			buildRules = (
 			);
 			dependencies = (
 			);
+			fileSystemSynchronizedGroups = (
+				D35BBF6D2CCAA3D00090B021 /* Speechify */,
+			);
 			name = Speechify;
+			packageProductDependencies = (
+			);
 			productName = Speechify;
-			productReference = 2207417B2CB5B4C5004CDBF8 /* Speechify.app */;
+			productReference = D35BBF6B2CCAA3D00090B021 /* Speechify.app */;
 			productType = "com.apple.product-type.application";
+		};
+		D35BBF7A2CCAA3D30090B021 /* SpeechifyTests */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = D35BBF922CCAA3D30090B021 /* Build configuration list for PBXNativeTarget "SpeechifyTests" */;
+			buildPhases = (
+				D35BBF772CCAA3D30090B021 /* Sources */,
+				D35BBF782CCAA3D30090B021 /* Frameworks */,
+				D35BBF792CCAA3D30090B021 /* Resources */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+				D35BBF7D2CCAA3D30090B021 /* PBXTargetDependency */,
+			);
+			fileSystemSynchronizedGroups = (
+				D35BBF7E2CCAA3D30090B021 /* SpeechifyTests */,
+			);
+			name = SpeechifyTests;
+			packageProductDependencies = (
+			);
+			productName = SpeechifyTests;
+			productReference = D35BBF7B2CCAA3D30090B021 /* SpeechifyTests.xctest */;
+			productType = "com.apple.product-type.bundle.unit-test";
+		};
+		D35BBF842CCAA3D30090B021 /* SpeechifyUITests */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = D35BBF952CCAA3D30090B021 /* Build configuration list for PBXNativeTarget "SpeechifyUITests" */;
+			buildPhases = (
+				D35BBF812CCAA3D30090B021 /* Sources */,
+				D35BBF822CCAA3D30090B021 /* Frameworks */,
+				D35BBF832CCAA3D30090B021 /* Resources */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+				D35BBF872CCAA3D30090B021 /* PBXTargetDependency */,
+			);
+			fileSystemSynchronizedGroups = (
+				D35BBF882CCAA3D30090B021 /* SpeechifyUITests */,
+			);
+			name = SpeechifyUITests;
+			packageProductDependencies = (
+			);
+			productName = SpeechifyUITests;
+			productReference = D35BBF852CCAA3D30090B021 /* SpeechifyUITests.xctest */;
+			productType = "com.apple.product-type.bundle.ui-testing";
 		};
 /* End PBXNativeTarget section */
 
 /* Begin PBXProject section */
-		220741732CB5B4C5004CDBF8 /* Project object */ = {
+		D35BBF632CCAA3D00090B021 /* Project object */ = {
 			isa = PBXProject;
 			attributes = {
 				BuildIndependentTargetsInParallel = 1;
-				LastSwiftUpdateCheck = 1410;
-				LastUpgradeCheck = 1410;
+				LastSwiftUpdateCheck = 1600;
+				LastUpgradeCheck = 1600;
 				TargetAttributes = {
-					2207417A2CB5B4C5004CDBF8 = {
-						CreatedOnToolsVersion = 14.1;
+					D35BBF6A2CCAA3D00090B021 = {
+						CreatedOnToolsVersion = 16.0;
+					};
+					D35BBF7A2CCAA3D30090B021 = {
+						CreatedOnToolsVersion = 16.0;
+						TestTargetID = D35BBF6A2CCAA3D00090B021;
+					};
+					D35BBF842CCAA3D30090B021 = {
+						CreatedOnToolsVersion = 16.0;
+						TestTargetID = D35BBF6A2CCAA3D00090B021;
 					};
 				};
 			};
-			buildConfigurationList = 220741762CB5B4C5004CDBF8 /* Build configuration list for PBXProject "Speechify" */;
-			compatibilityVersion = "Xcode 14.0";
+			buildConfigurationList = D35BBF662CCAA3D00090B021 /* Build configuration list for PBXProject "Speechify" */;
 			developmentRegion = en;
 			hasScannedForEncodings = 0;
 			knownRegions = (
 				en,
 				Base,
 			);
-			mainGroup = 220741722CB5B4C5004CDBF8;
-			productRefGroup = 2207417C2CB5B4C5004CDBF8 /* Products */;
+			mainGroup = D35BBF622CCAA3D00090B021;
+			minimizedProjectReferenceProxies = 1;
+			preferredProjectObjectVersion = 77;
+			productRefGroup = D35BBF6C2CCAA3D00090B021 /* Products */;
 			projectDirPath = "";
 			projectRoot = "";
 			targets = (
-				2207417A2CB5B4C5004CDBF8 /* Speechify */,
+				D35BBF6A2CCAA3D00090B021 /* Speechify */,
+				D35BBF7A2CCAA3D30090B021 /* SpeechifyTests */,
+				D35BBF842CCAA3D30090B021 /* SpeechifyUITests */,
 			);
 		};
 /* End PBXProject section */
 
 /* Begin PBXResourcesBuildPhase section */
-		220741792CB5B4C5004CDBF8 /* Resources */ = {
+		D35BBF692CCAA3D00090B021 /* Resources */ = {
 			isa = PBXResourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				220741862CB5B4C6004CDBF8 /* Preview Assets.xcassets in Resources */,
-				220741832CB5B4C6004CDBF8 /* Assets.xcassets in Resources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		D35BBF792CCAA3D30090B021 /* Resources */ = {
+			isa = PBXResourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		D35BBF832CCAA3D30090B021 /* Resources */ = {
+			isa = PBXResourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
 /* End PBXResourcesBuildPhase section */
 
 /* Begin PBXSourcesBuildPhase section */
-		220741772CB5B4C5004CDBF8 /* Sources */ = {
+		D35BBF672CCAA3D00090B021 /* Sources */ = {
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				220741812CB5B4C5004CDBF8 /* ContentView.swift in Sources */,
-				2207417F2CB5B4C5004CDBF8 /* SpeechifyApp.swift in Sources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		D35BBF772CCAA3D30090B021 /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		D35BBF812CCAA3D30090B021 /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
 /* End PBXSourcesBuildPhase section */
 
+/* Begin PBXTargetDependency section */
+		D35BBF7D2CCAA3D30090B021 /* PBXTargetDependency */ = {
+			isa = PBXTargetDependency;
+			target = D35BBF6A2CCAA3D00090B021 /* Speechify */;
+			targetProxy = D35BBF7C2CCAA3D30090B021 /* PBXContainerItemProxy */;
+		};
+		D35BBF872CCAA3D30090B021 /* PBXTargetDependency */ = {
+			isa = PBXTargetDependency;
+			target = D35BBF6A2CCAA3D00090B021 /* Speechify */;
+			targetProxy = D35BBF862CCAA3D30090B021 /* PBXContainerItemProxy */;
+		};
+/* End PBXTargetDependency section */
+
 /* Begin XCBuildConfiguration section */
-		220741872CB5B4C6004CDBF8 /* Debug */ = {
+		D35BBF8D2CCAA3D30090B021 /* Debug */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
 				ALWAYS_SEARCH_USER_PATHS = NO;
+				ASSETCATALOG_COMPILER_GENERATE_SWIFT_ASSET_SYMBOL_EXTENSIONS = YES;
 				CLANG_ANALYZER_NONNULL = YES;
 				CLANG_ANALYZER_NUMBER_OBJECT_CONVERSION = YES_AGGRESSIVE;
 				CLANG_CXX_LANGUAGE_STANDARD = "gnu++20";
@@ -181,7 +306,8 @@
 				DEBUG_INFORMATION_FORMAT = dwarf;
 				ENABLE_STRICT_OBJC_MSGSEND = YES;
 				ENABLE_TESTABILITY = YES;
-				GCC_C_LANGUAGE_STANDARD = gnu11;
+				ENABLE_USER_SCRIPT_SANDBOXING = YES;
+				GCC_C_LANGUAGE_STANDARD = gnu17;
 				GCC_DYNAMIC_NO_PIC = NO;
 				GCC_NO_COMMON_BLOCKS = YES;
 				GCC_OPTIMIZATION_LEVEL = 0;
@@ -195,20 +321,22 @@
 				GCC_WARN_UNINITIALIZED_AUTOS = YES_AGGRESSIVE;
 				GCC_WARN_UNUSED_FUNCTION = YES;
 				GCC_WARN_UNUSED_VARIABLE = YES;
-				IPHONEOS_DEPLOYMENT_TARGET = 16.1;
+				IPHONEOS_DEPLOYMENT_TARGET = 18.0;
+				LOCALIZATION_PREFERS_STRING_CATALOGS = YES;
 				MTL_ENABLE_DEBUG_INFO = INCLUDE_SOURCE;
 				MTL_FAST_MATH = YES;
 				ONLY_ACTIVE_ARCH = YES;
 				SDKROOT = iphoneos;
-				SWIFT_ACTIVE_COMPILATION_CONDITIONS = DEBUG;
+				SWIFT_ACTIVE_COMPILATION_CONDITIONS = "DEBUG $(inherited)";
 				SWIFT_OPTIMIZATION_LEVEL = "-Onone";
 			};
 			name = Debug;
 		};
-		220741882CB5B4C6004CDBF8 /* Release */ = {
+		D35BBF8E2CCAA3D30090B021 /* Release */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
 				ALWAYS_SEARCH_USER_PATHS = NO;
+				ASSETCATALOG_COMPILER_GENERATE_SWIFT_ASSET_SYMBOL_EXTENSIONS = YES;
 				CLANG_ANALYZER_NONNULL = YES;
 				CLANG_ANALYZER_NUMBER_OBJECT_CONVERSION = YES_AGGRESSIVE;
 				CLANG_CXX_LANGUAGE_STANDARD = "gnu++20";
@@ -241,7 +369,8 @@
 				DEBUG_INFORMATION_FORMAT = "dwarf-with-dsym";
 				ENABLE_NS_ASSERTIONS = NO;
 				ENABLE_STRICT_OBJC_MSGSEND = YES;
-				GCC_C_LANGUAGE_STANDARD = gnu11;
+				ENABLE_USER_SCRIPT_SANDBOXING = YES;
+				GCC_C_LANGUAGE_STANDARD = gnu17;
 				GCC_NO_COMMON_BLOCKS = YES;
 				GCC_WARN_64_TO_32_BIT_CONVERSION = YES;
 				GCC_WARN_ABOUT_RETURN_TYPE = YES_ERROR;
@@ -249,17 +378,17 @@
 				GCC_WARN_UNINITIALIZED_AUTOS = YES_AGGRESSIVE;
 				GCC_WARN_UNUSED_FUNCTION = YES;
 				GCC_WARN_UNUSED_VARIABLE = YES;
-				IPHONEOS_DEPLOYMENT_TARGET = 16.1;
+				IPHONEOS_DEPLOYMENT_TARGET = 18.0;
+				LOCALIZATION_PREFERS_STRING_CATALOGS = YES;
 				MTL_ENABLE_DEBUG_INFO = NO;
 				MTL_FAST_MATH = YES;
 				SDKROOT = iphoneos;
 				SWIFT_COMPILATION_MODE = wholemodule;
-				SWIFT_OPTIMIZATION_LEVEL = "-O";
 				VALIDATE_PRODUCT = YES;
 			};
 			name = Release;
 		};
-		2207418A2CB5B4C6004CDBF8 /* Debug */ = {
+		D35BBF902CCAA3D30090B021 /* Debug */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
@@ -279,7 +408,7 @@
 					"@executable_path/Frameworks",
 				);
 				MARKETING_VERSION = 1.0;
-				PRODUCT_BUNDLE_IDENTIFIER = lkds.Speechify;
+				PRODUCT_BUNDLE_IDENTIFIER = com.capstone.Speechify;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SWIFT_EMIT_LOC_STRINGS = YES;
 				SWIFT_VERSION = 5.0;
@@ -287,7 +416,7 @@
 			};
 			name = Debug;
 		};
-		2207418B2CB5B4C6004CDBF8 /* Release */ = {
+		D35BBF912CCAA3D30090B021 /* Release */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
@@ -307,7 +436,7 @@
 					"@executable_path/Frameworks",
 				);
 				MARKETING_VERSION = 1.0;
-				PRODUCT_BUNDLE_IDENTIFIER = lkds.Speechify;
+				PRODUCT_BUNDLE_IDENTIFIER = com.capstone.Speechify;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SWIFT_EMIT_LOC_STRINGS = YES;
 				SWIFT_VERSION = 5.0;
@@ -315,28 +444,114 @@
 			};
 			name = Release;
 		};
+		D35BBF932CCAA3D30090B021 /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				BUNDLE_LOADER = "$(TEST_HOST)";
+				CODE_SIGN_STYLE = Automatic;
+				CURRENT_PROJECT_VERSION = 1;
+				GENERATE_INFOPLIST_FILE = YES;
+				IPHONEOS_DEPLOYMENT_TARGET = 18.0;
+				MARKETING_VERSION = 1.0;
+				PRODUCT_BUNDLE_IDENTIFIER = com.capstone.SpeechifyTests;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SWIFT_EMIT_LOC_STRINGS = NO;
+				SWIFT_VERSION = 5.0;
+				TARGETED_DEVICE_FAMILY = "1,2";
+				TEST_HOST = "$(BUILT_PRODUCTS_DIR)/Speechify.app/$(BUNDLE_EXECUTABLE_FOLDER_PATH)/Speechify";
+			};
+			name = Debug;
+		};
+		D35BBF942CCAA3D30090B021 /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				BUNDLE_LOADER = "$(TEST_HOST)";
+				CODE_SIGN_STYLE = Automatic;
+				CURRENT_PROJECT_VERSION = 1;
+				GENERATE_INFOPLIST_FILE = YES;
+				IPHONEOS_DEPLOYMENT_TARGET = 18.0;
+				MARKETING_VERSION = 1.0;
+				PRODUCT_BUNDLE_IDENTIFIER = com.capstone.SpeechifyTests;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SWIFT_EMIT_LOC_STRINGS = NO;
+				SWIFT_VERSION = 5.0;
+				TARGETED_DEVICE_FAMILY = "1,2";
+				TEST_HOST = "$(BUILT_PRODUCTS_DIR)/Speechify.app/$(BUNDLE_EXECUTABLE_FOLDER_PATH)/Speechify";
+			};
+			name = Release;
+		};
+		D35BBF962CCAA3D30090B021 /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				CODE_SIGN_STYLE = Automatic;
+				CURRENT_PROJECT_VERSION = 1;
+				GENERATE_INFOPLIST_FILE = YES;
+				MARKETING_VERSION = 1.0;
+				PRODUCT_BUNDLE_IDENTIFIER = com.capstone.SpeechifyUITests;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SWIFT_EMIT_LOC_STRINGS = NO;
+				SWIFT_VERSION = 5.0;
+				TARGETED_DEVICE_FAMILY = "1,2";
+				TEST_TARGET_NAME = Speechify;
+			};
+			name = Debug;
+		};
+		D35BBF972CCAA3D30090B021 /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				CODE_SIGN_STYLE = Automatic;
+				CURRENT_PROJECT_VERSION = 1;
+				GENERATE_INFOPLIST_FILE = YES;
+				MARKETING_VERSION = 1.0;
+				PRODUCT_BUNDLE_IDENTIFIER = com.capstone.SpeechifyUITests;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SWIFT_EMIT_LOC_STRINGS = NO;
+				SWIFT_VERSION = 5.0;
+				TARGETED_DEVICE_FAMILY = "1,2";
+				TEST_TARGET_NAME = Speechify;
+			};
+			name = Release;
+		};
 /* End XCBuildConfiguration section */
 
 /* Begin XCConfigurationList section */
-		220741762CB5B4C5004CDBF8 /* Build configuration list for PBXProject "Speechify" */ = {
+		D35BBF662CCAA3D00090B021 /* Build configuration list for PBXProject "Speechify" */ = {
 			isa = XCConfigurationList;
 			buildConfigurations = (
-				220741872CB5B4C6004CDBF8 /* Debug */,
-				220741882CB5B4C6004CDBF8 /* Release */,
+				D35BBF8D2CCAA3D30090B021 /* Debug */,
+				D35BBF8E2CCAA3D30090B021 /* Release */,
 			);
 			defaultConfigurationIsVisible = 0;
 			defaultConfigurationName = Release;
 		};
-		220741892CB5B4C6004CDBF8 /* Build configuration list for PBXNativeTarget "Speechify" */ = {
+		D35BBF8F2CCAA3D30090B021 /* Build configuration list for PBXNativeTarget "Speechify" */ = {
 			isa = XCConfigurationList;
 			buildConfigurations = (
-				2207418A2CB5B4C6004CDBF8 /* Debug */,
-				2207418B2CB5B4C6004CDBF8 /* Release */,
+				D35BBF902CCAA3D30090B021 /* Debug */,
+				D35BBF912CCAA3D30090B021 /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
+		D35BBF922CCAA3D30090B021 /* Build configuration list for PBXNativeTarget "SpeechifyTests" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				D35BBF932CCAA3D30090B021 /* Debug */,
+				D35BBF942CCAA3D30090B021 /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
+		D35BBF952CCAA3D30090B021 /* Build configuration list for PBXNativeTarget "SpeechifyUITests" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				D35BBF962CCAA3D30090B021 /* Debug */,
+				D35BBF972CCAA3D30090B021 /* Release */,
 			);
 			defaultConfigurationIsVisible = 0;
 			defaultConfigurationName = Release;
 		};
 /* End XCConfigurationList section */
 	};
-	rootObject = 220741732CB5B4C5004CDBF8 /* Project object */;
+	rootObject = D35BBF632CCAA3D00090B021 /* Project object */;
 }
