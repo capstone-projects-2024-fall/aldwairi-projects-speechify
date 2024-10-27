@@ -11,6 +11,11 @@
 		220741812CB5B4C5004CDBF8 /* ContentView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 220741802CB5B4C5004CDBF8 /* ContentView.swift */; };
 		220741832CB5B4C6004CDBF8 /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 220741822CB5B4C6004CDBF8 /* Assets.xcassets */; };
 		220741862CB5B4C6004CDBF8 /* Preview Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 220741852CB5B4C6004CDBF8 /* Preview Assets.xcassets */; };
+		227D747A2CBEB5B100E1492A /* SignInView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 227D74792CBEB5B100E1492A /* SignInView.swift */; };
+		228DDC982CCDA6F400DC9C09 /* NotecardDetail.swift in Sources */ = {isa = PBXBuildFile; fileRef = 228DDC972CCDA6F400DC9C09 /* NotecardDetail.swift */; };
+		228DDC9A2CCDC2FB00DC9C09 /* English.json in Resources */ = {isa = PBXBuildFile; fileRef = 228DDC992CCDC2FB00DC9C09 /* English.json */; };
+		22EE94E42CC7E4B500AA858B /* Notecard.swift in Sources */ = {isa = PBXBuildFile; fileRef = 22EE94E32CC7E4B500AA858B /* Notecard.swift */; };
+		22EE94E62CC7E4C200AA858B /* Deck.swift in Sources */ = {isa = PBXBuildFile; fileRef = 22EE94E52CC7E4C200AA858B /* Deck.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
@@ -19,6 +24,11 @@
 		220741802CB5B4C5004CDBF8 /* ContentView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ContentView.swift; sourceTree = "<group>"; };
 		220741822CB5B4C6004CDBF8 /* Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Assets.xcassets; sourceTree = "<group>"; };
 		220741852CB5B4C6004CDBF8 /* Preview Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = "Preview Assets.xcassets"; sourceTree = "<group>"; };
+		227D74792CBEB5B100E1492A /* SignInView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SignInView.swift; sourceTree = "<group>"; };
+		228DDC972CCDA6F400DC9C09 /* NotecardDetail.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NotecardDetail.swift; sourceTree = "<group>"; };
+		228DDC992CCDC2FB00DC9C09 /* English.json */ = {isa = PBXFileReference; lastKnownFileType = text.json; path = English.json; sourceTree = "<group>"; };
+		22EE94E32CC7E4B500AA858B /* Notecard.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Notecard.swift; sourceTree = "<group>"; };
+		22EE94E52CC7E4C200AA858B /* Deck.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Deck.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -51,10 +61,14 @@
 		2207417D2CB5B4C5004CDBF8 /* Speechify */ = {
 			isa = PBXGroup;
 			children = (
+				228DDC972CCDA6F400DC9C09 /* NotecardDetail.swift */,
+				22EE94E22CC7E48A00AA858B /* Model */,
 				2207417E2CB5B4C5004CDBF8 /* SpeechifyApp.swift */,
 				220741802CB5B4C5004CDBF8 /* ContentView.swift */,
 				220741822CB5B4C6004CDBF8 /* Assets.xcassets */,
 				220741842CB5B4C6004CDBF8 /* Preview Content */,
+				227D74792CBEB5B100E1492A /* SignInView.swift */,
+				228DDC992CCDC2FB00DC9C09 /* English.json */,
 			);
 			path = Speechify;
 			sourceTree = "<group>";
@@ -65,6 +79,15 @@
 				220741852CB5B4C6004CDBF8 /* Preview Assets.xcassets */,
 			);
 			path = "Preview Content";
+			sourceTree = "<group>";
+		};
+		22EE94E22CC7E48A00AA858B /* Model */ = {
+			isa = PBXGroup;
+			children = (
+				22EE94E32CC7E4B500AA858B /* Notecard.swift */,
+				22EE94E52CC7E4C200AA858B /* Deck.swift */,
+			);
+			path = Model;
 			sourceTree = "<group>";
 		};
 /* End PBXGroup section */
@@ -126,6 +149,7 @@
 			buildActionMask = 2147483647;
 			files = (
 				220741862CB5B4C6004CDBF8 /* Preview Assets.xcassets in Resources */,
+				228DDC9A2CCDC2FB00DC9C09 /* English.json in Resources */,
 				220741832CB5B4C6004CDBF8 /* Assets.xcassets in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
@@ -137,6 +161,10 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				22EE94E62CC7E4C200AA858B /* Deck.swift in Sources */,
+				22EE94E42CC7E4B500AA858B /* Notecard.swift in Sources */,
+				227D747A2CBEB5B100E1492A /* SignInView.swift in Sources */,
+				228DDC982CCDA6F400DC9C09 /* NotecardDetail.swift in Sources */,
 				220741812CB5B4C5004CDBF8 /* ContentView.swift in Sources */,
 				2207417F2CB5B4C5004CDBF8 /* SpeechifyApp.swift in Sources */,
 			);

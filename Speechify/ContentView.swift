@@ -7,15 +7,23 @@
 
 import SwiftUI
 
+import SwiftUI
+
 struct ContentView: View {
+    @ObservedObject var datas = ReadData()
     var body: some View {
-        VStack {
-            Image(systemName: "globe")
-                .imageScale(.large)
-                .foregroundColor(.accentColor)
-            Text("Hello, world!")
+        NavigationView {
+            VStack {
+                List {
+                    ForEach(datas.notecards) { item in
+                        NavigationLink(destination: NotecardDetail(notecard: item)) {
+                            Text(item.word)
+                        }
+                    }
+                }
+                .listStyle(.grouped)
+            }
         }
-        .padding()
     }
 }
 
