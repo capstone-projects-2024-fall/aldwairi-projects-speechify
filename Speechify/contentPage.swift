@@ -9,7 +9,7 @@ import SwiftUI
 
 struct contentPageView: View {
     var body: some View {
-        NavigationView{
+        NavigationStack{
             VStack{
                 Text("Speechify").font(.largeTitle).multilineTextAlignment(.center).padding(10)
                 NavigationLink(destination: loginPageView()){
