@@ -25,7 +25,7 @@ struct loginPageView: View{
     }
     
     var body: some View{
-        NavigationView{
+        NavigationStack{
             VStack{
                 Text("Login").font(.largeTitle).frame(maxWidth: .infinity, alignment: .center).padding(.top, 10)
                 Text("Email").frame(maxWidth: .infinity, alignment: .leading)
