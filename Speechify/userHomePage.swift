@@ -2,7 +2,7 @@
 //  userHomePage.swift
 //  Speechify
 //
-//  Created by Oladapo Emmanuel Oladele on 10/24/24.
+//  Created by Oladapo Oladele on 2024/10/26.
 //
 
 import SwiftUI
@@ -13,7 +13,7 @@ struct userHomePage: View{
     @State private var viewSettings: Bool = false
     
     var body: some View{
-        NavigationView{
+        NavigationStack{
             VStack(){
                 HStack{
                     HStack{
@@ -56,7 +56,7 @@ struct userHomePage: View{
     }
 }
 
-/*struct wordCard: View{ 
+/*struct wordCard: View{
     /*
     struct wordCard<isFront: View, isBack: View>: View{
     let frontCard: () -> isFront
@@ -102,13 +102,13 @@ struct userHomePage: View{
             VStack{
                 Button(action: {
                     expandFavourites()
-                }){    
+                }){
                     Image(systemName:"star") // Update to filled when clicked
                 }
                 Spacer()
                 Button(action: {
                     accessAudioFile()
-                }){    
+                }){
                     Image(systemName:"speaker.wave.3.fill")
                 }
             }
@@ -149,7 +149,7 @@ struct cardFace<isFront: View, isBack: View>: View{
     @Binding var isFaceWord: Bool
     
     init(@ViewBuilder frontCard: @escaping () -> isFront, @ViewBuilder backCard: @escaping () -> isBack){
-        self.frontCard = isFront() 
+        self.frontCard = isFront()
         self.backCard = isBack()
     }
 
@@ -169,80 +169,85 @@ struct userProfileView: View{
     }
 }
 
-struct userFavouritesView: View{ // Add a little section at the bottom that shows the language , theme , phonetic spelling and an example of the word being used gramticaly (AI)
-    var body: some View{
-        VStack{
-            VStack{
-                HStack{
-                    Image(systemName:"arrow.left.square.fill").resizable().scaledToFit().frame(width: 50, height: 50)
-                    Text("Favourites").frame(width: 275, height: 175).background(Color(UIColor.systemGray5)).clipShape(RoundedRectangle(cornerRadius: 10))
-                    Image(systemName:"arrow.right.square.fill").resizable().scaledToFit().frame(width:50, height: 50)
-                }.padding()
-            }.background(Color.gray)
-        }
-        VStack{
-            HStack{
-                Text("Info")
-                // Display information here
-            }
-        }.background(Color.gray)
-    }
-}
-
-struct themeView: View{ // Replace the systemImages & themes names and add some animations and stuff
-    @State private var themeOptions: [String] = ["Random", "Greetings"]
+struct userFavouriteCardsView: View{
+    @State private var isFavouriteWords: [String] = ["Text1", "Text2", "Text3", "Text4", "Text5"]
+    
     var body: some View{
         ScrollView{
             VStack{
-                Text("Theme").font(.largeTitle).frame(maxWidth: .infinity, alignment: .center).padding(.top, 10)
-                //ForEach(Array(themeOptions.enumerated()), id: \.element){ index, item in
-                HStack{
+                Text("Favourite Words").font(.largeTitle).padding(.top, 10)
+                ForEach(isFavouriteWords, id: \.self){ isWord in
                     VStack{
-                        Image(systemName: "arrow.left").resizable().scaledToFit().frame(width: 175, height: 175)
-                        Text("Theme Name")
-                    }.padding(5).background(Color(UIColor.systemGray5)).clipShape(RoundedRectangle(cornerRadius: 10))
-                    VStack{
-                        Image(systemName: "arrow.right").resizable().scaledToFit().frame(width: 175, height: 175)
-                        Text("Theme Name")
-                    }.padding(5).background(Color(UIColor.systemGray5)).clipShape(RoundedRectangle(cornerRadius: 5))
-                }.padding(10)
-                HStack{
-                    VStack{
-                        Image(systemName: "arrow.up").resizable().scaledToFit().frame(width: 175, height: 175)
-                        Text("Theme Name")
-                    }.padding(5).background(Color(UIColor.systemGray5)).clipShape(RoundedRectangle(cornerRadius: 10))
-                    VStack{
-                        Image(systemName: "arrow.down").resizable().scaledToFit().frame(width: 175, height: 175)
-                        Text("Theme Name")
-                    }.padding(5).background(Color(UIColor.systemGray5)).clipShape(RoundedRectangle(cornerRadius: 5))
-                }.padding(10)
-                HStack{
-                    VStack{
-                        Image(systemName: "arrow.left").resizable().scaledToFit().frame(width: 175, height: 175)
-                        Text("Theme Name")
-                    }.padding(5).background(Color(UIColor.systemGray5)).clipShape(RoundedRectangle(cornerRadius: 10))
-                    VStack{
-                        Image(systemName: "arrow.right").resizable().scaledToFit().frame(width: 175, height: 175)
-                        Text("Theme Name")
-                    }.padding(5).background(Color(UIColor.systemGray5)).clipShape(RoundedRectangle(cornerRadius: 5))
-                }.padding(10)
-                HStack{
-                    VStack{
-                        Image(systemName: "arrow.up").resizable().scaledToFit().frame(width: 175, height: 175)
-                        Text("Theme Name")
-                    }.padding(5).background(Color(UIColor.systemGray5)).clipShape(RoundedRectangle(cornerRadius: 10))
-                    VStack{
-                        Image(systemName: "arrow.down").resizable().scaledToFit().frame(width: 175, height: 175)
-                        Text("Theme Name")
-                    }.padding(5).background(Color(UIColor.systemGray5)).clipShape(RoundedRectangle(cornerRadius: 5))
-                 }.padding(10)
-                    //}
+                        ZStack{
+                            VStack{
+                                HStack{
+                                    Image(systemName: "x.circle.fill").resizable().scaledToFit().frame(width: 25, height: 25).padding(.top, 5).onTapGesture{
+                                        if let isCardWordIndex = isFavouriteWords.firstIndex(of: isWord){
+                                            isFavouriteWords.remove(at: isCardWordIndex)
+                                        }
+                                    }
+                                }.frame(maxWidth: .infinity, alignment: .trailing).padding(.trailing, 5)
+                            }.frame(maxHeight: .infinity, alignment: .top)
+                            Text("\(isWord)").foregroundStyle(.blue).font(.largeTitle)
+                        }
+                    }.frame(width: 350, height: 200).background(Color(UIColor.systemGray5)).clipShape(RoundedRectangle(cornerRadius: 5)).padding(.vertical, 10)
                 }
             }
         }
     }
+}
+
+struct isFavouriteCardView: View{ // Add a little section at the bottom that shows the language , theme , phonetic spelling and an example of the word being used gramticaly (AI)
+    var body: some View{
+        VStack{
+            HStack{
+                Image(systemName:"arrow.left.square.fill").resizable().scaledToFit().frame(width: 25, height: 25).frame(maxWidth: .infinity, alignment: .leading).padding(.leading, 15)
+                Image(systemName:"arrow.right.square.fill").resizable().scaledToFit().frame(width: 25, height: 25).frame(maxWidth: .infinity, alignment: .trailing).padding(.trailing, 15)
+            }
+            VStack{
+                ZStack{
+                    VStack{
+                        HStack{
+                            Image(systemName: "star.fill").resizable().scaledToFit().frame(width: 25, height: 25).padding(.top, 5)
+                        }.frame(maxWidth: .infinity, alignment: .trailing).padding(.trailing, 5)
+                    }.frame(maxHeight: .infinity, alignment: .top)
+                    Text("Word")
+                    VStack{
+                        HStack{
+                            Image(systemName: "speaker.wave.3.fill").resizable().scaledToFit().frame(width: 25, height: 25).padding(.bottom, 5)
+                        }.frame(maxWidth: .infinity, alignment: .trailing).padding(.trailing, 5)
+                    }.frame(maxHeight: .infinity, alignment: .bottom)
+                }
+            }.frame(width: 325, height: 175).background(Color(UIColor.systemGray5)).clipShape(RoundedRectangle(cornerRadius: 10))
+            VStack{
+                Text("Information")
+            }.frame(width: 375, height: 500).background(Color(UIColor.systemGray3)).clipShape(RoundedRectangle(cornerRadius: 5)).padding(.top, 10)
+        }
+    }
+}
+
+struct userThemeSelectionView: View{
+    @State private var themeOptions: [String] = ["Category1", "Category2", "Category3", "Category4", "Category5", "Category6", "Category7", "Category8", "Category9"]
+    @State private var isGridColumn = [GridItem(.flexible(), spacing: 0), GridItem(.flexible(), spacing: 0)]
+    
+    var body: some View{
+        ScrollView{
+            VStack{
+                Text("Theme").font(.largeTitle).padding(.top, 10)
+                LazyVGrid(columns: isGridColumn, spacing: 5){
+                    ForEach(themeOptions, id: \.self){ isTheme in
+                        VStack{
+                            Image(systemName: "arrow.left").resizable().scaledToFit().frame(width: 170, height: 170)
+                            Text("\(isTheme)")
+                        }.padding(10).background(Color(UIColor.systemGray5)).clipShape(RoundedRectangle(cornerRadius: 5))//.padding(.horizontal, 10)
+                    }
+                }
+            }.background(Color.green)
+        }
+    }
+}
 
 
 #Preview {
-    userFavouritesView()
+    isFavouriteCardView()
 }
