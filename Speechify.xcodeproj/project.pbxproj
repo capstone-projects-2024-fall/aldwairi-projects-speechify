@@ -11,6 +11,8 @@
 		220741812CB5B4C5004CDBF8 /* ContentView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 220741802CB5B4C5004CDBF8 /* ContentView.swift */; };
 		220741832CB5B4C6004CDBF8 /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 220741822CB5B4C6004CDBF8 /* Assets.xcassets */; };
 		220741862CB5B4C6004CDBF8 /* Preview Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 220741852CB5B4C6004CDBF8 /* Preview Assets.xcassets */; };
+		2236D97B2CD3C46A0088D443 /* RecordAudio.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2236D97A2CD3C46A0088D443 /* RecordAudio.swift */; };
+		2236D97F2CD3CC510088D443 /* CategoryView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2236D97E2CD3CC4D0088D443 /* CategoryView.swift */; };
 		227D747A2CBEB5B100E1492A /* SignInView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 227D74792CBEB5B100E1492A /* SignInView.swift */; };
 		228DDC982CCDA6F400DC9C09 /* NotecardDetail.swift in Sources */ = {isa = PBXBuildFile; fileRef = 228DDC972CCDA6F400DC9C09 /* NotecardDetail.swift */; };
 		228DDC9A2CCDC2FB00DC9C09 /* English.json in Resources */ = {isa = PBXBuildFile; fileRef = 228DDC992CCDC2FB00DC9C09 /* English.json */; };
@@ -24,6 +26,8 @@
 		220741802CB5B4C5004CDBF8 /* ContentView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ContentView.swift; sourceTree = "<group>"; };
 		220741822CB5B4C6004CDBF8 /* Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Assets.xcassets; sourceTree = "<group>"; };
 		220741852CB5B4C6004CDBF8 /* Preview Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = "Preview Assets.xcassets"; sourceTree = "<group>"; };
+		2236D97A2CD3C46A0088D443 /* RecordAudio.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RecordAudio.swift; sourceTree = "<group>"; };
+		2236D97E2CD3CC4D0088D443 /* CategoryView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CategoryView.swift; sourceTree = "<group>"; };
 		227D74792CBEB5B100E1492A /* SignInView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SignInView.swift; sourceTree = "<group>"; };
 		228DDC972CCDA6F400DC9C09 /* NotecardDetail.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NotecardDetail.swift; sourceTree = "<group>"; };
 		228DDC992CCDC2FB00DC9C09 /* English.json */ = {isa = PBXFileReference; lastKnownFileType = text.json; path = English.json; sourceTree = "<group>"; };
@@ -65,10 +69,12 @@
 				22EE94E22CC7E48A00AA858B /* Model */,
 				2207417E2CB5B4C5004CDBF8 /* SpeechifyApp.swift */,
 				220741802CB5B4C5004CDBF8 /* ContentView.swift */,
+				2236D97E2CD3CC4D0088D443 /* CategoryView.swift */,
 				220741822CB5B4C6004CDBF8 /* Assets.xcassets */,
 				220741842CB5B4C6004CDBF8 /* Preview Content */,
 				227D74792CBEB5B100E1492A /* SignInView.swift */,
 				228DDC992CCDC2FB00DC9C09 /* English.json */,
+				2236D97A2CD3C46A0088D443 /* RecordAudio.swift */,
 			);
 			path = Speechify;
 			sourceTree = "<group>";
@@ -161,11 +167,13 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				2236D97B2CD3C46A0088D443 /* RecordAudio.swift in Sources */,
 				22EE94E62CC7E4C200AA858B /* Deck.swift in Sources */,
 				22EE94E42CC7E4B500AA858B /* Notecard.swift in Sources */,
 				227D747A2CBEB5B100E1492A /* SignInView.swift in Sources */,
 				228DDC982CCDA6F400DC9C09 /* NotecardDetail.swift in Sources */,
 				220741812CB5B4C5004CDBF8 /* ContentView.swift in Sources */,
+				2236D97F2CD3CC510088D443 /* CategoryView.swift in Sources */,
 				2207417F2CB5B4C5004CDBF8 /* SpeechifyApp.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
@@ -297,6 +305,8 @@
 				DEVELOPMENT_ASSET_PATHS = "\"Speechify/Preview Content\"";
 				ENABLE_PREVIEWS = YES;
 				GENERATE_INFOPLIST_FILE = YES;
+				INFOPLIST_KEY_LSApplicationCategoryType = "";
+				INFOPLIST_KEY_NSMicrophoneUsageDescription = "";
 				INFOPLIST_KEY_UIApplicationSceneManifest_Generation = YES;
 				INFOPLIST_KEY_UIApplicationSupportsIndirectInputEvents = YES;
 				INFOPLIST_KEY_UILaunchScreen_Generation = YES;
@@ -325,6 +335,8 @@
 				DEVELOPMENT_ASSET_PATHS = "\"Speechify/Preview Content\"";
 				ENABLE_PREVIEWS = YES;
 				GENERATE_INFOPLIST_FILE = YES;
+				INFOPLIST_KEY_LSApplicationCategoryType = "";
+				INFOPLIST_KEY_NSMicrophoneUsageDescription = "";
 				INFOPLIST_KEY_UIApplicationSceneManifest_Generation = YES;
 				INFOPLIST_KEY_UIApplicationSupportsIndirectInputEvents = YES;
 				INFOPLIST_KEY_UILaunchScreen_Generation = YES;

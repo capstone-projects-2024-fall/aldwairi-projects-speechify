@@ -9,6 +9,8 @@ import SwiftUI
 
 struct NotecardDetail: View {
     let notecard: Notecard
+    
+    
     var body: some View {
         
         

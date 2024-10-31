@@ -1,6 +1,7 @@
 // Person.swift
 import Foundation
 
+
 struct Notecard: Codable, Identifiable{
   
     enum CodingKeys: CodingKey{
@@ -22,28 +23,24 @@ struct Notecard: Codable, Identifiable{
     
 }
 
-//loading from JSON
-class ReadData: ObservableObject  {
-    @Published var notecards = [Notecard]()
+//loading from JSON and returning array of notecards
+
+func loadData()->[Notecard]{
+    guard let sourcesURL = Bundle.main.url(forResource: "English", withExtension:"json")
+    else {fatalError("Could not find JSON file")}
     
+    guard let languageData = try? Data(contentsOf: sourcesURL) else{
+        fatalError("Could not convert data")
+    }
     
-    init(){
-        loadData()
+    guard let notecards = try?JSONDecoder().decode([Notecard].self, from: languageData) else{
+        fatalError("There was a problem decoding data....")
     }
-    func loadData(){
-        guard let sourcesURL = Bundle.main.url(forResource: "English", withExtension:"json")
-        else {fatalError("Could not find JSON file")}
-        
-        guard let languageData = try? Data(contentsOf: sourcesURL) else{
-            fatalError("Could not convert data")
-        }
-        
-        guard let notecards = try?JSONDecoder().decode([Notecard].self, from: languageData) else{
-            fatalError("There was a problem decoding data....")
-        }
-        self.notecards = notecards
-    }
+    return notecards
+    
 }
+
+
 /*
 func parse(jsonData: Data) -> English? {
     do {
