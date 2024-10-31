@@ -10,11 +10,22 @@ import SwiftUI
 struct NotecardDetail: View {
     let notecard: Notecard
     @EnvironmentObject var data: ReadData  // Access ReadData instance
+    @StateObject private var ttsManager = TextToSpeechManager()
     
     var body: some View {
         VStack {
             Text(notecard.word).font(.largeTitle)
             Text(notecard.phonetic).font(.largeTitle)
+            
+            Button(action: {
+                ttsManager.speak(word: notecard.word)
+            }){
+                Image(systemName: "speaker.wave.2.fill")
+                    .font(.system(size: 40))
+                    .foregroundColor(.blue)
+            }
+            .padding()
+            
             AudioView()
             
         //favorit button
