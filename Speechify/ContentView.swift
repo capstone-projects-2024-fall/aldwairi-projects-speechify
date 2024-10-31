@@ -7,8 +7,6 @@
 
 import SwiftUI
 
-import SwiftUI
-
 struct ContentView: View {
     @ObservedObject var datas = ReadData()
     var body: some View {
@@ -22,6 +20,7 @@ struct ContentView: View {
                     }
                 }
                 .listStyle(.grouped)
+                .navigationTitle("Notecards")
             }
         }
     }

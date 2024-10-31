@@ -30,8 +30,9 @@ class ReadData: ObservableObject  {
     init(){
         loadData()
     }
+
     func loadData(){
-        guard let sourcesURL = Bundle.main.url(forResource: "English", withExtension:"json")
+        guard let sourcesURL = Bundle.main.url(forResource: "PhoneticDataSets/CMUDict_Notecards", withExtension:"json")
         else {fatalError("Could not find JSON file")}
         
         guard let languageData = try? Data(contentsOf: sourcesURL) else{
