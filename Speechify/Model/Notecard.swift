@@ -22,6 +22,7 @@ struct Notecard: Codable, Identifiable{
     
 }
 
+//loading from JSON
 class ReadData: ObservableObject  {
     @Published var notecards = [Notecard]()
     

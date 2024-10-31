@@ -10,9 +10,21 @@ import SwiftUI
 struct NotecardDetail: View {
     let notecard: Notecard
     var body: some View {
+        
+        
+      //  onAppear(){
+        //    Audio().initlizeRecordingSession()
+          //  print("initilzied session sucessfully")
+        //}
+        VStack{
             Text(notecard.word)
                 .font(.largeTitle)
+            Text(notecard.phonetic).font(.largeTitle)
+            AudioView()
+           
         }
+        
+    }
 }
 
 struct NotecardDetail_Previews: PreviewProvider {
