@@ -8,11 +8,6 @@
 import SwiftUI
 import AVKit
 
-struct AudioView: View {
-    var body: some View {
-        Audio()
-    }
-}
 
 struct Audio : View {
     
@@ -25,15 +20,11 @@ struct Audio : View {
     
     //fetch audio
     @State var audios: [URL] = []
-    //removing old data from app
-    
     
     var body : some View {
         NavigationView{
             VStack
             {
-                
-               
                 Button(action:{
                     playAudio()
                 }){
@@ -163,6 +154,6 @@ struct Audio : View {
 }
 
 #Preview {
-    AudioView()
+    Audio()
 }
 
