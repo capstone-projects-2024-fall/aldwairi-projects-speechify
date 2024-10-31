@@ -1,0 +1,213 @@
+[
+    {
+        "word": "aberration",
+        "phonetic": "ˌæbəˈreɪʃən",
+        "category": "noun",
+        "favorite": "false",
+        "audioPath": "/audio/aberration.mp3",
+        "wordID": "1"
+    },
+    {
+        "word": "benevolent",
+        "phonetic": "bəˈnɛvələnt",
+        "category": "adjective",
+        "favorite": "true",
+        "audioPath": "/audio/benevolent.mp3",
+        "wordID": "2"
+    },
+    {
+        "word": "candid",
+        "phonetic": "ˈkændɪd",
+        "category": "adjective",
+        "favorite": "false",
+        "audioPath": "/audio/candid.mp3",
+        "wordID": "3"
+    },
+    {
+        "word": "deleterious",
+        "phonetic": "ˌdɛləˈtɪriəs",
+        "category": "adjective",
+        "favorite": "true",
+        "audioPath": "/audio/deleterious.mp3",
+        "wordID": "4"
+    },
+    {
+        "word": "emulate",
+        "phonetic": "ˈɛmjəˌleɪt",
+        "category": "verb",
+        "favorite": "false",
+        "audioPath": "/audio/emulate.mp3",
+        "wordID": "5"
+    },
+    {
+        "word": "fervent",
+        "phonetic": "ˈfərvənt",
+        "category": "adjective",
+        "favorite": "true",
+        "audioPath": "/audio/fervent.mp3",
+        "wordID": "6"
+    },
+    {
+        "word": "gregarious",
+        "phonetic": "ɡrɪˈɡɛriəs",
+        "category": "adjective",
+        "favorite": "false",
+        "audioPath": "/audio/gregarious.mp3",
+        "wordID": "7"
+    },
+    {
+        "word": "harmony",
+        "phonetic": "ˈhɑːrməni",
+        "category": "noun",
+        "favorite": "true",
+        "audioPath": "/audio/harmony.mp3",
+        "wordID": "8"
+    },
+    {
+        "word": "indelible",
+        "phonetic": "ɪnˈdɛləbl",
+        "category": "adjective",
+        "favorite": "false",
+        "audioPath": "/audio/indelible.mp3",
+        "wordID": "9"
+    },
+    {
+        "word": "juxtapose",
+        "phonetic": "ˌdʒʌkstəˈpoʊz",
+        "category": "verb",
+        "favorite": "true",
+        "audioPath": "/audio/juxtapose.mp3",
+        "wordID": "10"
+    },
+    {
+        "word": "kinetic",
+        "phonetic": "kɪˈnɛtɪk",
+        "category": "adjective",
+        "favorite": "false",
+        "audioPath": "/audio/kinetic.mp3",
+        "wordID": "11"
+    },
+    {
+        "word": "lucid",
+        "phonetic": "ˈluːsɪd",
+        "category": "adjective",
+        "favorite": "true",
+        "audioPath": "/audio/lucid.mp3",
+        "wordID": "12"
+    },
+    {
+        "word": "malleable",
+        "phonetic": "ˈmæliəbl",
+        "category": "adjective",
+        "favorite": "false",
+        "audioPath": "/audio/malleable.mp3",
+        "wordID": "13"
+    },
+    {
+        "word": "nebulous",
+        "phonetic": "ˈnɛbjələs",
+        "category": "adjective",
+        "favorite": "true",
+        "audioPath": "/audio/nebulous.mp3",
+        "wordID": "14"
+    },
+    {
+        "word": "ostentatious",
+        "phonetic": "ˌɒstɛnˈteɪʃəs",
+        "category": "adjective",
+        "favorite": "false",
+        "audioPath": "/audio/ostentatious.mp3",
+        "wordID": "15"
+    },
+    {
+        "word": "pragmatic",
+        "phonetic": "præɡˈmætɪk",
+        "category": "adjective",
+        "favorite": "true",
+        "audioPath": "/audio/pragmatic.mp3",
+        "wordID": "16"
+    },
+    {
+        "word": "quixotic",
+        "phonetic": "kwɪkˈsɒtɪk",
+        "category": "adjective",
+        "favorite": "false",
+        "audioPath": "/audio/quixotic.mp3",
+        "wordID": "17"
+    },
+    {
+        "word": "resilient",
+        "phonetic": "rɪˈzɪliənt",
+        "category": "adjective",
+        "favorite": "true",
+        "audioPath": "/audio/resilient.mp3",
+        "wordID": "18"
+    },
+    {
+        "word": "serendipity",
+        "phonetic": "ˌsɛrənˈdɪpɪti",
+        "category": "noun",
+        "favorite": "false",
+        "audioPath": "/audio/serendipity.mp3",
+        "wordID": "19"
+    },
+    {
+        "word": "tenacious",
+        "phonetic": "təˈneɪʃəs",
+        "category": "adjective",
+        "favorite": "true",
+        "audioPath": "/audio/tenacious.mp3",
+        "wordID": "20"
+    },
+    {
+        "word": "ubiquitous",
+        "phonetic": "juːˈbɪkwɪtəs",
+        "category": "adjective",
+        "favorite": "false",
+        "audioPath": "/audio/ubiquitous.mp3",
+        "wordID": "21"
+    },
+    {
+        "word": "vivacious",
+        "phonetic": "vɪˈveɪʃəs",
+        "category": "adjective",
+        "favorite": "true",
+        "audioPath": "/audio/vivacious.mp3",
+        "wordID": "22"
+    },
+    {
+        "word": "wistful",
+        "phonetic": "ˈwɪstfəl",
+        "category": "adjective",
+        "favorite": "false",
+        "audioPath": "/audio/wistful.mp3",
+        "wordID": "23"
+    },
+    {
+        "word": "xenial",
+        "phonetic": "ˈziːniəl",
+        "category": "adjective",
+        "favorite": "true",
+        "audioPath": "/audio/xenial.mp3",
+        "wordID": "24"
+    },
+    {
+        "word": "yoke",
+        "phonetic": "joʊk",
+        "category": "verb",
+        "favorite": "false",
+        "audioPath": "/audio/yoke.mp3",
+        "wordID": "25"
+    },
+    {
+        "word": "zealous",
+        "phonetic": "ˈzɛləs",
+        "category": "adjective",
+        "favorite": "true",
+        "audioPath": "/audio/zealous.mp3",
+        "wordID": "26"
+    }
+  
+]
+
+
