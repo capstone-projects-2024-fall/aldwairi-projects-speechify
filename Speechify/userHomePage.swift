@@ -50,83 +50,52 @@ struct userHomePage: View{
                         }
                     }.padding(5).background(Color(UIColor.systemGray5)).clipShape(RoundedRectangle(cornerRadius: 5)).frame(maxWidth: .infinity, alignment: .leading)
                 }.frame(maxWidth: .infinity, maxHeight: .infinity, alignment: .top)
-                //wordCard()
+                wordCard()
+                HStack{
+                    Image(systemName: hasUserAudio ? "mic.circle.fill" : "mic.circle").resizable().scaledToFit().frame(width: 50, height: 50)
+                }.padding(10).onTapGesture {
+                    hasUserAudio.toggle()
+                }
             }
         }
     }
 }
 
-/*struct wordCard: View{
-    /*
-    struct wordCard<isFront: View, isBack: View>: View{
-    let frontCard: () -> isFront
-    let backCard: () -> isBack
-    */
-    @State private var isFaceWord: Bool = true
-    @State private var isWordCardFlipped: Bool = false
-    @State private var cardRotation = 0.0
-    @State private var cardContentRotation = 0.0
-    @State private var previousWords: [String]
-    @State private var currentWord: String
-    @State private var isFavouriteComponent: Bool = false
-    @State private var isPhoneticSpelling: String
-
-    init(){
-        initialLoading()
-    }
-
+struct wordCard: View{
+    @State private var isCardWord: Bool = true
+    @State private var isFavourite: Bool = false
+    @State private var isWord: String = "Word"
+    @State private var isPhoneticSpelling: String = "Phonetic-Spelling"
+    @State private var previousWords: [String] = []
+    @State var rotation: Double = 0.0
+    
     var body: some View{
-        ZStack{
-            HStack{
-                Button(action: {
-                    retrievePreviousWord()
-                }){
-                    HStack{
-                        Image(systemName:"arrow.left.square.fill")
-                    }
-                }
-                Spacer()
-                cardFace(frontCard:{Text("front"/*currentWord*/)}, backCard:{Text("Back"/*isPhoneticSpelling*/)}/*, isFaceWord: $isFaceWord*/)
-                Spacer()
-                Button(action: {
-                    fetchNextWord()
-                }){
-                    HStack{
-                        Image(systemName:"arrow.right.square.fill")
-                    }
-                }
-            }
-        }.rotation3DEffect(.degrees(cardRotation), axis: (x: 0, y: 1, z: 0)).frame(width: 400, height: 200).background(.white).rotation3DEffect(.degrees(cardContentRotation), axis: (x: 0, y: 1, z: 0))
-            .overlay(
-            Rectangle().stroke(.black, lineWidth: 2)
+        VStack{
             VStack{
-                Button(action: {
-                    expandFavourites()
-                }){
-                    Image(systemName:"star") // Update to filled when clicked
+                ZStack{
+                    VStack{
+                        HStack{
+                            if isCardWord{
+                                Image(systemName: isFavourite ? "star.fill" : "star").resizable().scaledToFit().frame(width: 25, height: 25).padding(.top, 5).onTapGesture{
+                                    isFavourite.toggle()
+                                }
+                            }
+                        }.frame(maxWidth: .infinity, alignment: .trailing).padding(.trailing, 5)
+                    }.frame(maxHeight: .infinity, alignment: .top)
+                    Text(isCardWord ? "\(isWord)" : "\(isPhoneticSpelling)").rotation3DEffect(.degrees(isCardWord ? 0 : 180), axis: (x: 0, y: 1, z: 0))
+                    VStack{
+                        HStack{
+                            if isCardWord{
+                                Image(systemName: "speaker.wave.3.fill").resizable().scaledToFit().frame(width: 25, height: 25).padding(.bottom, 5)
+                            }
+                        }.frame(maxWidth: .infinity, alignment: .trailing).padding(.trailing, 5)
+                    }.frame(maxHeight: .infinity, alignment: .bottom)
                 }
-                Spacer()
-                Button(action: {
-                    accessAudioFile()
-                }){
-                    Image(systemName:"speaker.wave.3.fill")
+            }.frame(width: 350, height: 200).background(Color(UIColor.systemGray5)).clipShape(RoundedRectangle(cornerRadius: 10)).rotation3DEffect(.degrees(isCardWord ? 0 : 180), axis: (x: 0, y: 1, z: 0)).onTapGesture{
+                withAnimation(.linear(duration: 1)){
+                    isCardWord.toggle()
                 }
             }
-        )
-        .onTapGesture {
-            flipWordCard()
-        }
-    }
-
-    private func flipWordCard(){
-        let animationDelay = 0.5
-        withAnimation(.linear(duration: animationDelay)){
-            cardRotation += 180
-        }
-        withAnimation(.linear(duration: 0.001).delay(animationDelay / 2)){
-            cardContentRotation += 180
-            isWordCardFlipped.toggle()
-            isFaceWord.toggle()
         }
     }
 
@@ -134,7 +103,9 @@ struct userHomePage: View{
 
     private func retrievePreviousWord(){}
 
-    private func expandFavourites(){}
+    private func expandFavourite() -> Bool{
+        return true
+    }
 
     private func accessAudioFile(){}
 
@@ -142,24 +113,6 @@ struct userHomePage: View{
 
     private func generatePhoneticSpelling(){}
 }
-
-struct cardFace<isFront: View, isBack: View>: View{
-    let frontCard: () -> isFront
-    let backCard: () -> isBack
-    @Binding var isFaceWord: Bool
-    
-    init(@ViewBuilder frontCard: @escaping () -> isFront, @ViewBuilder backCard: @escaping () -> isBack){
-        self.frontCard = isFront()
-        self.backCard = isBack()
-    }
-
-    var body: some View{
-        VStack{
-            isFaceWord ? frontCard() : backCard()
-        }
-    }
-}
-*/ //Card UI Loading.....
 
 struct userProfileView: View{
     var body: some View{
