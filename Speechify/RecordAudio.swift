@@ -22,6 +22,7 @@ struct Audio : View {
     @State var audioPlayer: AVAudioPlayer!
     @State var alert = false
     @State var count = 0
+    @State private var latestRecordingURL: URL? //For other files to access the recording
     
     //fetch audio
     @State var audios: [URL] = []
@@ -45,6 +46,7 @@ struct Audio : View {
                         if self.record{
                             //button is already clicked: so this if statment is handling stopping the recording
                             self.recorder.stop()
+                            self.latestRecordingURL = self.recorder.url //store recording
                             self.record.toggle()
                             self.getAudios()
                             return
@@ -132,9 +134,7 @@ struct Audio : View {
             
             //fetch all data from document directory
             
-            let result = try FileManager.default.contentsOfDirectory(at: url, includingPropertiesForKeys: nil,
-            
-                                                                     options: .producesRelativePathURLs)
+            let result = try FileManager.default.contentsOfDirectory(at: url, includingPropertiesForKeys: nil, options: .producesRelativePathURLs)
             
             //removing old data
             self.audios.removeAll()
@@ -160,9 +160,12 @@ struct Audio : View {
         }
         
     }
+    
+    func getLatestRecordingURL() -> URL? {
+        return latestRecordingURL
+    }
 }
 
 #Preview {
     AudioView()
 }
-
