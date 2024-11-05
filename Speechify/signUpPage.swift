@@ -6,6 +6,9 @@
 //
 
 import SwiftUI
+import FirebaseCore
+import FirebaseFirestore
+import FirebaseAuth
 
 struct signUpPageView: View{
     @State private var isUserName: String = ""
@@ -13,7 +16,7 @@ struct signUpPageView: View{
     @State private var isNameError: Bool = false
     @State private var nameErrorMessage: String = ""
     @State private var isUserEmail: String = ""
-    @FocusState private var isEmailFocused: Bool
+    @FocusState private var isEmailFocus: Bool
     @State private var isEmailError: Bool = false
     @State private var emailErrorMessage: String = ""
     @State private var isUserPassword: String = ""
@@ -26,29 +29,34 @@ struct signUpPageView: View{
     @State private var isPasswordConfirmVisible: Bool = false
     @State private var isPasswordConfirmError: Bool = false
     @State private var passwordConfirmErrorMessage: String = ""
-    @State private var isValidRegister: Bool = false
+    @State private var isRegistrationValid: Bool = false
     
     init(){
         self.isNameFocus = false
-        self.isEmailFocused = false
+        self.isEmailFocus = false
         self.isPasswordFocus = false
         self.isPasswordConfirmFocus = false
     }
-
+    
     var body: some View{
-        NavigationView{
+        NavigationStack{
             VStack{
                 Text("Sign-Up").font(.largeTitle).frame(maxWidth: .infinity, alignment: .center).padding(.top, 10)
                 Text("Username").frame(maxWidth: .infinity, alignment: .leading)
                 HStack{
                     Image(systemName: "person.fill").resizable().scaledToFit().frame(width: 25, height: 25).padding(.leading, 2).foregroundStyle(.gray)
-                    TextField("Username", text: $isUserName).focused($isNameFocus).background(Color.white).frame(height:30).onSubmit{
-                        isEmailFocused = true
-                        if isUserName.isEmpty{
-                            nameErrorMessage = "Please enter your username"
-                            isNameError = true
+                    TextField("Username", text: $isUserName).focused($isNameFocus).background(Color.white).frame(height:30).textInputAutocapitalization(.never).autocorrectionDisabled(true).onSubmit{
+                        isEmailFocus = true
+                        if !isUserName.isEmpty && isNameError{
+                            isNameError.toggle()
                         }
-                    }
+                    }.onChange(of: isNameFocus, {
+                        if !isNameFocus{
+                            if !isUserName.isEmpty && isNameError{
+                                isNameError.toggle()
+                            }
+                        }
+                    })
                 }.overlay(RoundedRectangle(cornerRadius: 5).stroke(lineWidth: 1))
                 if isNameError{
                     Text(nameErrorMessage).foregroundColor(.red).frame(maxWidth: .infinity, alignment: .leading).padding(5)
@@ -56,21 +64,18 @@ struct signUpPageView: View{
                 Text("Email").frame(maxWidth: .infinity, alignment: .leading)
                 HStack{
                     Image(systemName: "envelope.fill").resizable().scaledToFit().frame(width: 25, height: 25).padding(.leading, 2).foregroundStyle(.gray)
-                    TextField("Email Address", text: $isUserEmail).focused($isEmailFocused).background(Color.white).frame(height:30).onSubmit{
+                    TextField("Email Address", text: $isUserEmail).focused($isEmailFocus).background(Color.white).frame(height:30).textInputAutocapitalization(.never).autocorrectionDisabled(true).onSubmit{
                         isPasswordFocus = true
-                        if isUserEmail.isEmpty{
-                            emailErrorMessage = "Please enter your email address"
-                            isEmailError = true
-                        } else{
-                            let isEmailRegex: String = "[a-zA-Z0-9._%-]+@[a-zA-Z0-9.-]+\\.[a-zA-Z]{2,}"
-                            let isEmailPredicate = NSPredicate(format: "SELF MATCHES %@", isEmailRegex)
-                            let isValidAddress = isEmailPredicate.evaluate(with: isUserEmail)
-                            if isValidAddress{
-                                emailErrorMessage = "Invalid email address"
-                            }
-                            isEmailError = true
+                        if !isUserEmail.isEmpty && emailErrorMessage.contains("enter") && isEmailError{
+                            isEmailError.toggle()
                         }
-                    }
+                    }.onChange(of: isEmailFocus, {
+                        if !isEmailFocus{
+                            if !isUserEmail.isEmpty && emailErrorMessage.contains("enter") && isEmailError{
+                                isEmailError.toggle()
+                            }
+                        }
+                    })
                 }.overlay(RoundedRectangle(cornerRadius: 5).stroke(lineWidth: 1))
                 if isEmailError{
                     Text(emailErrorMessage).foregroundColor(.red).frame(maxWidth: .infinity, alignment: .leading).padding(5)
@@ -79,20 +84,31 @@ struct signUpPageView: View{
                 HStack{
                     Image(systemName: "lock.fill").resizable().scaledToFit().frame(width: 25, height: 25).padding(.leading, 1).foregroundStyle(.gray)
                     if(!isPasswordVisible){
-                        SecureField("Password", text: $isUserPassword).focused($isPasswordFocus).background(Color.white).frame(height:30).onSubmit{
+                        SecureField("Password", text: $isUserPassword).focused($isPasswordFocus).background(Color.white).frame(height:30).textInputAutocapitalization(.never).autocorrectionDisabled(true).onSubmit{
                             isPasswordConfirmFocus = true
-                            if isUserPassword.isEmpty{
-                                passwordErrorMessage = "Please enter your password"
-                                isPasswordError = true
+                            if !isUserPassword.isEmpty && isPasswordError{
+                                isPasswordError.toggle()
                             }
-                        }
+                        }.onChange(of: isPasswordFocus, {
+                            if !isPasswordFocus{
+                                if !isUserPassword.isEmpty && isPasswordError{
+                                    isPasswordError.toggle()
+                                }
+                            }
+                        })
                     } else{
-                        TextField("Password", text: $isUserPassword).focused($isPasswordFocus).background(Color.white).frame(height:30).onSubmit{
-                            if isUserPassword.isEmpty{
-                                passwordErrorMessage = "Please enter your password"
-                                isPasswordError = true
+                        TextField("Password", text: $isUserPassword).focused($isPasswordFocus).background(Color.white).frame(height:30).textInputAutocapitalization(.never).autocorrectionDisabled(true).onSubmit{
+                            isPasswordConfirmFocus = true
+                            if !isUserPassword.isEmpty && isPasswordError{
+                                isPasswordError.toggle()
                             }
-                        }
+                        }.onChange(of: isPasswordFocus, {
+                            if !isPasswordFocus{
+                                if !isUserPassword.isEmpty && isPasswordError{
+                                    isPasswordError.toggle()
+                                }
+                            }
+                        })
                     }
                     Button(action:{isPasswordVisible.toggle()}){
                         Image(systemName: !isPasswordVisible ? "eye.slash" : "eye").resizable().scaledToFit().frame(width: 25, height: 25).padding(.trailing, 2).foregroundStyle(.black)
@@ -105,25 +121,41 @@ struct signUpPageView: View{
                 HStack{
                     Image(systemName: "lock.fill").resizable().scaledToFit().frame(width: 25, height: 25).padding(.leading, 1).foregroundStyle(.gray)
                     if(!isPasswordConfirmVisible){
-                        SecureField("Confirm Password", text: $isUserPasswordConfirm).focused($isPasswordConfirmFocus).background(Color.white).frame(height:30).onSubmit{
-                            if isUserPasswordConfirm.isEmpty{
-                                passwordConfirmErrorMessage = "Please enter your password"
-                                isPasswordConfirmError = true
-                            } else if isUserPasswordConfirm != isUserPassword{
-                                passwordConfirmErrorMessage = "Passwords dont match"
-                                isPasswordConfirmError = true
+                        SecureField("Confirm Password", text: $isUserPasswordConfirm).focused($isPasswordConfirmFocus).background(Color.white).frame(height:30).textInputAutocapitalization(.never).autocorrectionDisabled(true).onSubmit{
+                            if !isUserPasswordConfirm.isEmpty && passwordConfirmErrorMessage.contains("enter") && isPasswordConfirmError{
+                                isPasswordConfirmError.toggle()
                             }
-                        }
+                            if isUserPasswordConfirm == isUserPassword && passwordConfirmErrorMessage.contains("match") && isPasswordConfirmError{
+                                isPasswordConfirmError.toggle()
+                            }
+                        }.onChange(of: isPasswordConfirmFocus, {
+                            if !isPasswordConfirmFocus{
+                                if !isUserPasswordConfirm.isEmpty && passwordConfirmErrorMessage.contains("enter") && isPasswordConfirmError{
+                                    isPasswordConfirmError.toggle()
+                                }
+                                if isUserPasswordConfirm == isUserPassword && passwordConfirmErrorMessage.contains("match") && isPasswordConfirmError{
+                                    isPasswordConfirmError.toggle()
+                                }
+                            }
+                        })
                     } else{
-                        TextField("Confirm Password", text: $isUserPasswordConfirm).focused($isPasswordFocus).background(Color.white).frame(height:30).onSubmit{
-                            if isUserPasswordConfirm.isEmpty{
-                                passwordConfirmErrorMessage = "Please enter your password"
-                                isPasswordConfirmError = true
-                            } else if isUserPasswordConfirm != isUserPassword{
-                                passwordConfirmErrorMessage = "Passwords dont match"
-                                isPasswordConfirmError = true
+                        TextField("Confirm Password", text: $isUserPasswordConfirm).focused($isPasswordConfirmFocus).background(Color.white).frame(height:30).textInputAutocapitalization(.never).autocorrectionDisabled(true).onSubmit{
+                            if !isUserPasswordConfirm.isEmpty && passwordConfirmErrorMessage.contains("enter") && isPasswordConfirmError{
+                                isPasswordConfirmError.toggle()
                             }
-                        }
+                            if isUserPasswordConfirm == isUserPassword && passwordConfirmErrorMessage.contains("match") && isPasswordConfirmError{
+                                isPasswordConfirmError.toggle()
+                            }
+                        }.onChange(of: isPasswordConfirmFocus, {
+                            if !isPasswordConfirmFocus{
+                                if !isUserPasswordConfirm.isEmpty && passwordConfirmErrorMessage.contains("enter") && isPasswordConfirmError{
+                                    isPasswordConfirmError.toggle()
+                                }
+                                if isUserPasswordConfirm == isUserPassword && passwordConfirmErrorMessage.contains("match") && isPasswordConfirmError{
+                                    isPasswordConfirmError.toggle()
+                                }
+                            }
+                        })
                     }
                     Button(action:{isPasswordConfirmVisible.toggle()}){
                         Image(systemName: !isPasswordConfirmVisible ? "eye.slash" : "eye").resizable().scaledToFit().frame(width: 25, height: 25).padding(.trailing, 2).foregroundStyle(.black)
@@ -132,40 +164,85 @@ struct signUpPageView: View{
                 if isPasswordConfirmError{
                     Text(passwordConfirmErrorMessage).foregroundColor(.red).frame(maxWidth: .infinity, alignment: .leading).padding(5)
                 }
-                Text("Sign Up").padding(10).foregroundStyle(.blue).background(Color(UIColor.systemGray5)).clipShape(RoundedRectangle(cornerRadius: 5)).frame(maxWidth: .infinity).onTapGesture{
-                    if isUserName.isEmpty || isUserEmail.isEmpty || isUserPassword.isEmpty || isUserPasswordConfirm.isEmpty{
-                        if isUserName.isEmpty{
-                            nameErrorMessage = "Please enter your username"
-                            isNameError = true
-                        }
-                        if isUserEmail.isEmpty{
-                            emailErrorMessage = "Please enter your email address"
+                Text("Sign Up").padding(10).foregroundStyle(.blue).background(Color(UIColor.systemGray5)).clipShape(RoundedRectangle(cornerRadius: 5)).onTapGesture{
+                    if isUserName.isEmpty{
+                        nameErrorMessage = "Please enter your username"
+                        isNameError = true
+                    }
+                    if isUserEmail.isEmpty{
+                        emailErrorMessage = "Please enter your email address"
+                        isEmailError = true
+                    } else{
+                        let isEmailRegex: String = "[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\\.[a-zA-Z]{2,}"
+                        let isEmailPredicate = NSPredicate(format: "SELF MATCHES[c] %@", isEmailRegex)
+                        let isValidAddress = isEmailPredicate.evaluate(with: isUserEmail)
+                        if !isValidAddress{
+                            emailErrorMessage = "Invalid email address"
                             isEmailError = true
                         }
-                        if isUserPassword.isEmpty{
-                            passwordErrorMessage = "Please enter your password"
-                            isPasswordError = true
+                        if isValidAddress && emailErrorMessage.contains("Invalid") && isEmailError{
+                            isEmailError.toggle()
                         }
-                        if isUserPasswordConfirm.isEmpty{
-                            passwordConfirmErrorMessage = "Please enter your password"
-                            isPasswordConfirmError = true
-                        }
-                    } else{
-                        isValidRegister = validateAndRegisterUser()
                     }
-                }.padding(10)
+                    if isUserPassword.isEmpty{
+                        passwordErrorMessage = "Please enter your password"
+                        isPasswordError = true
+                    }
+                    if isUserPasswordConfirm.isEmpty{
+                        passwordConfirmErrorMessage = "Please enter your password"
+                        isPasswordConfirmError = true
+                    } else if isUserPasswordConfirm != isUserPassword{
+                        passwordConfirmErrorMessage = "Passwords dont match"
+                        isPasswordConfirmError = true
+                    }
+                    if !isNameError && !isEmailError && !isPasswordError && !isPasswordConfirmError{
+                        _ = Task{
+                            isRegistrationValid = await validateAndRegisterUser()
+                        }
+                    }
+                }.padding(10).navigationDestination(isPresented: $isRegistrationValid){
+                    userHomePageView()
+                }
                 HStack{
                     Text("Already have an account? ")
                     NavigationLink(destination: loginPageView()){
                         Text("Login")
                     }
                 }
-            }.padding(15)
+            }.padding(15).onTapGesture{
+                isNameFocus = false
+                isEmailFocus = false
+                isPasswordFocus = false
+                isPasswordConfirmFocus = false
+            }
         }
     }
-
-    private func validateAndRegisterUser() -> Bool{
-        return false
+    
+    private func validateAndRegisterUser() async -> Bool{
+        do{
+            var isRegistrationValid: Bool = true
+            try await Auth.auth().createUser(withEmail: isUserEmail, password: isUserPassword){
+                authResult, error in
+                if let userRegistrationError = error{
+                    isRegistrationValid = false
+                    print(userRegistrationError)
+                    return
+                }
+                guard let isUser = authResult?.user else{return}
+                let isUserProfile = isUser.createProfileChangeRequest()
+                isUserProfile.displayName = isUserName
+                isUserProfile.commitChanges{ error in
+                    if let userProfileError = error{
+                        print(userProfileError)
+                    } else{
+                        print("Set Successfully")
+                    }
+                }
+            }
+            return isRegistrationValid
+        } catch{
+            
+        }
     }
 }
 
