@@ -13,7 +13,7 @@ import SwiftUI
 struct SpeechifyApp: App {
     var body: some Scene {
         WindowGroup {
-            ContentView()
+            NoteCardView()
         }
     }
 }
