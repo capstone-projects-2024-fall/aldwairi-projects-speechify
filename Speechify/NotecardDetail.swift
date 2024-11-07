@@ -11,6 +11,9 @@ struct NotecardDetail: View {
     let notecard: Notecard
     @EnvironmentObject var data: ReadData  // Access ReadData instance
     @StateObject private var ttsManager = TextToSpeechManager()
+    @StateObject private var sttManager = SpeechToText()
+    @State private var audioURL = FileManager.default.urls(for: .documentDirectory, in:
+            .userDomainMask)[0]
     
     var body: some View {
         VStack {
@@ -27,7 +30,12 @@ struct NotecardDetail: View {
             .padding()
             
             AudioView()
-            
+            Button(action: {
+                sttManager.transcribeAudio(url: audioURL)
+            }){
+                Image(systemName: "square").font(.system(size: 40))
+                    .foregroundColor(.blue)
+            }
         //favorit button
             Button(action: {
                 data.toggleFavorite(notecard)

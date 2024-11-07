@@ -56,8 +56,14 @@ struct Audio : View {
                         //gets path to user directory
                         let url = FileManager.default.urls(for: .documentDirectory, in: .userDomainMask)[0]
                         
-                        //appends filename to recording
+                        //to check the url of the user audio
                         let fileName = url.appendingPathComponent("recording.m4a")
+                        
+                        if FileManager.default.fileExists(atPath: fileName.path) {
+                            print("File already exists at path: \(fileName.path)")
+                        } else {
+                            print("File path for new recording: \(fileName.path)")
+                        }
                         
                         //audio settings (audio clarity)
                         let settings = [
