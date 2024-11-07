@@ -11,9 +11,13 @@ import SwiftUI
 // testing
 
 struct SpeechifyApp: App {
+    @StateObject private var data = ReadData()
+    
     var body: some Scene {
         WindowGroup {
-            NoteCardView()
+            SignInView()
+                .environmentObject(data)
+           // NoteCardView()
         }
     }
 }
