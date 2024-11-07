@@ -12,14 +12,6 @@ struct NotecardDetail: View {
     @EnvironmentObject var data: ReadData  // Access ReadData instance
     @StateObject private var ttsManager = TextToSpeechManager()
     
-    // Add this computed property to get the current state of the notecard
-    private var currentNotecard: Notecard {
-        if let updatedCard = data.notecards.first(where: { $0.wordID == notecard.wordID }) {
-            return updatedCard
-        }
-        return notecard
-    }
-    
     var body: some View {
         VStack {
             Text(notecard.word).font(.largeTitle)
@@ -36,34 +28,30 @@ struct NotecardDetail: View {
             
             AudioView()
             
-        //favorite button
+        //favorit button
             Button(action: {
-                data.toggleFavorite(currentNotecard)
+                data.toggleFavorite(notecard)
             }) {
                 HStack {
-                    Image(systemName: currentNotecard.favorite == "true" ? "star.fill" : "star")
+                    Image(systemName: notecard.favorite == "true" ? "star.fill" : "star")
                         .foregroundColor(.yellow)
                     Text(notecard.favorite == "true" ? "Remove from Favorites" : "Add to Favorites")
                 }
             }
             .padding()
-            .padding(.bottom, 10)
         }
-        .padding()
         .onAppear {
-            data.addToRecent(currentNotecard)
+            data.addToRecent(notecard)
         }
     }
 }
 
 
- 
- struct NotecardDetail_Previews: PreviewProvider {
- static var previews: some View {
- NotecardDetail(notecard: Notecard(word: "", phonetic: "", favorite: "", audioPath: "", wordID: ""))
- .environmentObject(ReadData())
- }
- 
- }
- 
- 
+struct NotecardDetail_Previews: PreviewProvider {
+    static var previews: some View {
+        NotecardDetail(notecard: Notecard(word: "", phonetic: "", favorite: "", audioPath: "", wordID: ""))
+            .environmentObject(ReadData())
+    }
+                    
+}
+
