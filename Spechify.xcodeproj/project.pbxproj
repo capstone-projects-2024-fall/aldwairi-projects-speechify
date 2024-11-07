@@ -7,6 +7,15 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
+		1342A0302CDC2C09005E7E38 /* userHomePage.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1342A02F2CDC2C09005E7E38 /* userHomePage.swift */; };
+		1342A0332CDC2E88005E7E38 /* GoogleService-Info.plist in Resources */ = {isa = PBXBuildFile; fileRef = 1342A0322CDC2E88005E7E38 /* GoogleService-Info.plist */; };
+		1342A0362CDC2FF2005E7E38 /* FirebaseAuth in Frameworks */ = {isa = PBXBuildFile; productRef = 1342A0352CDC2FF2005E7E38 /* FirebaseAuth */; };
+		1342A0382CDC3003005E7E38 /* FirebaseDatabase in Frameworks */ = {isa = PBXBuildFile; productRef = 1342A0372CDC3003005E7E38 /* FirebaseDatabase */; };
+		1342A03A2CDC3047005E7E38 /* FirebaseFirestore in Frameworks */ = {isa = PBXBuildFile; productRef = 1342A0392CDC3047005E7E38 /* FirebaseFirestore */; };
+		1342A03C2CDC3061005E7E38 /* FirebaseCore in Frameworks */ = {isa = PBXBuildFile; productRef = 1342A03B2CDC3061005E7E38 /* FirebaseCore */; };
+		1342A03E2CDC32E0005E7E38 /* contentPage.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1342A03D2CDC32D6005E7E38 /* contentPage.swift */; };
+		1342A0402CDC332A005E7E38 /* signUpPage.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1342A03F2CDC3321005E7E38 /* signUpPage.swift */; };
+		1342A0422CDC336F005E7E38 /* loginPage.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1342A0412CDC336A005E7E38 /* loginPage.swift */; };
 		13444E932CD3F31A00A41952 /* CMUDict_Notecards.json in Resources */ = {isa = PBXBuildFile; fileRef = 13444E922CD3F31A00A41952 /* CMUDict_Notecards.json */; };
 		13444E952CD3F58200A41952 /* RecordAudio.swift in Sources */ = {isa = PBXBuildFile; fileRef = 13444E942CD3F58200A41952 /* RecordAudio.swift */; };
 		137D371C2CD4223500D004B9 /* TextToSpeechManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = 137D371B2CD4222900D004B9 /* TextToSpeechManager.swift */; };
@@ -24,6 +33,11 @@
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
+		1342A02F2CDC2C09005E7E38 /* userHomePage.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = userHomePage.swift; sourceTree = "<group>"; };
+		1342A0322CDC2E88005E7E38 /* GoogleService-Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = "GoogleService-Info.plist"; sourceTree = "<group>"; };
+		1342A03D2CDC32D6005E7E38 /* contentPage.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = contentPage.swift; sourceTree = "<group>"; };
+		1342A03F2CDC3321005E7E38 /* signUpPage.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = signUpPage.swift; sourceTree = "<group>"; };
+		1342A0412CDC336A005E7E38 /* loginPage.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = loginPage.swift; sourceTree = "<group>"; };
 		13444E922CD3F31A00A41952 /* CMUDict_Notecards.json */ = {isa = PBXFileReference; lastKnownFileType = text.json; path = CMUDict_Notecards.json; sourceTree = "<group>"; };
 		13444E942CD3F58200A41952 /* RecordAudio.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RecordAudio.swift; sourceTree = "<group>"; };
 		137D371B2CD4222900D004B9 /* TextToSpeechManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TextToSpeechManager.swift; sourceTree = "<group>"; };
@@ -46,16 +60,28 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				1342A0382CDC3003005E7E38 /* FirebaseDatabase in Frameworks */,
+				1342A0362CDC2FF2005E7E38 /* FirebaseAuth in Frameworks */,
+				1342A03C2CDC3061005E7E38 /* FirebaseCore in Frameworks */,
+				1342A03A2CDC3047005E7E38 /* FirebaseFirestore in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
 /* End PBXFrameworksBuildPhase section */
 
 /* Begin PBXGroup section */
+		1342A0312CDC2D61005E7E38 /* Frameworks */ = {
+			isa = PBXGroup;
+			children = (
+			);
+			name = Frameworks;
+			sourceTree = "<group>";
+		};
 		220741722CB5B4C5004CDBF8 = {
 			isa = PBXGroup;
 			children = (
 				2207417D2CB5B4C5004CDBF8 /* Speechify */,
+				1342A0312CDC2D61005E7E38 /* Frameworks */,
 				2207417C2CB5B4C5004CDBF8 /* Products */,
 			);
 			sourceTree = "<group>";
@@ -71,8 +97,13 @@
 		2207417D2CB5B4C5004CDBF8 /* Speechify */ = {
 			isa = PBXGroup;
 			children = (
+				1342A0412CDC336A005E7E38 /* loginPage.swift */,
+				1342A03F2CDC3321005E7E38 /* signUpPage.swift */,
+				1342A03D2CDC32D6005E7E38 /* contentPage.swift */,
+				1342A0322CDC2E88005E7E38 /* GoogleService-Info.plist */,
 				13E4CBC32CD9A0BF007BF951 /* UserAudioLoader.swift */,
 				137D371B2CD4222900D004B9 /* TextToSpeechManager.swift */,
+				1342A02F2CDC2C09005E7E38 /* userHomePage.swift */,
 				228DDC972CCDA6F400DC9C09 /* NotecardDetail.swift */,
 				13444E942CD3F58200A41952 /* RecordAudio.swift */,
 				22EE94E22CC7E48A00AA858B /* Model */,
@@ -149,6 +180,9 @@
 				Base,
 			);
 			mainGroup = 220741722CB5B4C5004CDBF8;
+			packageReferences = (
+				1342A0342CDC2FBB005E7E38 /* XCRemoteSwiftPackageReference "firebase-ios-sdk" */,
+			);
 			productRefGroup = 2207417C2CB5B4C5004CDBF8 /* Products */;
 			projectDirPath = "";
 			projectRoot = "";
@@ -165,6 +199,7 @@
 			files = (
 				220741862CB5B4C6004CDBF8 /* Preview Assets.xcassets in Resources */,
 				13444E932CD3F31A00A41952 /* CMUDict_Notecards.json in Resources */,
+				1342A0332CDC2E88005E7E38 /* GoogleService-Info.plist in Resources */,
 				228DDC9A2CCDC2FB00DC9C09 /* English.json in Resources */,
 				3DDE73AE2CDC33B500EC8C17 /* Launch Screen.storyboard in Resources */,
 				220741832CB5B4C6004CDBF8 /* Assets.xcassets in Resources */,
@@ -178,14 +213,18 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				1342A0302CDC2C09005E7E38 /* userHomePage.swift in Sources */,
 				13444E952CD3F58200A41952 /* RecordAudio.swift in Sources */,
 				22EE94E62CC7E4C200AA858B /* Deck.swift in Sources */,
 				22EE94E42CC7E4B500AA858B /* Notecard.swift in Sources */,
 				227D747A2CBEB5B100E1492A /* SignInView.swift in Sources */,
 				228DDC982CCDA6F400DC9C09 /* NotecardDetail.swift in Sources */,
 				13E4CBC42CD9A0C4007BF951 /* UserAudioLoader.swift in Sources */,
+				1342A03E2CDC32E0005E7E38 /* contentPage.swift in Sources */,
+				1342A0422CDC336F005E7E38 /* loginPage.swift in Sources */,
 				220741812CB5B4C5004CDBF8 /* NoteCardView.swift in Sources */,
 				2207417F2CB5B4C5004CDBF8 /* SpeechifyApp.swift in Sources */,
+				1342A0402CDC332A005E7E38 /* signUpPage.swift in Sources */,
 				137D371C2CD4223500D004B9 /* TextToSpeechManager.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
@@ -328,7 +367,7 @@
 					"@executable_path/Frameworks",
 				);
 				MARKETING_VERSION = 1.0;
-				PRODUCT_BUNDLE_IDENTIFIER = lkds.Speechify;
+				PRODUCT_BUNDLE_IDENTIFIER = com.Capstone.Speechify;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SWIFT_EMIT_LOC_STRINGS = YES;
 				SWIFT_VERSION = 5.0;
@@ -357,7 +396,7 @@
 					"@executable_path/Frameworks",
 				);
 				MARKETING_VERSION = 1.0;
-				PRODUCT_BUNDLE_IDENTIFIER = lkds.Speechify;
+				PRODUCT_BUNDLE_IDENTIFIER = com.Capstone.Speechify;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SWIFT_EMIT_LOC_STRINGS = YES;
 				SWIFT_VERSION = 5.0;
@@ -387,6 +426,40 @@
 			defaultConfigurationName = Release;
 		};
 /* End XCConfigurationList section */
+
+/* Begin XCRemoteSwiftPackageReference section */
+		1342A0342CDC2FBB005E7E38 /* XCRemoteSwiftPackageReference "firebase-ios-sdk" */ = {
+			isa = XCRemoteSwiftPackageReference;
+			repositoryURL = "https://github.com/firebase/firebase-ios-sdk";
+			requirement = {
+				kind = upToNextMajorVersion;
+				minimumVersion = 11.4.0;
+			};
+		};
+/* End XCRemoteSwiftPackageReference section */
+
+/* Begin XCSwiftPackageProductDependency section */
+		1342A0352CDC2FF2005E7E38 /* FirebaseAuth */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = 1342A0342CDC2FBB005E7E38 /* XCRemoteSwiftPackageReference "firebase-ios-sdk" */;
+			productName = FirebaseAuth;
+		};
+		1342A0372CDC3003005E7E38 /* FirebaseDatabase */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = 1342A0342CDC2FBB005E7E38 /* XCRemoteSwiftPackageReference "firebase-ios-sdk" */;
+			productName = FirebaseDatabase;
+		};
+		1342A0392CDC3047005E7E38 /* FirebaseFirestore */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = 1342A0342CDC2FBB005E7E38 /* XCRemoteSwiftPackageReference "firebase-ios-sdk" */;
+			productName = FirebaseFirestore;
+		};
+		1342A03B2CDC3061005E7E38 /* FirebaseCore */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = 1342A0342CDC2FBB005E7E38 /* XCRemoteSwiftPackageReference "firebase-ios-sdk" */;
+			productName = FirebaseCore;
+		};
+/* End XCSwiftPackageProductDependency section */
 	};
 	rootObject = 220741732CB5B4C5004CDBF8 /* Project object */;
 }

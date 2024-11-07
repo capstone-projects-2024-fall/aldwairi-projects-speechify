@@ -51,6 +51,7 @@ struct NoteCardView: View {
 
                 if searchText.isEmpty {
                     // Show Recent and Favorite lists when no search text
+
                     
                     ScrollView {
                         
@@ -84,6 +85,19 @@ struct NoteCardView: View {
                                 }
                                 .padding(.bottom)
                             }
+
+                    Text("Recents").font(.headline)
+                    List(data.recentNotecards) { item in
+                        NavigationLink(destination: NotecardDetail(notecard: item).environmentObject(ReadData())) {
+                            Text(item.word)
+                        }
+                    }
+                    
+                    Text("Favorites").font(.headline)
+                    List(data.favoriteNotecards) { item in
+                        NavigationLink(destination: NotecardDetail(notecard: item).environmentObject(ReadData())) {
+                            Text(item.word)
+
                         }
                         
                         // Recents Section
@@ -155,7 +169,7 @@ struct NoteCardView: View {
                 } else {
                     // Show filtered search results when there is search text
                     List(filteredNotecards) { item in
-                        NavigationLink(destination: NotecardDetail(notecard: item)) {
+                        NavigationLink(destination: NotecardDetail(notecard: item).environmentObject(ReadData())) {
                             Text(item.word)
                         }
                     }
