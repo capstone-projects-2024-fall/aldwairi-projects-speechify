@@ -29,6 +29,7 @@
 		228DDC9A2CCDC2FB00DC9C09 /* English.json in Resources */ = {isa = PBXBuildFile; fileRef = 228DDC992CCDC2FB00DC9C09 /* English.json */; };
 		22EE94E42CC7E4B500AA858B /* Notecard.swift in Sources */ = {isa = PBXBuildFile; fileRef = 22EE94E32CC7E4B500AA858B /* Notecard.swift */; };
 		22EE94E62CC7E4C200AA858B /* Deck.swift in Sources */ = {isa = PBXBuildFile; fileRef = 22EE94E52CC7E4C200AA858B /* Deck.swift */; };
+		3DDE73AE2CDC33B500EC8C17 /* Launch Screen.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = 3DDE73AD2CDC33B500EC8C17 /* Launch Screen.storyboard */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
@@ -51,6 +52,7 @@
 		228DDC992CCDC2FB00DC9C09 /* English.json */ = {isa = PBXFileReference; lastKnownFileType = text.json; path = English.json; sourceTree = "<group>"; };
 		22EE94E32CC7E4B500AA858B /* Notecard.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Notecard.swift; sourceTree = "<group>"; };
 		22EE94E52CC7E4C200AA858B /* Deck.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Deck.swift; sourceTree = "<group>"; };
+		3DDE73AD2CDC33B500EC8C17 /* Launch Screen.storyboard */ = {isa = PBXFileReference; lastKnownFileType = file.storyboard; path = "Launch Screen.storyboard"; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -112,6 +114,7 @@
 				227D74792CBEB5B100E1492A /* SignInView.swift */,
 				228DDC992CCDC2FB00DC9C09 /* English.json */,
 				13444E922CD3F31A00A41952 /* CMUDict_Notecards.json */,
+				3DDE73AD2CDC33B500EC8C17 /* Launch Screen.storyboard */,
 			);
 			path = Speechify;
 			sourceTree = "<group>";
@@ -198,6 +201,7 @@
 				13444E932CD3F31A00A41952 /* CMUDict_Notecards.json in Resources */,
 				1342A0332CDC2E88005E7E38 /* GoogleService-Info.plist in Resources */,
 				228DDC9A2CCDC2FB00DC9C09 /* English.json in Resources */,
+				3DDE73AE2CDC33B500EC8C17 /* Launch Screen.storyboard in Resources */,
 				220741832CB5B4C6004CDBF8 /* Assets.xcassets in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
