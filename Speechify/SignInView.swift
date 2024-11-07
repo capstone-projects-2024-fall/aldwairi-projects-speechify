@@ -8,15 +8,8 @@
 import SwiftUI
 
 struct SignInView: View {
-    
-    @EnvironmentObject var data: ReadData
-    
     var body: some View {
-        NavigationView {
-            NavigationLink(destination: NoteCardView(), label: {
-                Text("Sign in!")
-            })
-        }
+        Text("Sign in!")
     }
 }
 
