@@ -10,7 +10,7 @@ import SwiftUI
 struct NoteCardView: View {
     @ObservedObject var data = ReadData()
     @State private var searchText: String = ""  // To track search input
-
+    @StateObject private var pointsManager = PointsManager()
     // Computed property to filter notecards based on search
     var filteredNotecards: [Notecard] {
         if searchText.isEmpty {
@@ -23,6 +23,13 @@ struct NoteCardView: View {
     var body: some View {
         NavigationView {
             VStack {
+                //Points Label
+                Text("Points: \(pointsManager.points)")
+                    .padding(.top, -20)
+                    .frame(maxWidth: .infinity, alignment: .trailing)
+                    .padding(.trailing)
+                
+                
                 // Search Bar
                 TextField("Search...", text: $searchText)
                     .textFieldStyle(RoundedBorderTextFieldStyle())

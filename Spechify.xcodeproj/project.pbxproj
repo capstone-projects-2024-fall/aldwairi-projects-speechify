@@ -29,6 +29,7 @@
 		228DDC9A2CCDC2FB00DC9C09 /* English.json in Resources */ = {isa = PBXBuildFile; fileRef = 228DDC992CCDC2FB00DC9C09 /* English.json */; };
 		22EE94E42CC7E4B500AA858B /* Notecard.swift in Sources */ = {isa = PBXBuildFile; fileRef = 22EE94E32CC7E4B500AA858B /* Notecard.swift */; };
 		22EE94E62CC7E4C200AA858B /* Deck.swift in Sources */ = {isa = PBXBuildFile; fileRef = 22EE94E52CC7E4C200AA858B /* Deck.swift */; };
+		ED8147092CDD12F10059429C /* PointsManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = ED8147082CDD12E70059429C /* PointsManager.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
@@ -51,6 +52,7 @@
 		228DDC992CCDC2FB00DC9C09 /* English.json */ = {isa = PBXFileReference; lastKnownFileType = text.json; path = English.json; sourceTree = "<group>"; };
 		22EE94E32CC7E4B500AA858B /* Notecard.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Notecard.swift; sourceTree = "<group>"; };
 		22EE94E52CC7E4C200AA858B /* Deck.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Deck.swift; sourceTree = "<group>"; };
+		ED8147082CDD12E70059429C /* PointsManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PointsManager.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -95,6 +97,7 @@
 		2207417D2CB5B4C5004CDBF8 /* Speechify */ = {
 			isa = PBXGroup;
 			children = (
+				ED8147082CDD12E70059429C /* PointsManager.swift */,
 				1342A0412CDC336A005E7E38 /* loginPage.swift */,
 				1342A03F2CDC3321005E7E38 /* signUpPage.swift */,
 				1342A03D2CDC32D6005E7E38 /* contentPage.swift */,
@@ -215,6 +218,7 @@
 				22EE94E42CC7E4B500AA858B /* Notecard.swift in Sources */,
 				227D747A2CBEB5B100E1492A /* SignInView.swift in Sources */,
 				228DDC982CCDA6F400DC9C09 /* NotecardDetail.swift in Sources */,
+				ED8147092CDD12F10059429C /* PointsManager.swift in Sources */,
 				13E4CBC42CD9A0C4007BF951 /* UserAudioLoader.swift in Sources */,
 				1342A03E2CDC32E0005E7E38 /* contentPage.swift in Sources */,
 				1342A0422CDC336F005E7E38 /* loginPage.swift in Sources */,
