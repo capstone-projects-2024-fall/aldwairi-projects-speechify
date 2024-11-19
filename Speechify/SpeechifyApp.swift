@@ -1179,36 +1179,38 @@ struct userHomePageView: View{
         var hasFavouriteField: Bool = false
         guard let isUserID = userHomePageView.isUser?.uid else{return false}
         do{
-            print("Start")
             let isUserDocument = try await Firestore.firestore().collection("users").document(isUserID).getDocument()
             guard isUserDocument.exists else{return false}
-            if isUserDocument.data()?.keys.contains("isFavourites") ?? false{
+            if isUserDocument.data()?.keys.contains("favouriteWords") ?? false{
                 hasFavouriteField.toggle()
-                print("hasFavourite")
-                //try await Firestore.firestore().collection("users").document(isUserID).updateData(["isFavourites": FieldValue.delete()])
-                }
+            }
             if hasFavouriteField{
-                guard let isLanguageFavourites = isUserDocument.data()?["isFavourites"] as? [String:[Int]] else{return false}
-                if let hasLanguageEntry = isLanguageFavourites[isWordLanguage]{
+                guard var isLanguageFavourites = isUserDocument.data()?["favouriteWords"] as? [String:[Int]] else{return false}
+                if var hasLanguageEntry = isLanguageFavourites[isWordLanguage]{
                     if hasLanguageEntry.contains(isLanguageEntryID){
-                        try await Firestore.firestore().collection("users").document(isUserID).setData(["isFavourites.\(isWordLanguage)": FieldValue.arrayRemove([isLanguageEntryID])], merge: true)
-                        if hasLanguageEntry.count == 1{
-                            try await Firestore.firestore().collection("users").document(isUserID).updateData(["isFavourites.\(isWordLanguage)": FieldValue.delete()])
+                        let languageEntryCount = hasLanguageEntry.count
+                        hasLanguageEntry.removeAll{ $0 == isLanguageEntryID}
+                        isLanguageFavourites[isWordLanguage] = hasLanguageEntry
+                        try await Firestore.firestore().collection("users").document(isUserID).setData(["favouriteWords":isLanguageFavourites], merge: true)
+                        if languageEntryCount == 1{
+                            isLanguageFavourites.removeValue(forKey: isWordLanguage)
+                            try await Firestore.firestore().collection("users").document(isUserID).setData(["favouriteWords": isLanguageFavourites], merge: true)
                         }
                     } else{
-                        try await Firestore.firestore().collection("users").document(isUserID).setData(["isFavourites.\(isWordLanguage)": FieldValue.arrayUnion([isLanguageEntryID])], merge: true)
+                        hasLanguageEntry.append(isLanguageEntryID)
+                        isLanguageFavourites[isWordLanguage] = hasLanguageEntry
+                        try await Firestore.firestore().collection("users").document(isUserID).setData(["favouriteWords":isLanguageFavourites], merge: true)
                     }
                 } else{
                     let isUserWord: [String:[Int]] = [isWordLanguage : [isLanguageEntryID]]
-                    try await Firestore.firestore().collection("users").document(isUserID).setData(["isFavourites": isUserWord], merge: true)
+                    try await Firestore.firestore().collection("users").document(isUserID).setData(["favouriteWords": isUserWord], merge: true)
                 }
             } else{
                 let isUserWord: [String:[Int]] = [isWordLanguage : [isLanguageEntryID]]
-                try await Firestore.firestore().collection("users").document(isUserID).setData(["isFavourites": isUserWord], merge: true)
+                try await Firestore.firestore().collection("users").document(isUserID).setData(["favouriteWords": isUserWord], merge: true)
             }
             isFavourite.toggle()
             isFavouriteSet.toggle()
-            print("End")
         } catch{
             print(error.localizedDescription)
         }
