@@ -30,16 +30,19 @@ struct SpeechifyApp: App{
 }
 
 struct contentPageView: View{
+    @State var loginNavigate: Bool = false
+    @State var signupNavigate: Bool = false
+    
     var body: some View{
         NavigationStack{
             VStack{
                 Text("Speechify").font(.largeTitle).multilineTextAlignment(.center).padding(10)
-                NavigationLink(destination: loginPageView()){
-                    Text("Login").padding(5)
-                }.buttonStyle(.bordered).buttonBorderShape(.roundedRectangle(radius: 5)).foregroundStyle(.blue).padding(10)
-                NavigationLink(destination: signUpPageView()){
-                    Text("Sign-Up").padding(5)
-                }.buttonStyle(.bordered).buttonBorderShape(.roundedRectangle(radius: 5)).foregroundStyle(.blue).padding(10)
+                Text("Login").font(.title).padding(10).foregroundStyle(.blue).background(Color(UIColor.systemGray5)).clipShape(RoundedRectangle(cornerRadius: 5)).onTapGesture{loginNavigate.toggle()}.navigationDestination(isPresented: $loginNavigate){
+                    loginPageView().navigationBarBackButtonHidden(true)
+                }
+                Text("Sign-Up").font(.title).padding(10).foregroundStyle(.blue).background(Color(UIColor.systemGray5)).clipShape(RoundedRectangle(cornerRadius: 5)).onTapGesture{signupNavigate.toggle()}.navigationDestination(isPresented: $signupNavigate){
+                    signUpPageView().navigationBarBackButtonHidden(true)
+                }
             }
         }
     }
@@ -232,11 +235,11 @@ struct signUpPageView: View{
                     }
                     if !isNameError && !isEmailError && !isPasswordError && !isPasswordConfirmError{
                         _ = Task{
-                            isRegistrationValid = await validateAndRegisterUser()
+                            isRegistrationValid = await registerCredentials()
                         }
                     }
                 }.padding(10).navigationDestination(isPresented: $isRegistrationValid){
-                    initialUserConfigurationView()
+                    initialUserConfigurationView().navigationBarBackButtonHidden(true)
                 }
                 HStack{
                     Text("Already have an account? ")
@@ -253,32 +256,15 @@ struct signUpPageView: View{
         }
     }
     
-    private func validateAndRegisterUser() async -> Bool{
+    private func registerCredentials() async -> Bool{
         var isValidRegistration: Bool = false
         do{
-            try await Auth.auth().createUser(withEmail: isUserEmail, password: isUserPassword){
-                authResult, error in
-                if let userRegistrationError = error{
-                    print(userRegistrationError.localizedDescription)
-                    return
-                } else{
-                    guard let isUser = authResult?.user else{return}
-                    let isUserProfile = isUser.createProfileChangeRequest()
-                    isUserProfile.displayName = isUserName
-                    isUserProfile.commitChanges{ error in
-                        if let userProfileError = error{
-                            print(userProfileError.localizedDescription)
-                            return
-                        } else{
-                            print("Set Successfully")
-                        }
-                    }
-                }
-            }
-            let isDataBase = Firestore.firestore()
-            guard let userId = Auth.auth().currentUser?.uid else{return false}
-            try await isDataBase.collection("users").document(userId).setData(["userName": isUserName])
-            isValidRegistration = true
+            let authResult = try await Auth.auth().createUser(withEmail: isUserEmail, password: isUserPassword)
+            let isUserProfile = authResult.user.createProfileChangeRequest()
+            isUserProfile.displayName = isUserName
+            try await isUserProfile.commitChanges()
+            try await Firestore.firestore().collection("users").document(authResult.user.uid).setData(["userName": isUserName])
+            isValidRegistration.toggle()
         } catch{
             print(error.localizedDescription)
         }
@@ -287,29 +273,30 @@ struct signUpPageView: View{
 }
 
 struct initialUserConfigurationView: View{
-    @State private var genderOptionSelection: [String: Bool] = ["Female" : false, "Male" : false, "Other" : false]
-    @State private var isGenderMenuOpen: Bool = false
+    private let ISO639_3: [String:String] = ["Arabic":"ara", "Bengali":"ben", "Bulgarian":"bul", "Czech":"ces", "Dutch":"nid", "English (UK)":"eng_UK", "English (US)":"eng_US", "French":"fra", "German":"deu", "Hindi":"hin", "Indonesian":"ind", "Irish":"gle", "Italian":"ita", "Japanese":"jpn", "Korean":"kor", "Portuguese":"por", "Spanish":"spa", "Russian":"rus", "Swedish":"swe", "Vietnamese":"vie"]
+    @State private var genderOptionSelection: [String:Bool] = ["Female":false, "Male":false, "Other":false]
+    private let dateMonthSelection: [String] = ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"]
+    @State private var nativeOptionSelection: [String: Bool] = ["Arabic":false, "Dutch":false, "English (UK)":false, "English (US)":false, "French":false, "German":false, "Hindi":false, "Italian":false, "Japanese":false, "Korean":false, "Portuguese":false, "Spanish":false, "Russian":false]
+    @State private var learnOptionSelection: [String: Bool] = ["Arabic":false, "Dutch":false, "English (UK)":false, "English (US)":false, "French":false, "German":false, "Hindi":false, "Italian":false, "Japanese":false, "Korean":false, "Portuguese":false, "Spanish":false, "Russian":false]
+    @State private var themeOptionSelection: [String: Bool] = ["Randomize":false, "Greetings":false, "Culture":false]
+    private let dateDaySelection: Range<Int> = 1..<32
+    private var dateYearSelection: Range<Int> = 1900..<2025
     @State private var selectedGender: String = ""
     @State private var isGenderInput: String = ""
-    private var dateDaySelection: Range<Int> = 1..<32
-    @State private var isDayMenuOpen: Bool = false
     @State private var selectedDay: String = ""
-    private var dateMonthSelection: [String] = ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"]
-    @State private var isMonthMenuOpen: Bool = false
     @State private var selectedMonth: String = ""
-    private var dateYearSelection: Range<Int> = 1900..<2025
-    @State private var isYearMenuOpen: Bool = false
     @State private var selectedYear: String = ""
     @State private var selectedBirthday = ""
-    @State private var nativeOptionSelection: [String: Bool] = ["Arabic" : false, "Dutch" : false, "English" : false, "French" : false, "German" : false, "Hindi" : false, "Italian" : false, "Japanese" : false, "Korean" : false, "Portuguese" : false, "Spanish" : false, "Russian" : false]
-    @State private var isNativeMenuOpen: Bool = false
     @State private var selectedNativeLanguage: [String] = []
-    @State private var learnOptionSelection: [String: Bool] = ["Arabic" : false, "Dutch" : false, "English" : false, "French" : false, "German" : false, "Hindi" : false, "Italian" : false, "Japanese" : false, "Korean" : false, "Portuguese" : false, "Spanish" : false, "Russian" : false]
-    @State private var isLearningMenuOpen: Bool = false
     @State private var selectedLearningLanguage: [String] = []
-    @State private var themeOptionSelection: [String: Bool] = ["Randomize" : false, "Greetings" : false, "Culture" : false]
-    @State private var isThemeMenuOpen: Bool = false
     @State private var selectedLanguageTheme: [String] = []
+    @State private var isGenderMenuOpen: Bool = false
+    @State private var isDayMenuOpen: Bool = false
+    @State private var isMonthMenuOpen: Bool = false
+    @State private var isYearMenuOpen: Bool = false
+    @State private var isNativeMenuOpen: Bool = false
+    @State private var isLearningMenuOpen: Bool = false
+    @State private var isThemeMenuOpen: Bool = false
     @State private var showOverlay: Bool = false
     @State private var isLayoutChange: Bool = false
     @State private var hasUserSettings: Bool = false
@@ -435,15 +422,11 @@ struct initialUserConfigurationView: View{
                             isErrorMessage.append(isErrorMessage.isEmpty ? "Language Theme" : ", Language Theme")
                         }
                         if isErrorMessage.isEmpty{
-                            _ = Task{
-                                hasUserSettings = await storeUserSettings()
-                            }
+                            _ = Task{hasUserSettings = await storeUserSettings()}
                         } else{
                             hasSettingError.toggle()
                         }
-                    }.navigationDestination(isPresented: $hasUserSettings){
-                        userHomePageView()
-                    }
+                    }.navigationDestination(isPresented: $hasUserSettings){userHomePageView().navigationBarBackButtonHidden(true)}
                 }.onTapGesture{backgroundOverlayCollapse()}
                 if hasSettingError{
                     VStack{
@@ -483,7 +466,7 @@ struct initialUserConfigurationView: View{
                                 }
                             }
                         }.padding(5).background(Color(UIColor.systemGray4)).clipShape(RoundedRectangle(cornerRadius: 5)).frame(maxWidth: .infinity, alignment: .leading).padding(.leading, 10)
-                    }.offset(y: isLayoutChange ? -143 : -124).frame(height: 100) // ScrollView
+                    }.offset(y: isLayoutChange ? -143 : -124).frame(height: 100)
                 }
                 if isDayMenuOpen{
                     ScrollView{
@@ -542,7 +525,6 @@ struct initialUserConfigurationView: View{
                                     }
                                     if selectedYear.isEmpty{
                                         selectedYear = String(year)
-                                        print(selectedYear)
                                     } else{
                                         selectedYear = ""
                                     }
@@ -564,10 +546,11 @@ struct initialUserConfigurationView: View{
                                 }.padding(5).onTapGesture{
                                     if let isSelected = nativeOptionSelection[key]{
                                         nativeOptionSelection[key] = !isSelected
+                                        guard let isISO639_3 = ISO639_3[key]else{return}
                                         if !isSelected{
-                                            selectedNativeLanguage.append(key)
+                                            selectedNativeLanguage.append(isISO639_3)
                                         } else{
-                                            if let index = selectedNativeLanguage.firstIndex(of: key){
+                                            if let index = selectedNativeLanguage.firstIndex(of: isISO639_3){
                                                 selectedNativeLanguage.remove(at: index)
                                             }
                                         }
@@ -575,7 +558,7 @@ struct initialUserConfigurationView: View{
                                 }
                             }
                         }.padding(5).background(Color(UIColor.systemGray4)).clipShape(RoundedRectangle(cornerRadius: 5)).frame(maxWidth: .infinity, alignment: .leading).padding(.leading, 10)
-                    }.offset(y: isLayoutChange ? 49 : 30).frame(height: 100) // ScrollView
+                    }.offset(y: isLayoutChange ? 49 : 30).frame(height: 100)
                 }
                 if isLearningMenuOpen{
                     ScrollView{
@@ -589,10 +572,11 @@ struct initialUserConfigurationView: View{
                                 }.padding(5).onTapGesture{
                                     if let isSelected = learnOptionSelection[key]{
                                         learnOptionSelection[key] = !isSelected
+                                        guard let isISO639_3 = ISO639_3[key]else{return}
                                         if !isSelected{
-                                            selectedLearningLanguage.append(key)
+                                            selectedLearningLanguage.append(isISO639_3)
                                         } else{
-                                            if let index = selectedLearningLanguage.firstIndex(of: key){
+                                            if let index = selectedLearningLanguage.firstIndex(of: isISO639_3){
                                                 selectedLearningLanguage.remove(at: index)
                                             }
                                         }
@@ -635,13 +619,13 @@ struct initialUserConfigurationView: View{
         var isSettingStored: Bool = false
         do{
             let isDataBase = Firestore.firestore()
-            guard let userId = Auth.auth().currentUser?.uid else{return false}
+            guard let isUserID = Auth.auth().currentUser?.uid else{return false}
             selectedBirthday = "\(selectedDay) \(selectedMonth) \(selectedYear)"
             let isUserSetting: [String: Any] = ["gender" : selectedGender, "birthday" : selectedBirthday, "nativeLanguage" : selectedNativeLanguage, "learnLanguage" : selectedLearningLanguage, "languageTheme" : selectedLanguageTheme]
-            try await isDataBase.collection("users").document(userId).setData(isUserSetting)
+            try await isDataBase.collection("users").document(isUserID).setData(isUserSetting, merge: true)
             isSettingStored = true
         } catch{
-            print(error)
+            print(error.localizedDescription)
         }
         return isSettingStored
     }
@@ -662,25 +646,24 @@ struct initialUserConfigurationView: View{
 
 struct loginPageView: View{
     @State private var isUserEmail: String = ""
-    @FocusState private var isEmailFocus: Bool
-    @State private var isEmailError: Bool = false
-    @State private var emailErrorMessage: String = ""
     @State private var isUserPassword: String = ""
-    @FocusState private var isPasswordFocus: Bool
-    @State private var isPasswordVisible: Bool = false
-    @State private var isPasswordError: Bool = false
-    @State private var passwordErrorMessage: String = ""
-    @State private var isUserValid: Bool = false
-    @State private var isLoginError: Bool = false
-    @State private var isPasswordReset: Bool = false
     @State private var isResetEdit: String = ""
+    @FocusState private var isEmailFocus: Bool
+    @FocusState private var isPasswordFocus: Bool
     @FocusState private var resetEditFocus: Bool
+    @State private var isPasswordVisible: Bool = false
+    @State private var isPasswordReset: Bool = false
+    @State private var isEmailError: Bool = false
+    @State private var isLoginError: Bool = false
+    @State private var isPasswordError: Bool = false
     @State private var resetEditError: Bool = false
+    @State private var emailErrorMessage: String = ""
+    @State private var passwordErrorMessage: String = ""
     @State private var resetEditErrorMessage: String = ""
     @State private var isResetResult: Bool = false
     @State private var isResetMessage: String = ""
     @State private var isResetValid: Bool = false
-    
+    @State private var isUserValid: Bool = false
     
     init(){
         self.isEmailFocus = false
@@ -770,12 +753,11 @@ struct loginPageView: View{
                             isPasswordError = false
                         }
                         if !isEmailError && !isPasswordError{
-                            _ = Task{
-                                isUserValid = await validateCredentials(userEmail: isUserEmail, userPassword: isUserPassword)
-                            }
+                            print("login reached")
+                            _ = Task{isUserValid = await validateCredentials()}
                         }
                     }.padding(10).navigationDestination(isPresented: $isUserValid){
-                        userHomePageView()
+                        userHomePageView().navigationBarBackButtonHidden(true)
                     }
                     if isLoginError{
                         Text("Invalid Email Or Password").foregroundColor(.red).padding(.top, 5)
@@ -845,15 +827,13 @@ struct loginPageView: View{
                                     resetEditError.toggle()
                                 }
                                 if !resetEditError{
-                                    _ = Task{
-                                        isResetValid = await userPasswordReset()
-                                        isResetResult.toggle()
-                                    }
+                                    _ = Task{isResetValid = await userPasswordReset()}
                                     if isResetValid{
                                         isResetEdit = ""
                                         resetEditError = false
                                         resetEditErrorMessage = ""
                                     }
+                                    isResetResult.toggle()
                                     DispatchQueue.main.asyncAfter(deadline: .now() + 5, execute: {isResetResult.toggle()})
                                 }
                             }
@@ -869,41 +849,29 @@ struct loginPageView: View{
         }
     }
     
-    private func validateCredentials(userEmail: String, userPassword: String) async-> Bool{
+    private func validateCredentials() async-> Bool{
+        var isCredentialValid: Bool = false
         do{
-            var areCredentialsValid: Bool = false
-            try await Auth.auth().signIn(withEmail: isUserEmail, password: isUserPassword){
-                authResult, error in
-                if error != nil{
-                    isLoginError.toggle()
-                } else{
-                    if isLoginError {isLoginError.toggle()}
-                    areCredentialsValid.toggle()
-                }
-            }
-            return areCredentialsValid
+            try await Auth.auth().signIn(withEmail: isUserEmail, password: isUserPassword)
+            if isLoginError {isLoginError.toggle()}
+            isCredentialValid.toggle()
         } catch{
-            print("API Call Failed")
+            isLoginError.toggle()
+            print(error.localizedDescription)
         }
+        return isCredentialValid
     }
     
     private func userPasswordReset() async ->Bool{
+        var isResetPasswordSent: Bool = false
         do{
-            var isResetPasswordSent: Bool = false
-            try await Auth.auth().sendPasswordReset(withEmail: isResetEdit){ // Doesnt check if email is part of the databse
-                error in
-                if let passwordResetError = error{
-                    isResetMessage = passwordResetError.localizedDescription
-                    print(isResetMessage)
-                } else{
-                    isResetMessage = "Email Successfully Sent"
-                    isResetPasswordSent.toggle()
-                }
-            }
-            return isResetPasswordSent
+            try await Auth.auth().sendPasswordReset(withEmail: isResetEdit) // Doesnt check if email is part of the databse
+            isResetMessage = "Email Successfully Sent"
+            isResetPasswordSent.toggle()
         } catch{
-            print("API Call Failed")
+            isResetMessage = error.localizedDescription
         }
+        return isResetPasswordSent
     }
 }
 
@@ -924,16 +892,31 @@ class AudioPlayerDelegate: NSObject, AVAudioPlayerDelegate{
 }
 
 struct userHomePageView: View{
+    @State private var isInitialLoad = true
     static let isUser = Auth.auth().currentUser
     @State private var isAuthenticationInvalid: Bool = false
-    @State private var isUserName: String = ""
+    @State private var isCardWord: Bool = true
+    @State private var isFavourite: Bool = false
+    @State private var isLearnLanguages: [String] = []
+    @State private var isWordLanguage: String = ""
+    @State private var isWord: String = "Word"
+    @State private var isPhonetic: String = "Phonetic-Spelling"
+    @State private var isPronunciation: String = ""
+    @State private var isLanguageEntryID: Int = 0
+    @State private var isPreviousWords: [String:[Int]] = [:]
+    @State private var indexingPreviousWords: (isLanguage: String, isIndex: Int, isCurrent: Bool) = ("", -1, false)
+    @State private var isLanguageIndex: Int = -1
+    @State private var isSpeechSynthesizer: AVSpeechSynthesizer?
+    @State private var speechSynthesizerLanguages: [String] = []
+    
+    
     @State private var hasUserImage: Bool = false
-    @State private var isThemeNavigation: Bool = false
     @State private var viewSettings: Bool = false
     @State private var isProfileNavigation: Bool = false
     @State private var isStoreNavigation: Bool = false
     @State private var isFavouritesNavigation: Bool = false
     @State private var isSettingNavigation: Bool = false
+    @State private var isThemeNavigation: Bool = false
     @State private var hasMicrophoneAccess: Bool = false
     @State private var isAudioRecording: Bool = false
     @State private var hasRecorderError: Bool = false
@@ -953,7 +936,7 @@ struct userHomePageView: View{
     @State private var isAudioDelegate: AudioPlayerDelegate?
     
     init(){
-        guard let hasUser = userHomePageView.isUser else{
+        guard userHomePageView.isUser != nil else{
             isAuthenticationInvalid.toggle()
             return
         }
@@ -972,7 +955,30 @@ struct userHomePageView: View{
                             Image(systemName:"person.circle.fill").resizable().scaledToFit().frame(width: 50, height: 50).onTapGesture{viewSettings.toggle()}
                         }.frame(maxWidth: .infinity, alignment: .trailing).padding(.trailing, 10)
                     }
-                    wordCard().padding(.top, 50)
+                    VStack{
+                        ZStack{
+                            VStack{
+                                HStack{
+                                    if isCardWord{
+                                        Image(systemName: isFavourite ? "star.fill" : "star").resizable().scaledToFit().frame(width: 25, height: 25).padding(.top, 5).onTapGesture{
+                                            //isFavourite.toggle()
+                                            _ = Task{ _ = await isWordFavourite()}
+                                        }
+                                    }
+                                }.frame(maxWidth: .infinity, alignment: .trailing).padding(.trailing, 5)
+                            }.frame(maxHeight: .infinity, alignment: .top)
+                            Text(isCardWord ? "\(isWord)" : "\(isPhonetic)").rotation3DEffect(.degrees(isCardWord ? 0 : 180), axis: (x: 0, y: 1, z: 0))
+                            VStack{
+                                HStack{
+                                    if isCardWord{
+                                        Image(systemName: "speaker.wave.3.fill").resizable().scaledToFit().frame(width: 25, height: 25).padding(.bottom, 5)
+                                    }
+                                }.frame(maxWidth: .infinity, alignment: .trailing).padding(.trailing, 5)
+                            }.frame(maxHeight: .infinity, alignment: .bottom)
+                        }
+                    }.frame(width: 375, height: 200).background(Color(UIColor.systemGray5)).clipShape(RoundedRectangle(cornerRadius: 10)).rotation3DEffect(.degrees(isCardWord ? 0 : 180), axis: (x: 0, y: 1, z: 0)).onTapGesture{
+                        withAnimation(.linear(duration: 1)){isCardWord.toggle()}
+                    }.padding(.top, 50)
                     HStack{ //Will extend more on pausing and handling interruptions later.
                         HStack{
                             Image(systemName: isAudioPlaying ? "play.circle.fill" : "play.circle").resizable().scaledToFit().frame(width: 50, height: 50)
@@ -994,12 +1000,28 @@ struct userHomePageView: View{
                             if isAudioRecording{
                                 isAudioRecorder?.stop()
                                 isAudioRecording.toggle()
+                                var isTranslation = speechToText()
                             } else{
                                 _ = Task{hasRecorderError = await getUserRecording()}
                             }
                         }
                     }.padding(10)
-                }.frame(maxHeight: .infinity, alignment: .top).navigationDestination(isPresented: $isAuthenticationInvalid){contentPageView()}
+                    VStack{
+                        Text("Transcribed Audio: \(isAudioText)")
+                    }
+                    Text("Test").padding(10).foregroundStyle(.blue).background(Color(UIColor.systemGray5)).clipShape(RoundedRectangle(cornerRadius: 5)).onTapGesture{
+                        //_ = Task{ var testing = await uploadFile()}
+                    }
+                }.frame(maxHeight: .infinity, alignment: .top).navigationDestination(isPresented: $isAuthenticationInvalid){contentPageView().navigationBarBackButtonHidden(true)}.task{
+                    if isInitialLoad{
+                        do{
+                            _ = try await initialLoading()
+                            isInitialLoad.toggle()
+                        } catch{
+                            print(error.localizedDescription)
+                        }
+                    }
+                }
             }.overlay{
                 if viewSettings{
                     VStack{
@@ -1027,6 +1049,206 @@ struct userHomePageView: View{
                 }
             }
         }
+    }
+    
+    private func initialLoading()async throws->Bool{
+        var isPropertySet: Bool = false
+        guard let isUserID = userHomePageView.isUser?.uid else{return false}
+        do{
+            let isUserDocument = try await Firestore.firestore().collection("users").document(isUserID).getDocument()
+            guard isUserDocument.exists else{return false}
+            guard let getLearnLanguageField = isUserDocument.data()?["learnLanguage"] as? [String] else{return false}
+            isLearnLanguages = getLearnLanguageField
+            guard let getWordLanguage = getLearnLanguageField.randomElement() else{return false}
+            isWordLanguage = getWordLanguage
+            let isEntriesCount = 39849 + 1 // get actual size
+            let isRandomID = Int.random(in: 0...isEntriesCount)
+            let isRandomEntry = try await Firestore.firestore().collection(isWordLanguage).document(String(isRandomID)).getDocument()
+            guard isRandomEntry.exists else{return false}
+            isLanguageEntryID = isRandomID
+            guard let getWordField = isRandomEntry.data()?["isWord"] as? String else{return false}
+            isWord = getWordField
+            guard let getPhoneticField = isRandomEntry.data()?["isPhonetic"] as? String else{return false}
+            isPhonetic = getPhoneticField
+            guard let getPronunciationField = isRandomEntry.data()?["isPronunciation"] as? String else{return false}
+            isPronunciation = getPronunciationField
+            isPropertySet.toggle()
+        } catch{
+            print(error.localizedDescription)
+        }
+        //let isLanguageEntries = try await isDataBase.collection("en_US").getDocuments()
+        //let isEntriesCount = isLanguageEntries.count
+        return isPropertySet
+    }
+    
+    private func navigateWordSelection(navigationChoice: String)async->Bool{
+        var hasNavigated: Bool = false
+        if navigationChoice == "preceding"{
+            if isPreviousWords.isEmpty || isLanguageIndex == -1 {return true}
+            if indexingPreviousWords.isLanguage == ""{
+                isLanguageIndex = isPreviousWords.count
+                indexingPreviousWords.isLanguage = Array(isPreviousWords.keys)[isLanguageIndex - 1]
+                indexingPreviousWords.isIndex = isPreviousWords[indexingPreviousWords.isLanguage]?.count ?? -1 - 1
+            } else{
+                indexingPreviousWords.isIndex -= 1
+                if indexingPreviousWords.isIndex == -1 && isLanguageIndex > 0{
+                    isLanguageIndex -= 1
+                    indexingPreviousWords.isLanguage = Array(isPreviousWords.keys)[isLanguageIndex - 1]
+                    indexingPreviousWords.isIndex = isPreviousWords[indexingPreviousWords.isLanguage]?.count ?? -1 - 1
+                }
+            }
+            do{
+                let isPreviousEntry = try await Firestore.firestore().collection(indexingPreviousWords.isLanguage).document(String(indexingPreviousWords.isIndex)).getDocument()
+                guard isPreviousEntry.exists else{return false}
+                guard let getWordField = isPreviousEntry.data()?["isWord"] as? String else{return false}
+                isWord = getWordField
+                guard let getPhoneticField = isPreviousEntry.data()?["isPhonetic"] as? String else{return false}
+                isPhonetic = getPhoneticField
+                guard let getPronunciationField = isPreviousEntry.data()?["isPronunciation"] as? String else{return false}
+                isPronunciation = getPronunciationField
+                hasNavigated.toggle()
+            } catch{
+                print(error.localizedDescription)
+            }
+        } else if navigationChoice == "proceeding"{
+            if indexingPreviousWords.isCurrent{
+                let isPreviousCount = isPreviousWords.values.reduce(0){$0 + $1.count}
+                if isPreviousCount == 10{
+                    guard let firstEntry = isPreviousWords.keys.first else{return false}
+                    guard var entryIndexes = isPreviousWords[firstEntry] else{return false}
+                    entryIndexes.removeFirst()
+                    isPreviousWords[firstEntry] = entryIndexes
+                }
+                if var isIndexes =  isPreviousWords[isWordLanguage]{
+                    isIndexes.append(isLanguageEntryID)
+                    isPreviousWords[isWordLanguage] = isIndexes
+                } else{
+                    isPreviousWords[isWordLanguage] = [isLanguageEntryID]
+                }
+                do{
+                    guard let getLanguage = isLearnLanguages.randomElement() else{return false}
+                    isWordLanguage = getLanguage
+                    let isEntriesCount = 39849 + 1
+                    let isRandomID = Int.random(in: 0...isEntriesCount)
+                    let isRandomEntry = try await Firestore.firestore().collection(isWordLanguage).document(String(isRandomID)).getDocument()
+                    guard isRandomEntry.exists else{return false}
+                    isLanguageEntryID = isRandomID
+                    guard let getWordField = isRandomEntry.data()?["isWord"] as? String else{return false}
+                    isWord = getWordField
+                    guard let getPhoneticField = isRandomEntry.data()?["isPhonetic"] as? String else{return false}
+                    isPhonetic = getPhoneticField
+                    guard let getPronunciationField = isRandomEntry.data()?["isPronunciation"] as? String else{return false}
+                    isPronunciation = getPronunciationField
+                    hasNavigated.toggle()
+                } catch{
+                    print(error.localizedDescription)
+                }
+            } else{
+                var getCurrentWord: Bool = false
+                indexingPreviousWords.isIndex += indexingPreviousWords.isIndex <= isPreviousWords[indexingPreviousWords.isLanguage]?.count ?? -1 ? 1 : 0
+                if indexingPreviousWords.isIndex == isPreviousWords[indexingPreviousWords.isLanguage]?.count ?? -1{
+                    isLanguageIndex += 1
+                    if isLanguageIndex < Array(isPreviousWords.keys).count{
+                        indexingPreviousWords.isLanguage = Array(isPreviousWords.keys)[isLanguageIndex - 1]
+                        indexingPreviousWords.isIndex = 0
+                    } else{
+                        getCurrentWord.toggle()
+                    }
+                }
+                do{
+                    let isPreviousEntry = try await Firestore.firestore().collection(getCurrentWord ? isWordLanguage : indexingPreviousWords.isLanguage).document(getCurrentWord ? String(isLanguageEntryID) : String(indexingPreviousWords.isIndex)).getDocument()
+                    guard isPreviousEntry.exists else{return false}
+                    guard let getWordField = isPreviousEntry.data()?["isWord"] as? String else{return false}
+                    isWord = getWordField
+                    guard let getPhoneticField = isPreviousEntry.data()?["isPhonetic"] as? String else{return false}
+                    isPhonetic = getPhoneticField
+                    guard let getPronunciationField = isPreviousEntry.data()?["isPronunciation"] as? String else{return false}
+                    isPronunciation = getPronunciationField
+                    hasNavigated.toggle()
+                } catch{
+                    print(error.localizedDescription)
+                }
+                if getCurrentWord {indexingPreviousWords.isCurrent.toggle()}
+            }
+        }
+        return hasNavigated
+    }
+    
+    private func isWordFavourite() async -> Bool{
+        var isFavouriteSet: Bool = false
+        var hasFavouriteField: Bool = false
+        guard let isUserID = userHomePageView.isUser?.uid else{return false}
+        do{
+            print("Start")
+            let isUserDocument = try await Firestore.firestore().collection("users").document(isUserID).getDocument()
+            guard isUserDocument.exists else{return false}
+            if isUserDocument.data()?.keys.contains("isFavourites") ?? false{
+                hasFavouriteField.toggle()
+                print("hasFavourite")
+                //try await Firestore.firestore().collection("users").document(isUserID).updateData(["isFavourites": FieldValue.delete()])
+                }
+            if hasFavouriteField{
+                guard let isLanguageFavourites = isUserDocument.data()?["isFavourites"] as? [String:[Int]] else{return false}
+                if let hasLanguageEntry = isLanguageFavourites[isWordLanguage]{
+                    if hasLanguageEntry.contains(isLanguageEntryID){
+                        try await Firestore.firestore().collection("users").document(isUserID).setData(["isFavourites.\(isWordLanguage)": FieldValue.arrayRemove([isLanguageEntryID])], merge: true)
+                        if hasLanguageEntry.count == 1{
+                            try await Firestore.firestore().collection("users").document(isUserID).updateData(["isFavourites.\(isWordLanguage)": FieldValue.delete()])
+                        }
+                    } else{
+                        try await Firestore.firestore().collection("users").document(isUserID).setData(["isFavourites.\(isWordLanguage)": FieldValue.arrayUnion([isLanguageEntryID])], merge: true)
+                    }
+                } else{
+                    let isUserWord: [String:[Int]] = [isWordLanguage : [isLanguageEntryID]]
+                    try await Firestore.firestore().collection("users").document(isUserID).setData(["isFavourites": isUserWord], merge: true)
+                }
+            } else{
+                let isUserWord: [String:[Int]] = [isWordLanguage : [isLanguageEntryID]]
+                try await Firestore.firestore().collection("users").document(isUserID).setData(["isFavourites": isUserWord], merge: true)
+            }
+            isFavourite.toggle()
+            isFavouriteSet.toggle()
+            print("End")
+        } catch{
+            print(error.localizedDescription)
+        }
+        return isFavouriteSet
+    }
+    
+    private func accessAudioFile(){}
+    
+    private func generatePhoneticSpelling()->Bool{
+        var isPhoneticGenerated: Bool = false
+        return isPhoneticGenerated
+    }
+    
+    private func generatePronunciation()->Bool{
+        var isPronunciationGenerated: Bool = false
+        return isPronunciationGenerated
+    }
+    
+    private func textToSpeech()->Bool{ // Allow user to change male or female voice
+        var isTextSynthesized: Bool = false
+        let isSpeechUtterance = AVSpeechUtterance(string: isWord)
+        for isVoice in AVSpeechSynthesisVoice.speechVoices(){
+            if !speechSynthesizerLanguages.contains(isVoice.language){
+                speechSynthesizerLanguages.append(isVoice.language)
+            }
+        }
+        if !speechSynthesizerLanguages.contains(isWordLanguage){return false}
+        isSpeechUtterance.voice = AVSpeechSynthesisVoice(language: isWordLanguage)
+        isSpeechUtterance.rate = 0.5 // Add a function for user to modify
+        isSpeechUtterance.pitchMultiplier = 1.0 // Add function for user to modify
+        isSpeechSynthesizer = AVSpeechSynthesizer()
+        isSpeechSynthesizer?.speak(isSpeechUtterance)
+        isTextSynthesized.toggle()
+        return isTextSynthesized
+    }
+    
+    private func endTextToSpeech(){
+        //if isSpeechSynthesizer?.isSpeaking{
+            isSpeechSynthesizer?.stopSpeaking(at: .immediate)
+        //}
     }
     
     private func playUserRecording()->Bool{
@@ -1159,78 +1381,31 @@ struct userHomePageView: View{
         }
         return isSignOutValid
     }
-}
-
-struct wordCard: View{
-    @State private var isCardWord: Bool = true
-    @State private var isFavourite: Bool = false
-    @State private var isWord: String = "Word"
-    @State private var isWordLanguage: String = ""
-    @State private var isPhoneticSpelling: String = "Phonetic-Spelling"
-    @State private var previousWords: [String] = []
-    @State private var isSpeechSynthesizer: AVSpeechSynthesizer?
-    @State private var speechSynthesizerLanguages: [String] = []
     
-    var body: some View{
-        VStack{
-            VStack{
-                ZStack{
-                    VStack{
-                        HStack{
-                            if isCardWord{
-                                Image(systemName: isFavourite ? "star.fill" : "star").resizable().scaledToFit().frame(width: 25, height: 25).padding(.top, 5).onTapGesture{
-                                    isFavourite.toggle()
-                                }
-                            }
-                        }.frame(maxWidth: .infinity, alignment: .trailing).padding(.trailing, 5)
-                    }.frame(maxHeight: .infinity, alignment: .top)
-                    Text(isCardWord ? "\(isWord)" : "\(isPhoneticSpelling)").rotation3DEffect(.degrees(isCardWord ? 0 : 180), axis: (x: 0, y: 1, z: 0))
-                    VStack{
-                        HStack{
-                            if isCardWord{
-                                Image(systemName: "speaker.wave.3.fill").resizable().scaledToFit().frame(width: 25, height: 25).padding(.bottom, 5)
-                            }
-                        }.frame(maxWidth: .infinity, alignment: .trailing).padding(.trailing, 5)
-                    }.frame(maxHeight: .infinity, alignment: .bottom)
-                }
-            }.frame(width: 375, height: 200).background(Color(UIColor.systemGray5)).clipShape(RoundedRectangle(cornerRadius: 10)).rotation3DEffect(.degrees(isCardWord ? 0 : 180), axis: (x: 0, y: 1, z: 0)).onTapGesture{
-                withAnimation(.linear(duration: 1)){
-                    isCardWord.toggle()
-                }
+    private func uploadFile() async -> Bool{
+        var isUploadSucess: Bool = false
+        guard let sourceFileURL = Bundle.main.url(forResource: "eng_US", withExtension: "json") else{print("File not found")
+        return false}
+        var sourceJSONObject: [[String: Any]]?
+        do{
+            let isSourceData = try Data(contentsOf: sourceFileURL)
+            sourceJSONObject = try JSONSerialization.jsonObject(with: isSourceData, options: []) as? [[String:Any]]
+        } catch{
+            print(error.localizedDescription)
+        }
+        guard let hasSourceJSON = sourceJSONObject else{return false}
+        let isDataBase = Firestore.firestore()
+        for entry in hasSourceJSON{
+            guard let entryID = entry["isID"] as? Int else{break}
+            let isDocumentID = String(entryID)
+            do{
+                try await isDataBase.collection("eng_US").document(isDocumentID).setData(entry, merge: true)
+                isUploadSucess = true
+            } catch{
+                print(error)
             }
         }
-    }
-    private func initialLoading(){}
-    private func retrievePreviousWord(){}
-    private func expandFavourite() -> Bool{
-        return true
-    }
-    private func accessAudioFile(){}
-    private func fetchNextWord(){}
-    private func generatePhoneticSpelling(){}
-    
-    private func textToSpeech()->Bool{ // Allow user to change male or female voice
-        var isTextSynthesized: Bool = false
-        let isSpeechUtterance = AVSpeechUtterance(string: isWord)
-        //check if the word language is available for synthesizer
-        for isVoice in AVSpeechSynthesisVoice.speechVoices(){
-            if !speechSynthesizerLanguages.contains(isVoice.language){
-                speechSynthesizerLanguages.append(isVoice.language)
-            }
-        }
-        if !speechSynthesizerLanguages.contains(isWordLanguage){return false}
-        isSpeechUtterance.voice = AVSpeechSynthesisVoice(language: isWordLanguage)
-        isSpeechUtterance.rate = 0.5 // Add a function for user to modify
-        isSpeechUtterance.pitchMultiplier = 1.0 // Add function for user to modify
-        isSpeechSynthesizer = AVSpeechSynthesizer()
-        isSpeechSynthesizer?.speak(isSpeechUtterance)
-        return isTextSynthesized
-    }
-    
-    private func endTextToSpeech(){
-        //if isSpeechSynthesizer?.isSpeaking{
-            isSpeechSynthesizer?.stopSpeaking(at: .immediate)
-        //}
+        return isUploadSucess
     }
 }
 
@@ -1980,5 +2155,5 @@ struct userSettingView: View{
 }
 
 #Preview{
-    userHomePageView()
+    contentPageView()
 }
