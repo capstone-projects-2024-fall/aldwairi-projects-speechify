@@ -949,54 +949,53 @@ struct userHomePageView: View{
                     HStack{
                         HStack{
                             Image(systemName:"square.grid.2x2.fill").resizable().scaledToFit().frame(width: 50, height: 50)
-                        }.frame(maxWidth: .infinity, alignment: .leading).padding(.leading, 10).onTapGesture{isThemeNavigation.toggle()}.navigationDestination(isPresented: $isThemeNavigation){userThemeSelectionView()}
+                        }.frame(maxWidth: .infinity, alignment: .leading).padding(.leading, 10).onTapGesture{isThemeNavigation.toggle()}.navigationDestination(isPresented: $isThemeNavigation){languageThemeView().navigationBarBackButtonHidden(true)}
                         HStack{
-                            Image(systemName: "plus").resizable().scaledToFit().frame(width: 50, height: 50).padding(.trailing, 5)
-                            Image(systemName:"person.circle.fill").resizable().scaledToFit().frame(width: 50, height: 50).onTapGesture{viewSettings.toggle()}
-                        }.frame(maxWidth: .infinity, alignment: .trailing).padding(.trailing, 10)
-                    }
+                            Image(systemName:"person.circle.fill").resizable().scaledToFit().frame(width: 50, height: 50)
+                        }.frame(maxWidth: .infinity, alignment: .trailing).padding(.trailing, 10).onTapGesture{viewSettings.toggle()}
+                    }.frame(maxHeight: .infinity, alignment:.top).padding(.top, 10)
                     VStack{
-                        ZStack{
-                            VStack{
-                                HStack{
-                                    if isCardWord{
-                                        Image(systemName: isFavourite ? "star.fill" : "star").resizable().scaledToFit().frame(width: 25, height: 25).padding(.top, 5).onTapGesture{
-                                            //isFavourite.toggle()
-                                            _ = Task{ _ = await isWordFavourite()}
-                                        }
+                        VStack{
+                            HStack{
+                                if isCardWord{
+                                    Image(systemName: isFavourite ? "star.fill" : "star").resizable().scaledToFit().frame(width: 25, height: 25).padding(.top, 5).onTapGesture{
+                                        _ = Task{ _ = await isWordFavourite()}
                                     }
-                                }.frame(maxWidth: .infinity, alignment: .trailing).padding(.trailing, 5)
-                            }.frame(maxHeight: .infinity, alignment: .top)
-                            Text(isCardWord ? "\(isWord)" : "\(isPhonetic)").rotation3DEffect(.degrees(isCardWord ? 0 : 180), axis: (x: 0, y: 1, z: 0))
-                            VStack{
-                                HStack{
-                                    if isCardWord{
-                                        Image(systemName: "speaker.wave.3.fill").resizable().scaledToFit().frame(width: 25, height: 25).padding(.bottom, 5)
-                                    }
-                                }.frame(maxWidth: .infinity, alignment: .trailing).padding(.trailing, 5)
-                            }.frame(maxHeight: .infinity, alignment: .bottom)
-                        }
+                                }
+                            }.frame(maxWidth: .infinity, alignment: .trailing).padding(.trailing, 5)
+                        }.frame(maxHeight: .infinity, alignment: .top)
+                        Text(isCardWord ? "\(isWord)" : "\(isPhonetic)").rotation3DEffect(.degrees(isCardWord ? 0 : 180), axis: (x: 0, y: 1, z: 0))
+                        VStack{
+                            HStack{
+                                if isCardWord{
+                                    Image(systemName: "speaker.wave.3.fill").resizable().scaledToFit().frame(width: 25, height: 25).padding(.bottom, 5)
+                                }
+                            }.frame(maxWidth: .infinity, alignment: .trailing).padding(.trailing, 5)
+                        }.frame(maxHeight: .infinity, alignment: .bottom)
                     }.frame(width: 375, height: 200).background(Color(UIColor.systemGray5)).clipShape(RoundedRectangle(cornerRadius: 10)).rotation3DEffect(.degrees(isCardWord ? 0 : 180), axis: (x: 0, y: 1, z: 0)).onTapGesture{
                         withAnimation(.linear(duration: 1)){isCardWord.toggle()}
-                    }.padding(.top, 50)
+                    }.padding(.vertical, 10)
                     HStack{ //Will extend more on pausing and handling interruptions later.
+                        HStack{
+                            Image(systemName: "arrowshape.left.fill").resizable().scaledToFit().frame(width: 50, height: 50)
+                        }.frame(maxWidth: .infinity, alignment: .leading).padding(.leading, 10).onTapGesture{
+                            _ = Task{_ = await navigateWordSelection(navigationChoice: "preceding")}
+                        }
                         HStack{
                             Image(systemName: isAudioPlaying ? "play.circle.fill" : "play.circle").resizable().scaledToFit().frame(width: 50, height: 50)
                         }.onTapGesture{
                             if isAudioPlaying{
                                 //isAudioPlayer?.pause()
-                                
                             } else{
                                 hasPlayerError = playUserRecording()
                             }
-                            
                         }
                         HStack{
                             Image(systemName: "stop.circle").resizable().scaledToFit().frame(width: 50, height: 50)
                         }
                         HStack{
                             Image(systemName: isAudioRecording ? "mic.circle.fill" : "mic.circle").resizable().scaledToFit().frame(width: 50, height: 50)
-                        }.onTapGesture {
+                        }.onTapGesture{
                             if isAudioRecording{
                                 isAudioRecorder?.stop()
                                 isAudioRecording.toggle()
@@ -1005,20 +1004,40 @@ struct userHomePageView: View{
                                 _ = Task{hasRecorderError = await getUserRecording()}
                             }
                         }
-                    }.padding(10)
+                        HStack{
+                            Image(systemName: "arrowshape.right.fill").resizable().scaledToFit().frame(width: 50, height: 50)
+                        }.frame(maxWidth: .infinity, alignment: .trailing).padding(.trailing, 10).onTapGesture{
+                            _ = Task{_ = await navigateWordSelection(navigationChoice: "proceeding")}
+                        }
+                    }.padding(.vertical, 10)
                     VStack{
                         Text("Transcribed Audio: \(isAudioText)")
-                    }
-                    Text("Test").padding(10).foregroundStyle(.blue).background(Color(UIColor.systemGray5)).clipShape(RoundedRectangle(cornerRadius: 5)).onTapGesture{
-                        //_ = Task{ var testing = await uploadFile()}
-                    }
-                }.frame(maxHeight: .infinity, alignment: .top).navigationDestination(isPresented: $isAuthenticationInvalid){contentPageView().navigationBarBackButtonHidden(true)}.task{
+                    }.frame(width: 375, height: 275).background(Color(UIColor.systemGray5)).clipShape(RoundedRectangle(cornerRadius: 5)).padding(.vertical, 10)
+                    HStack{
+                        HStack{
+                            Image(systemName:"house.fill").resizable().scaledToFit().frame(width: 50, height: 50)
+                        }.padding(.horizontal, 10).onTapGesture{isThemeNavigation.toggle()}.navigationDestination(isPresented: $isThemeNavigation){languageThemeView().navigationBarBackButtonHidden(true)}
+                        HStack{
+                            Image(systemName:"heart.fill").resizable().scaledToFit().frame(width: 50, height: 50)
+                        }.padding(.horizontal, 10).onTapGesture{isFavouritesNavigation.toggle()}.navigationDestination(isPresented: $isFavouritesNavigation){userFavouriteCardsView().navigationBarBackButtonHidden(true)}
+                        HStack{
+                            Image(systemName:"plus.square.fill").resizable().scaledToFit().frame(width: 50, height: 50)
+                        }.padding(.horizontal, 10).onTapGesture{isWordInput.toggle()}.navigationDestination(isPresented: $isThemeNavigation){/*languageThemeView().navigationBarBackButtonHidden(true)*/} // Dont forget to change word redirection to new word input page
+                        HStack{
+                            Image(systemName:"cart.fill").resizable().scaledToFit().frame(width: 50, height: 50)
+                        }.padding(.horizontal, 10).onTapGesture{isStoreNavigation.toggle()}.navigationDestination(isPresented: $isStoreNavigation){userStoreView().navigationBarBackButtonHidden(true)}
+                        HStack{
+                            Image(systemName:"sparkles").resizable().scaledToFit().frame(width: 50, height: 50)
+                        }.padding(.horizontal, 10).onTapGesture{isTaskNavigation.toggle()}.navigationDestination(isPresented: $isTaskNavigation){userTaskView().navigationBarBackButtonHidden(true)}
+                    }.frame(maxHeight: .infinity, alignment: .bottom).padding(.bottom, 10)
+                }.navigationDestination(isPresented: $isErrorOccurrence){errorPageView().navigationBarBackButtonHidden(true)}.navigationDestination(isPresented: $signOutNavigation){contentPageView().navigationBarBackButtonHidden(true)}.task{
                     if isInitialLoad{
                         do{
                             _ = try await initialLoading()
                             isInitialLoad.toggle()
                         } catch{
                             print(error.localizedDescription)
+                            isErrorOccurrence.toggle()
                         }
                     }
                 }
@@ -1028,24 +1047,24 @@ struct userHomePageView: View{
                         HStack{
                             Image(systemName:"person.circle.fill").resizable().scaledToFit().frame(width: 25, height: 25)
                             Text("Profile").font(.title2)
-                        }.onTapGesture{isProfileNavigation.toggle()}.navigationDestination(isPresented: $isProfileNavigation){userProfileView()}
+                        }.onTapGesture{isProfileNavigation.toggle()}.navigationDestination(isPresented: $isProfileNavigation){userProfileView().navigationBarBackButtonHidden(true)}
                         HStack{
-                            Image(systemName: "bag.fill").resizable().scaledToFit().frame(width: 25, height: 25)
+                            Image(systemName: "cart.fill").resizable().scaledToFit().frame(width: 25, height: 25)
                             Text("Store").font(.title2)
-                        }.onTapGesture{isStoreNavigation.toggle()}.navigationDestination(isPresented: $isStoreNavigation){userStoreView()}
+                        }.onTapGesture{isStoreNavigation.toggle()}.navigationDestination(isPresented: $isStoreNavigation){userStoreView().navigationBarBackButtonHidden(true)}
                         HStack{
                             Image(systemName:"star.fill").resizable().scaledToFit().frame(width: 25, height: 25)
                             Text("Favourites").font(.title2)
-                        }.onTapGesture{isFavouritesNavigation.toggle()}.navigationDestination(isPresented: $isFavouritesNavigation){userFavouriteCardsView()}
+                        }.onTapGesture{isFavouritesNavigation.toggle()}.navigationDestination(isPresented: $isFavouritesNavigation){userFavouriteCardsView().navigationBarBackButtonHidden(true)}
                         HStack{
                             Image(systemName: "gear").resizable().scaledToFit().frame(width: 25, height: 25)
                             Text("Setting").font(.title2)
-                        }.onTapGesture{isSettingNavigation.toggle()}.navigationDestination(isPresented: $isSettingNavigation){userSettingView()}
+                        }.onTapGesture{isSettingNavigation.toggle()}.navigationDestination(isPresented: $isSettingNavigation){userSettingView().navigationBarBackButtonHidden(true)}
                         HStack{
                             Image(systemName:"rectangle.portrait.and.arrow.right").resizable().scaledToFit().frame(width: 25, height: 25)
                             Text("Sign Out").font(.title2)
-                        }.onTapGesture{isAuthenticationInvalid = userSignOut()}
-                    }.padding(10).background(Color(UIColor.systemGray4)).clipShape(RoundedRectangle(cornerRadius: 5)).frame(maxWidth: .infinity, alignment: .trailing).padding(.trailing, 5).offset(y: -225)
+                        }.onTapGesture{signOutNavigation = userSignOut()}
+                    }.padding(10).background(Color(UIColor.systemGray4)).clipShape(RoundedRectangle(cornerRadius: 5)).frame(maxWidth: .infinity, alignment: .trailing).padding(.trailing, 5).offset(y: -215)
                 }
             }
         }
