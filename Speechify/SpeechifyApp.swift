@@ -1084,28 +1084,30 @@ struct userHomePageView: View{
     private func navigateWordSelection(navigationChoice: String)async->Bool{
         var hasNavigated: Bool = false
         if navigationChoice == "preceding"{
-            if isPreviousWords.isEmpty || isLanguageIndex == -1 {return true}
+            if indexingPreviousWords.isCurrent {indexingPreviousWords.isCurrent.toggle()}
             if indexingPreviousWords.isLanguage == ""{
-                isLanguageIndex = isPreviousWords.count
-                indexingPreviousWords.isLanguage = Array(isPreviousWords.keys)[isLanguageIndex - 1]
-                indexingPreviousWords.isIndex = isPreviousWords[indexingPreviousWords.isLanguage]?.count ?? -1 - 1
+                isLanguageIndex = isPreviousWords.count - 1
+                indexingPreviousWords.isLanguage = Array(isPreviousWords.keys)[isLanguageIndex]
+                indexingPreviousWords.isIndex = (isPreviousWords[indexingPreviousWords.isLanguage]?.count ?? -1) - 1
             } else{
-                indexingPreviousWords.isIndex -= 1
+                indexingPreviousWords.isIndex -= (indexingPreviousWords.isIndex >= 0) ? 1 : 0
+                if indexingPreviousWords.isIndex == -1 && isLanguageIndex == 0 {return true}
                 if indexingPreviousWords.isIndex == -1 && isLanguageIndex > 0{
                     isLanguageIndex -= 1
-                    indexingPreviousWords.isLanguage = Array(isPreviousWords.keys)[isLanguageIndex - 1]
-                    indexingPreviousWords.isIndex = isPreviousWords[indexingPreviousWords.isLanguage]?.count ?? -1 - 1
+                    indexingPreviousWords.isLanguage = Array(isPreviousWords.keys)[isLanguageIndex ]
+                    indexingPreviousWords.isIndex = (isPreviousWords[indexingPreviousWords.isLanguage]?.count ?? -1) - 1
                 }
             }
+            guard let wordIndexReference = isPreviousWords[indexingPreviousWords.isLanguage]?[indexingPreviousWords.isIndex] else{return false}
             do{
-                let isPreviousEntry = try await Firestore.firestore().collection(indexingPreviousWords.isLanguage).document(String(indexingPreviousWords.isIndex)).getDocument()
+                let isPreviousEntry = try await Firestore.firestore().collection(indexingPreviousWords.isLanguage).document(String(wordIndexReference)).getDocument()
                 guard isPreviousEntry.exists else{return false}
                 guard let getWordField = isPreviousEntry.data()?["isWord"] as? String else{return false}
                 isWord = getWordField
                 guard let getPhoneticField = isPreviousEntry.data()?["isPhonetic"] as? String else{return false}
                 isPhonetic = getPhoneticField
-                guard let getPronunciationField = isPreviousEntry.data()?["isPronunciation"] as? String else{return false}
-                isPronunciation = getPronunciationField
+                //guard let getPronunciationField = isPreviousEntry.data()?["isPronunciation"] as? String else{return false}
+                //isPronunciation = getPronunciationField
                 hasNavigated.toggle()
             } catch{
                 print(error.localizedDescription)
@@ -1119,7 +1121,7 @@ struct userHomePageView: View{
                     entryIndexes.removeFirst()
                     isPreviousWords[firstEntry] = entryIndexes
                 }
-                if var isIndexes =  isPreviousWords[isWordLanguage]{
+                if var isIndexes = isPreviousWords[isWordLanguage]{
                     isIndexes.append(isLanguageEntryID)
                     isPreviousWords[isWordLanguage] = isIndexes
                 } else{
@@ -1137,40 +1139,44 @@ struct userHomePageView: View{
                     isWord = getWordField
                     guard let getPhoneticField = isRandomEntry.data()?["isPhonetic"] as? String else{return false}
                     isPhonetic = getPhoneticField
-                    guard let getPronunciationField = isRandomEntry.data()?["isPronunciation"] as? String else{return false}
-                    isPronunciation = getPronunciationField
+                    //guard let getPronunciationField = isRandomEntry.data()?["isPronunciation"] as? String else{return false}
+                    //isPronunciation = getPronunciationField
                     hasNavigated.toggle()
                 } catch{
                     print(error.localizedDescription)
                 }
             } else{
                 var getCurrentWord: Bool = false
-                indexingPreviousWords.isIndex += indexingPreviousWords.isIndex <= isPreviousWords[indexingPreviousWords.isLanguage]?.count ?? -1 ? 1 : 0
-                if indexingPreviousWords.isIndex == isPreviousWords[indexingPreviousWords.isLanguage]?.count ?? -1{
-                    isLanguageIndex += 1
-                    if isLanguageIndex < Array(isPreviousWords.keys).count{
-                        indexingPreviousWords.isLanguage = Array(isPreviousWords.keys)[isLanguageIndex - 1]
+                indexingPreviousWords.isIndex += (indexingPreviousWords.isIndex == -1) ? 2 : (indexingPreviousWords.isIndex < isPreviousWords[indexingPreviousWords.isLanguage]?.count ?? -1) ? 1 : 0
+                if indexingPreviousWords.isIndex == isPreviousWords[indexingPreviousWords.isLanguage]?.count ?? -1 && isLanguageIndex >= 0{
+                    if isLanguageIndex + 1 < Array(isPreviousWords.keys).count{
+                        isLanguageIndex += 1
+                        indexingPreviousWords.isLanguage = Array(isPreviousWords.keys)[isLanguageIndex]
                         indexingPreviousWords.isIndex = 0
                     } else{
                         getCurrentWord.toggle()
                     }
                 }
+                guard let wordIndexReference = getCurrentWord ? 0 : isPreviousWords[indexingPreviousWords.isLanguage]?[indexingPreviousWords.isIndex] else{return false}
                 do{
-                    let isPreviousEntry = try await Firestore.firestore().collection(getCurrentWord ? isWordLanguage : indexingPreviousWords.isLanguage).document(getCurrentWord ? String(isLanguageEntryID) : String(indexingPreviousWords.isIndex)).getDocument()
+                    let isPreviousEntry = try await Firestore.firestore().collection(getCurrentWord ? isWordLanguage : indexingPreviousWords.isLanguage).document(getCurrentWord ? String(isLanguageEntryID) : String(wordIndexReference)).getDocument()
                     guard isPreviousEntry.exists else{return false}
                     guard let getWordField = isPreviousEntry.data()?["isWord"] as? String else{return false}
                     isWord = getWordField
                     guard let getPhoneticField = isPreviousEntry.data()?["isPhonetic"] as? String else{return false}
                     isPhonetic = getPhoneticField
-                    guard let getPronunciationField = isPreviousEntry.data()?["isPronunciation"] as? String else{return false}
-                    isPronunciation = getPronunciationField
+                    //guard let getPronunciationField = isPreviousEntry.data()?["isPronunciation"] as? String else{return false}
+                    //isPronunciation = getPronunciationField
                     hasNavigated.toggle()
                 } catch{
                     print(error.localizedDescription)
                 }
-                if getCurrentWord {indexingPreviousWords.isCurrent.toggle()}
+                if getCurrentWord{
+                    indexingPreviousWords.isLanguage = ""
+                    indexingPreviousWords.isIndex = -1
+                    indexingPreviousWords.isCurrent.toggle()
+                }
             }
-        }
         return hasNavigated
     }
     
