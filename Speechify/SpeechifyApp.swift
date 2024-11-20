@@ -891,10 +891,9 @@ class AudioPlayerDelegate: NSObject, AVAudioPlayerDelegate{
     }
 }
 
-struct userHomePageView: View{
-    @State private var isInitialLoad = true
+struct userHomePageView: View{@State private var isInitialLoad = true
     static let isUser = Auth.auth().currentUser
-    @State private var isAuthenticationInvalid: Bool = false
+    @State private var isErrorOccurrence: Bool = false
     @State private var isCardWord: Bool = true
     @State private var isFavourite: Bool = false
     @State private var isLearnLanguages: [String] = []
@@ -904,11 +903,10 @@ struct userHomePageView: View{
     @State private var isPronunciation: String = ""
     @State private var isLanguageEntryID: Int = 0
     @State private var isPreviousWords: [String:[Int]] = [:]
-    @State private var indexingPreviousWords: (isLanguage: String, isIndex: Int, isCurrent: Bool) = ("", -1, false)
+    @State private var indexingPreviousWords: (isLanguage: String, isIndex: Int, isCurrent: Bool) = ("", -1, true)
     @State private var isLanguageIndex: Int = -1
     @State private var isSpeechSynthesizer: AVSpeechSynthesizer?
     @State private var speechSynthesizerLanguages: [String] = []
-    
     
     @State private var hasUserImage: Bool = false
     @State private var viewSettings: Bool = false
@@ -916,6 +914,7 @@ struct userHomePageView: View{
     @State private var isStoreNavigation: Bool = false
     @State private var isFavouritesNavigation: Bool = false
     @State private var isSettingNavigation: Bool = false
+    @State private var signOutNavigation: Bool = false
     @State private var isThemeNavigation: Bool = false
     @State private var hasMicrophoneAccess: Bool = false
     @State private var isAudioRecording: Bool = false
@@ -934,6 +933,9 @@ struct userHomePageView: View{
     
     @State private var isAudioText: String = ""
     @State private var isAudioDelegate: AudioPlayerDelegate?
+    
+    @State private var isWordInput: Bool = false
+    @State private var isTaskNavigation: Bool = false
     
     init(){
         guard userHomePageView.isUser != nil else{
