@@ -2210,7 +2210,10 @@ struct userStoreView: View{
 }
 
 struct userFavouriteCardsView: View{ // add feature when user clicks the star it removes the word from favourites
-    @State private var isFavouriteWords: [String] = ["Text1", "Text2", "Text3", "Text4", "Text5"]
+    @State private var isFavouriteWords: [String:[Int]] = [:]
+    @State private var isWord: String = ""
+    @State private var isWordLanguage: String = ""
+    @State private var isLanguageEntryID: Int = -1
     @State private var isHomeNavigation: Bool = false
     @State private var isWordInputNavigation: Bool = false
     @State private var isStoreNavigation: Bool = false
@@ -2222,21 +2225,33 @@ struct userFavouriteCardsView: View{ // add feature when user clicks the star it
                 Text("Favourite Words").font(.largeTitle).frame(maxWidth: .infinity, alignment: .center).padding(.top, 10)
                 ScrollView{
                     VStack{
-                        ForEach(isFavouriteWords, id: \.self){ isWord in
-                            VStack{
-                                ZStack{
-                                    VStack{
-                                        HStack{
-                                            Image(systemName: "x.circle.fill").resizable().scaledToFit().frame(width: 25, height: 25).padding(.top, 5).onTapGesture{
-                                                if let isCardWordIndex = isFavouriteWords.firstIndex(of: isWord){
-                                                    isFavouriteWords.remove(at: isCardWordIndex)
+                        ForEach(isFavouriteWords.keys.sorted(), id: \.self){ hasLanguageEntry in
+                            ForEach(isFavouriteWords[hasLanguageEntry] ?? [], id: \.self){ hasLanguageEntryID in
+                                VStack{
+                                    ZStack{
+                                        VStack{
+                                            HStack{
+                                                Image(systemName: "x.circle.fill").resizable().scaledToFit().frame(width: 25, height: 25).padding(.top, 5).onTapGesture{
+                                                    isFavouriteWords[isWord]?.removeAll{$0 == isLanguageEntryID}
+                                                    _ = Task{
+                                                        _ = await removeWord()
+                                                    }
                                                 }
-                                            }
-                                        }.frame(maxWidth: .infinity, alignment: .trailing).padding(.trailing, 5)
-                                    }.frame(maxHeight: .infinity, alignment: .top)
-                                    Text("\(isWord)").foregroundStyle(.blue).font(.largeTitle)
-                                }
-                            }.frame(width: 350, height: 200).background(Color(UIColor.systemGray5)).clipShape(RoundedRectangle(cornerRadius: 5)).padding(.vertical, 10)
+                                            }.frame(maxWidth: .infinity, alignment: .trailing).padding(.trailing, 5)
+                                        }.frame(maxHeight: .infinity, alignment: .top)
+                                        Text("\(isWord)").foregroundStyle(.blue).font(.largeTitle)
+                                    }.task{
+                                        isWordLanguage = hasLanguageEntry
+                                        isLanguageEntryID = hasLanguageEntryID
+                                        
+                                        do{
+                                            _ = await getFavouriteWord()
+                                        } catch{
+                                            print(error.localizedDescription)
+                                        }
+                                    }
+                                }.frame(width: 350, height: 200).background(Color(UIColor.systemGray5)).clipShape(RoundedRectangle(cornerRadius: 5)).padding(.vertical, 10)
+                            }
                         }
                     }
                 }.frame(height: 600)
@@ -2257,8 +2272,70 @@ struct userFavouriteCardsView: View{ // add feature when user clicks the star it
                         Image(systemName:"sparkles").resizable().scaledToFit().frame(width: 50, height: 50)
                     }.padding(.horizontal, 10).onTapGesture{isTaskNavigation.toggle()}.navigationDestination(isPresented: $isTaskNavigation){userTaskView().navigationBarBackButtonHidden(true)}
                 }.frame(maxHeight: .infinity, alignment: .bottom).padding(.bottom, 10)
+            }.task{
+                do{
+                    _ = await initialLoading()
+                    print(isFavouriteWords)
+                    //isErrorOccurrence.toggle()
+                } catch{
+                    print(error.localizedDescription)
+                }
             }
         }
+    }
+    
+    private func initialLoading()async->Bool{
+        var hasUserFavourites: Bool = false
+        guard let isUserID = userHomeView.isUser?.uid else{return false}
+        do{
+            let isUserDocument = try await Firestore.firestore().collection("users").document(isUserID).getDocument()
+            guard isUserDocument.exists else{return false}
+            guard let isLanguageFavourites = isUserDocument.data()?["favouriteWords"] as? [String:[Int]] else{return false}
+            isFavouriteWords = isLanguageFavourites
+            hasUserFavourites.toggle()
+        } catch{
+            print(error.localizedDescription)
+        }
+        return hasUserFavourites
+    }
+    
+    private func getFavouriteWord()async->Bool{
+        var hasWord: Bool = false
+        guard let isUserID = userHomeView.isUser?.uid else{return false}
+        do{
+            let isUserDocument = try await Firestore.firestore().collection("users").document(isUserID).getDocument()
+            guard isUserDocument.exists else{return false}
+            let isLanguageEntry = try await Firestore.firestore().collection(isWordLanguage).document(String(isLanguageEntryID)).getDocument()
+            guard let getWordField = isLanguageEntry.data()?["isWord"] as? String else{return false}
+            isWord = getWordField
+            hasWord.toggle()
+        } catch{
+            print(error.localizedDescription)
+        }
+        return hasWord
+    }
+    
+    private func removeWord()async->Bool{
+        var isWordRemoved: Bool = false
+        guard let isUserID = userHomeView.isUser?.uid else{return false}
+        do{
+            let isUserDocument = try await Firestore.firestore().collection("users").document(isUserID).getDocument()
+            guard isUserDocument.exists else{return false}
+            guard var isLanguageFavourites = isUserDocument.data()?["favouriteWords"] as? [String:[Int]] else{return false}
+            let isLanguageEntryCount = isLanguageFavourites[isWordLanguage]?.count
+            var isLanguageEntry = isLanguageFavourites[isWordLanguage]
+            isLanguageEntry?.removeAll{$0 == isLanguageEntryID}
+            isLanguageFavourites[isWordLanguage] = isLanguageEntry
+            try await Firestore.firestore().collection("users").document(isUserID).setData(["favouriteWords":isLanguageFavourites], merge: true)
+            if isLanguageEntryCount == 1{
+                isLanguageFavourites.removeValue(forKey: isWordLanguage)
+                try await Firestore.firestore().collection("users").document(isUserID).setData(["favouriteWords": isLanguageFavourites], merge: true)
+            }
+            isWordRemoved.toggle()
+        } catch{
+            print(error.localizedDescription)
+        }
+        return isWordRemoved
     }
 }
 
