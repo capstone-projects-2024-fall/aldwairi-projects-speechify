@@ -38,17 +38,17 @@ struct contentPageView: View{
             VStack{
                 Text("Speechify").font(.largeTitle).multilineTextAlignment(.center).padding(10)
                 Text("Login").font(.title).padding(10).foregroundStyle(.blue).background(Color(UIColor.systemGray5)).clipShape(RoundedRectangle(cornerRadius: 5)).onTapGesture{loginNavigate.toggle()}.navigationDestination(isPresented: $loginNavigate){
-                    loginPageView().navigationBarBackButtonHidden(true)
+                    authenticationView().navigationBarBackButtonHidden(true)
                 }
                 Text("Sign-Up").font(.title).padding(10).foregroundStyle(.blue).background(Color(UIColor.systemGray5)).clipShape(RoundedRectangle(cornerRadius: 5)).onTapGesture{signupNavigate.toggle()}.navigationDestination(isPresented: $signupNavigate){
-                    signUpPageView().navigationBarBackButtonHidden(true)
+                    registrationView().navigationBarBackButtonHidden(true)
                 }
             }
         }
     }
 }
 
-struct signUpPageView: View{
+struct registrationView: View{
     @State private var isUserName: String = ""
     @FocusState private var isNameFocus: Bool
     @State private var isNameError: Bool = false
@@ -243,7 +243,7 @@ struct signUpPageView: View{
                 }
                 HStack{
                     Text("Already have an account? ")
-                    NavigationLink(destination: loginPageView()){
+                    NavigationLink(destination: authenticationView().navigationBarBackButtonHidden(true)){
                         Text("Login")
                     }
                 }
@@ -426,7 +426,7 @@ struct initialUserConfigurationView: View{
                         } else{
                             hasSettingError.toggle()
                         }
-                    }.navigationDestination(isPresented: $hasUserSettings){userHomePageView().navigationBarBackButtonHidden(true)}
+                    }.navigationDestination(isPresented: $hasUserSettings){userHomeView().navigationBarBackButtonHidden(true)}
                 }.onTapGesture{backgroundOverlayCollapse()}
                 if hasSettingError{
                     VStack{
@@ -644,7 +644,7 @@ struct initialUserConfigurationView: View{
     }
 }
 
-struct loginPageView: View{
+struct authenticationView: View{
     @State private var isUserEmail: String = ""
     @State private var isUserPassword: String = ""
     @State private var isResetEdit: String = ""
@@ -757,7 +757,7 @@ struct loginPageView: View{
                             _ = Task{isUserValid = await validateCredentials()}
                         }
                     }.padding(10).navigationDestination(isPresented: $isUserValid){
-                        userHomePageView().navigationBarBackButtonHidden(true)
+                        userHomeView().navigationBarBackButtonHidden(true)
                     }
                     if isLoginError{
                         Text("Invalid Email Or Password").foregroundColor(.red).padding(.top, 5)
@@ -767,7 +767,7 @@ struct loginPageView: View{
                     }
                     HStack{
                         Text("Don't have an account? ")
-                        NavigationLink(destination: signUpPageView()){
+                        NavigationLink(destination: registrationView().navigationBarBackButtonHidden(true)){
                             Text("Sign Up")
                         }
                     }
@@ -892,6 +892,7 @@ class AudioPlayerDelegate: NSObject, AVAudioPlayerDelegate{
 }
 
 struct userHomePageView: View{@State private var isInitialLoad = true
+    @State private var isInitialLoad = true
     static let isUser = Auth.auth().currentUser
     @State private var isErrorOccurrence: Bool = false
     @State private var isCardWord: Bool = true
@@ -907,6 +908,7 @@ struct userHomePageView: View{@State private var isInitialLoad = true
     @State private var isLanguageIndex: Int = -1
     @State private var isSpeechSynthesizer: AVSpeechSynthesizer?
     @State private var speechSynthesizerLanguages: [String] = []
+    
     
     @State private var hasUserImage: Bool = false
     @State private var viewSettings: Bool = false
@@ -934,12 +936,12 @@ struct userHomePageView: View{@State private var isInitialLoad = true
     @State private var isAudioText: String = ""
     @State private var isAudioDelegate: AudioPlayerDelegate?
     
-    @State private var isWordInput: Bool = false
+    @State private var isWordInputNavigation: Bool = false
     @State private var isTaskNavigation: Bool = false
     
     init(){
-        guard userHomePageView.isUser != nil else{
-            isAuthenticationInvalid.toggle()
+        guard userHomeView.isUser != nil else{
+            isErrorOccurrence.toggle()
             return
         }
     }
@@ -1018,13 +1020,13 @@ struct userHomePageView: View{@State private var isInitialLoad = true
                     HStack{
                         HStack{
                             Image(systemName:"house.fill").resizable().scaledToFit().frame(width: 50, height: 50)
-                        }.padding(.horizontal, 10).onTapGesture{isThemeNavigation.toggle()}.navigationDestination(isPresented: $isThemeNavigation){languageThemeView().navigationBarBackButtonHidden(true)}
+                        }.padding(.horizontal, 10)
                         HStack{
                             Image(systemName:"heart.fill").resizable().scaledToFit().frame(width: 50, height: 50)
                         }.padding(.horizontal, 10).onTapGesture{isFavouritesNavigation.toggle()}.navigationDestination(isPresented: $isFavouritesNavigation){userFavouriteCardsView().navigationBarBackButtonHidden(true)}
                         HStack{
                             Image(systemName:"plus.square.fill").resizable().scaledToFit().frame(width: 50, height: 50)
-                        }.padding(.horizontal, 10).onTapGesture{isWordInput.toggle()}.navigationDestination(isPresented: $isThemeNavigation){/*languageThemeView().navigationBarBackButtonHidden(true)*/} // Dont forget to change word redirection to new word input page
+                        }.padding(.horizontal, 10).onTapGesture{isWordInputNavigation.toggle()}.navigationDestination(isPresented: $isWordInputNavigation){/*languageThemeView().navigationBarBackButtonHidden(true)*/} // Dont forget to change word redirection to new word input page
                         HStack{
                             Image(systemName:"cart.fill").resizable().scaledToFit().frame(width: 50, height: 50)
                         }.padding(.horizontal, 10).onTapGesture{isStoreNavigation.toggle()}.navigationDestination(isPresented: $isStoreNavigation){userStoreView().navigationBarBackButtonHidden(true)}
@@ -1032,7 +1034,7 @@ struct userHomePageView: View{@State private var isInitialLoad = true
                             Image(systemName:"sparkles").resizable().scaledToFit().frame(width: 50, height: 50)
                         }.padding(.horizontal, 10).onTapGesture{isTaskNavigation.toggle()}.navigationDestination(isPresented: $isTaskNavigation){userTaskView().navigationBarBackButtonHidden(true)}
                     }.frame(maxHeight: .infinity, alignment: .bottom).padding(.bottom, 10)
-                }.navigationDestination(isPresented: $isErrorOccurrence){errorPageView().navigationBarBackButtonHidden(true)}.navigationDestination(isPresented: $signOutNavigation){contentPageView().navigationBarBackButtonHidden(true)}.task{
+                }.navigationDestination(isPresented: $isErrorOccurrence){errorView().navigationBarBackButtonHidden(true)}.navigationDestination(isPresented: $signOutNavigation){contentPageView().navigationBarBackButtonHidden(true)}.task{
                     if isInitialLoad{
                         do{
                             _ = try await initialLoading()
@@ -1066,7 +1068,7 @@ struct userHomePageView: View{@State private var isInitialLoad = true
                             Image(systemName:"rectangle.portrait.and.arrow.right").resizable().scaledToFit().frame(width: 25, height: 25)
                             Text("Sign Out").font(.title2)
                         }.onTapGesture{signOutNavigation = userSignOut()}
-                    }.padding(10).background(Color(UIColor.systemGray4)).clipShape(RoundedRectangle(cornerRadius: 5)).frame(maxWidth: .infinity, alignment: .trailing).padding(.trailing, 5).offset(y: -215)
+                    }.padding(10).background(Color(UIColor.systemGray4)).clipShape(RoundedRectangle(cornerRadius: 5))/*.frame(maxWidth: .infinity, alignment: .trailing)*/.padding(.trailing, 5).offset(y: -215)
                 }
             }
         }
@@ -1074,7 +1076,7 @@ struct userHomePageView: View{@State private var isInitialLoad = true
     
     private func initialLoading()async throws->Bool{
         var isPropertySet: Bool = false
-        guard let isUserID = userHomePageView.isUser?.uid else{return false}
+        guard let isUserID = userHomeView.isUser?.uid else{return false}
         do{
             let isUserDocument = try await Firestore.firestore().collection("users").document(isUserID).getDocument()
             guard isUserDocument.exists else{return false}
@@ -1155,6 +1157,7 @@ struct userHomePageView: View{@State private var isInitialLoad = true
                     let isRandomID = Int.random(in: 0...isEntriesCount)
                     let isRandomEntry = try await Firestore.firestore().collection(isWordLanguage).document(String(isRandomID)).getDocument()
                     guard isRandomEntry.exists else{return false}
+                    print("New Word Entry")
                     isLanguageEntryID = isRandomID
                     guard let getWordField = isRandomEntry.data()?["isWord"] as? String else{return false}
                     isWord = getWordField
@@ -1167,6 +1170,7 @@ struct userHomePageView: View{@State private var isInitialLoad = true
                     print(error.localizedDescription)
                 }
             } else{
+                print("Next From Previous")
                 var getCurrentWord: Bool = false
                 indexingPreviousWords.isIndex += (indexingPreviousWords.isIndex == -1) ? 2 : (indexingPreviousWords.isIndex < isPreviousWords[indexingPreviousWords.isLanguage]?.count ?? -1) ? 1 : 0
                 if indexingPreviousWords.isIndex == isPreviousWords[indexingPreviousWords.isLanguage]?.count ?? -1 && isLanguageIndex >= 0{
@@ -1198,13 +1202,14 @@ struct userHomePageView: View{@State private var isInitialLoad = true
                     indexingPreviousWords.isCurrent.toggle()
                 }
             }
+        }
         return hasNavigated
     }
     
     private func isWordFavourite() async -> Bool{
         var isFavouriteSet: Bool = false
         var hasFavouriteField: Bool = false
-        guard let isUserID = userHomePageView.isUser?.uid else{return false}
+        guard let isUserID = userHomeView.isUser?.uid else{return false}
         do{
             let isUserDocument = try await Firestore.firestore().collection("users").document(isUserID).getDocument()
             guard isUserDocument.exists else{return false}
@@ -1438,29 +1443,55 @@ struct userHomePageView: View{@State private var isInitialLoad = true
     }
 }
 
-struct userThemeSelectionView: View{
+struct languageThemeView: View{
     @State private var themeOptions: [String] = ["Category1", "Category2", "Category3", "Category4", "Category5", "Category6", "Category7", "Category8", "Category9"]
     @State private var isGridColumn = [GridItem(.flexible(), spacing: 0), GridItem(.flexible(), spacing: 0)]
+    @State private var isHomeNavigation: Bool = false
+    @State private var isFavouritesNavigation: Bool = false
+    @State private var isWordInputNavigation: Bool = false
+    @State private var isStoreNavigation: Bool = false
+    @State private var isTaskNavigation: Bool = false
     
     var body: some View{
-        ScrollView{
+        NavigationStack{
             VStack{
-                Text("Theme").font(.largeTitle).frame(maxWidth: .infinity, alignment: .center).padding(.top, 10)
-                LazyVGrid(columns: isGridColumn, spacing: 5){
-                    ForEach(themeOptions, id: \.self){ isTheme in
-                        VStack{
-                            Image(systemName: "arrow.left").resizable().scaledToFit().frame(width: 170, height: 170)
-                            Text("\(isTheme)")
-                        }.padding(10).background(Color(UIColor.systemGray5)).clipShape(RoundedRectangle(cornerRadius: 5))//.padding(.horizontal, 10)
+                ScrollView{
+                    VStack{
+                        Text("Theme").font(.largeTitle).frame(maxWidth: .infinity, alignment: .center).padding(.top, 10)
+                        LazyVGrid(columns: isGridColumn, spacing: 5){
+                            ForEach(themeOptions, id: \.self){ isTheme in
+                                VStack{
+                                    Image(systemName: "arrow.left").resizable().scaledToFit().frame(width: 170, height: 170)
+                                    Text("\(isTheme)")
+                                }.padding(10).background(Color(UIColor.systemGray5)).clipShape(RoundedRectangle(cornerRadius: 5))//.padding(.horizontal, 10)
+                            }
+                        }
                     }
-                }
+                }.frame(height: 690)
+                HStack{
+                    HStack{
+                        Image(systemName:"house.fill").resizable().scaledToFit().frame(width: 50, height: 50)
+                    }.padding(.horizontal, 10).onTapGesture{isHomeNavigation.toggle()}.navigationDestination(isPresented: $isHomeNavigation){userHomeView().navigationBarBackButtonHidden(true)}
+                    HStack{
+                        Image(systemName:"heart.fill").resizable().scaledToFit().frame(width: 50, height: 50)
+                    }.padding(.horizontal, 10).onTapGesture{isFavouritesNavigation.toggle()}.navigationDestination(isPresented: $isFavouritesNavigation){userFavouriteCardsView().navigationBarBackButtonHidden(true)}
+                    HStack{
+                        Image(systemName:"plus.square.fill").resizable().scaledToFit().frame(width: 50, height: 50)
+                    }.padding(.horizontal, 10).onTapGesture{isWordInputNavigation.toggle()}.navigationDestination(isPresented: $isWordInputNavigation){/*languageThemeView().navigationBarBackButtonHidden(true)*/} // Dont forget to change word redirection to new word input page
+                    HStack{
+                        Image(systemName:"cart.fill").resizable().scaledToFit().frame(width: 50, height: 50)
+                    }.padding(.horizontal, 10).onTapGesture{isStoreNavigation.toggle()}.navigationDestination(isPresented: $isStoreNavigation){userStoreView().navigationBarBackButtonHidden(true)}
+                    HStack{
+                        Image(systemName:"sparkles").resizable().scaledToFit().frame(width: 50, height: 50)
+                    }.padding(.horizontal, 10).onTapGesture{isTaskNavigation.toggle()}.navigationDestination(isPresented: $isTaskNavigation){userTaskView().navigationBarBackButtonHidden(true)}
+                }.frame(maxHeight: .infinity, alignment: .bottom).padding(.bottom, 10)
             }
         }
     }
 }
 
 struct userProfileView: View{
-    let isUser = userHomePageView.isUser
+    let isUser = userHomeView.isUser
     enum editFocus: Hashable{
         case editName
         case editEmail
@@ -1499,277 +1530,141 @@ struct userProfileView: View{
     @State private var isEditReport: String = ""
     @State private var isOverlayView: Bool = false
     
+    @State private var isHomeNavigation: Bool = false
+    @State private var isFavouritesNavigation: Bool = false
+    @State private var isWordInputNavigation: Bool = false
+    @State private var isStoreNavigation: Bool = false
+    @State private var isTaskNavigation: Bool = false
+    
     init(){
         self.isVerificationFocus = false
     }
     
     var body: some View{
-        ZStack{
-            if isOverlayView{
-                Color.black.opacity(0.5).ignoresSafeArea(.all).onTapGesture{backgroundOverlayCollapse()}
-            }
-            VStack{
-                Text("User Profile").font(.largeTitle).frame(maxWidth: .infinity, alignment: .center).padding(.top, 10)
-                ZStack(alignment: .bottomTrailing){
-                    Image(systemName: "person.fill").resizable().scaledToFit().frame(width: 150, height: 150, alignment: .center).clipShape(Circle()).overlay(Circle().stroke(.pink, lineWidth: 2))
-                    Circle().fill(.blue).frame(width: 50, height: 50).overlay(Circle().stroke(.white, lineWidth: 3)).overlay(Image(systemName: "plus").resizable().scaledToFit().frame(width: 25, height: 25).padding(5).foregroundStyle(.white))//.overlay(Circle().stroke(.white, lineWidth: 3)).background(.blue)
+        NavigationStack{
+            ZStack{
+                if isOverlayView{
+                    Color.black.opacity(0.5).ignoresSafeArea(.all).onTapGesture{backgroundOverlayCollapse()}
                 }
-                HStack{
-                    VStack{
-                        Text("USERNAME").font(.title2).frame(maxWidth: .infinity, alignment: .leading).padding(.leading, 10)
-                        Text("\(isUserName)").font(.title3).frame(maxWidth: .infinity, alignment: .leading).padding(.leading, 10)
-                    }.frame(maxWidth: .infinity, alignment: .leading)
-                    Image(systemName:  "chevron.right").frame(maxWidth: .infinity, alignment: .trailing).padding(.trailing, 5)
-                }.padding(10).onTapGesture{
-                    if isOverlayView{
-                        backgroundOverlayCollapse()
-                    } else{
-                        isOverlayView.toggle()
-                        isNameEdit.toggle()
-                    }
-                }
-                HStack{
-                    VStack{
-                        Text("GENDER").font(.title2).frame(maxWidth: .infinity, alignment: .leading).padding(.leading, 10)
-                        Text("\(isUserGender)").font(.title3).frame(maxWidth: .infinity, alignment: .leading).padding(.leading, 10)
-                    }
-                    Image(systemName:  "chevron.right").frame(maxWidth: .infinity, alignment: .trailing).padding(.trailing, 5)
-                }.padding(10).onTapGesture{
-                    if isOverlayView{
-                        backgroundOverlayCollapse()
-                    } else{
-                        isOverlayView.toggle()
-                        isGenderEdit.toggle()
-                    }
-                }
-                HStack{
-                    VStack{
-                        Text("DATE OF BIRTH").font(.title2).frame(maxWidth: .infinity, alignment: .leading).padding(.leading, 10)
-                        Text("\(isUserBirthday)").font(.title3).frame(maxWidth: .infinity, alignment: .leading).padding(.leading, 10)
-                    }
-                    Image(systemName:  "chevron.right").frame(maxWidth: .infinity, alignment: .trailing).padding(.trailing, 5)
-                }.padding(10).onTapGesture{
-                    if isOverlayView{
-                        backgroundOverlayCollapse()
-                    } else{
-                        isOverlayView.toggle()
-                        isBirthdayEdit.toggle()
-                    }
-                }
-                HStack{
-                    VStack{
-                        Text("EMAIL ADDRESS").font(.title2).frame(maxWidth: .infinity, alignment: .leading).padding(.leading, 10)
-                        Text("\(isUserEmail)").font(.title3).frame(maxWidth: .infinity, alignment: .leading).padding(.leading, 10)
-                    }
-                    Image(systemName:  "chevron.right").frame(maxWidth: .infinity, alignment: .trailing).padding(.trailing, 5)
-                }.padding(10).onTapGesture{
-                    if isOverlayView{
-                        backgroundOverlayCollapse()
-                    } else{
-                        isOverlayView.toggle()
-                        isEmailEdit.toggle()
-                    }
-                }
-                HStack{
-                    VStack{
-                        Text("PASSWORD").font(.title2).frame(maxWidth: .infinity, alignment: .leading).padding(.leading, 10)
-                        Text("\(isUserPassword)").font(.title3).frame(maxWidth: .infinity, alignment: .leading).padding(.leading, 10)
-                    }
-                    Image(systemName:  "chevron.right").frame(maxWidth: .infinity, alignment: .trailing).padding(.trailing, 5)
-                }.padding(10).onTapGesture{
-                    if isOverlayView{
-                        backgroundOverlayCollapse()
-                    } else{
-                        isOverlayView.toggle()
-                        isPasswordEdit.toggle()
-                    }
-                }
-            }//.ignoresSafeArea(.all).background(.gray)
-        }.overlay(alignment: .center){
-            if isNameEdit{
                 VStack{
-                    ZStack{
-                        HStack{
-                            Image(systemName: "x.circle.fill").resizable().scaledToFit().frame(width: 25, height: 25)
-                        }.frame(maxWidth: .infinity, alignment: .topTrailing).onTapGesture{
-                            isNameEdit.toggle()
+                    Text("User Profile").font(.largeTitle).frame(maxWidth: .infinity, alignment: .center).padding(.top, 10)
+                    ZStack(alignment: .bottomTrailing){
+                        Image(systemName: "person.fill").resizable().scaledToFit().frame(width: 150, height: 150, alignment: .center).clipShape(Circle()).overlay(Circle().stroke(.pink, lineWidth: 2))
+                        Circle().fill(.blue).frame(width: 50, height: 50).overlay(Circle().stroke(.white, lineWidth: 3)).overlay(Image(systemName: "plus").resizable().scaledToFit().frame(width: 25, height: 25).padding(5).foregroundStyle(.white))//.overlay(Circle().stroke(.white, lineWidth: 3)).background(.blue)
+                    }
+                    HStack{
+                        VStack{
+                            Text("USERNAME").font(.title2).frame(maxWidth: .infinity, alignment: .leading).padding(.leading, 10)
+                            Text("\(isUserName)").font(.title3).frame(maxWidth: .infinity, alignment: .leading).padding(.leading, 10)
+                        }.frame(maxWidth: .infinity, alignment: .leading)
+                        Image(systemName:  "chevron.right").frame(maxWidth: .infinity, alignment: .trailing).padding(.trailing, 5)
+                    }.padding(10).onTapGesture{
+                        if isOverlayView{
+                            backgroundOverlayCollapse()
+                        } else{
                             isOverlayView.toggle()
-                            isEditString = ""
-                            isEditError = false
-                            editErrorMessage = ""
+                            isNameEdit.toggle()
                         }
                     }
-                    Text("Change UserName")
-                    Text("Username").frame(maxWidth: .infinity, alignment: .leading)
                     HStack{
-                        Image(systemName: "person.fill").resizable().scaledToFit().frame(width: 25, height: 25).padding(.leading, 2).foregroundStyle(.gray)
-                        TextField("Username", text: $isEditString).focused($isEditFocus, equals: .editName).background(Color.white).frame(height:30).textInputAutocapitalization(.never).autocorrectionDisabled(true).onSubmit{
-                            if !isEditString.isEmpty && isEditError{
-                                isEditError.toggle()
+                        VStack{
+                            Text("GENDER").font(.title2).frame(maxWidth: .infinity, alignment: .leading).padding(.leading, 10)
+                            Text("\(isUserGender)").font(.title3).frame(maxWidth: .infinity, alignment: .leading).padding(.leading, 10)
+                        }
+                        Image(systemName:  "chevron.right").frame(maxWidth: .infinity, alignment: .trailing).padding(.trailing, 5)
+                    }.padding(10).onTapGesture{
+                        if isOverlayView{
+                            backgroundOverlayCollapse()
+                        } else{
+                            isOverlayView.toggle()
+                            isGenderEdit.toggle()
+                        }
+                    }
+                    HStack{
+                        VStack{
+                            Text("DATE OF BIRTH").font(.title2).frame(maxWidth: .infinity, alignment: .leading).padding(.leading, 10)
+                            Text("\(isUserBirthday)").font(.title3).frame(maxWidth: .infinity, alignment: .leading).padding(.leading, 10)
+                        }
+                        Image(systemName:  "chevron.right").frame(maxWidth: .infinity, alignment: .trailing).padding(.trailing, 5)
+                    }.padding(10).onTapGesture{
+                        if isOverlayView{
+                            backgroundOverlayCollapse()
+                        } else{
+                            isOverlayView.toggle()
+                            isBirthdayEdit.toggle()
+                        }
+                    }
+                    HStack{
+                        VStack{
+                            Text("EMAIL ADDRESS").font(.title2).frame(maxWidth: .infinity, alignment: .leading).padding(.leading, 10)
+                            Text("\(isUserEmail)").font(.title3).frame(maxWidth: .infinity, alignment: .leading).padding(.leading, 10)
+                        }
+                        Image(systemName:  "chevron.right").frame(maxWidth: .infinity, alignment: .trailing).padding(.trailing, 5)
+                    }.padding(10).onTapGesture{
+                        if isOverlayView{
+                            backgroundOverlayCollapse()
+                        } else{
+                            isOverlayView.toggle()
+                            isEmailEdit.toggle()
+                        }
+                    }
+                    HStack{
+                        VStack{
+                            Text("PASSWORD").font(.title2).frame(maxWidth: .infinity, alignment: .leading).padding(.leading, 10)
+                            Text("\(isUserPassword)").font(.title3).frame(maxWidth: .infinity, alignment: .leading).padding(.leading, 10)
+                        }
+                        Image(systemName:  "chevron.right").frame(maxWidth: .infinity, alignment: .trailing).padding(.trailing, 5)
+                    }.padding(10).onTapGesture{
+                        if isOverlayView{
+                            backgroundOverlayCollapse()
+                        } else{
+                            isOverlayView.toggle()
+                            isPasswordEdit.toggle()
+                        }
+                    }
+                    HStack{
+                        HStack{
+                            Image(systemName:"house.fill").resizable().scaledToFit().frame(width: 50, height: 50)
+                        }.padding(.horizontal, 10).onTapGesture{isHomeNavigation.toggle()}.navigationDestination(isPresented: $isHomeNavigation){userHomeView().navigationBarBackButtonHidden(true)}
+                        HStack{
+                            Image(systemName:"heart.fill").resizable().scaledToFit().frame(width: 50, height: 50)
+                        }.padding(.horizontal, 10).onTapGesture{isFavouritesNavigation.toggle()}.navigationDestination(isPresented: $isFavouritesNavigation){userFavouriteCardsView().navigationBarBackButtonHidden(true)}
+                        HStack{
+                            Image(systemName:"plus.square.fill").resizable().scaledToFit().frame(width: 50, height: 50)
+                        }.padding(.horizontal, 10).onTapGesture{isWordInputNavigation.toggle()}.navigationDestination(isPresented: $isWordInputNavigation){/*languageThemeView().navigationBarBackButtonHidden(true)*/} // Dont forget to change word redirection to new word input page
+                        HStack{
+                            Image(systemName:"cart.fill").resizable().scaledToFit().frame(width: 50, height: 50)
+                        }.padding(.horizontal, 10).onTapGesture{isStoreNavigation.toggle()}.navigationDestination(isPresented: $isStoreNavigation){userStoreView().navigationBarBackButtonHidden(true)}
+                        HStack{
+                            Image(systemName:"sparkles").resizable().scaledToFit().frame(width: 50, height: 50)
+                        }.padding(.horizontal, 10).onTapGesture{isTaskNavigation.toggle()}.navigationDestination(isPresented: $isTaskNavigation){userTaskView().navigationBarBackButtonHidden(true)}
+                    }.frame(maxHeight: .infinity, alignment: .bottom).padding(.bottom, 10)
+                }//.ignoresSafeArea(.all).background(.gray)
+            }.overlay(alignment: .center){
+                if isNameEdit{
+                    VStack{
+                        ZStack{
+                            HStack{
+                                Image(systemName: "x.circle.fill").resizable().scaledToFit().frame(width: 25, height: 25)
+                            }.frame(maxWidth: .infinity, alignment: .topTrailing).onTapGesture{
+                                isNameEdit.toggle()
+                                isOverlayView.toggle()
+                                isEditString = ""
+                                isEditError = false
+                                editErrorMessage = ""
                             }
-                        }.onChange(of: isEditFocus, {
-                            if isEditFocus != .editName{
+                        }
+                        Text("Change UserName")
+                        Text("Username").frame(maxWidth: .infinity, alignment: .leading)
+                        HStack{
+                            Image(systemName: "person.fill").resizable().scaledToFit().frame(width: 25, height: 25).padding(.leading, 2).foregroundStyle(.gray)
+                            TextField("Username", text: $isEditString).focused($isEditFocus, equals: .editName).background(Color.white).frame(height:30).textInputAutocapitalization(.never).autocorrectionDisabled(true).onSubmit{
                                 if !isEditString.isEmpty && isEditError{
                                     isEditError.toggle()
                                 }
-                            }
-                        })
-                    }.overlay(RoundedRectangle(cornerRadius: 5).stroke(lineWidth: 1))
-                    if isEditError{
-                        Text(editErrorMessage).foregroundColor(.red).frame(maxWidth: .infinity, alignment: .leading).padding(5)
-                    }
-                    Text("Confirm").padding(10).foregroundStyle(.blue).background(Color(UIColor.systemGray5)).clipShape(RoundedRectangle(cornerRadius: 5)).onTapGesture{
-                        if isEditString.isEmpty{
-                            editErrorMessage = "Please enter your username"
-                            isEditError = true
-                        } else if isEditString == isUserName{
-                            editErrorMessage = "Please a new username"
-                            isEditError = true
-                        } else{
-                            isEditValid = updateUserName()
-                            isEditResult.toggle()
-                            if isEditValid{
-                                isEditString = ""
-                                isEditError = false
-                                editErrorMessage = ""
-                            }
-                            DispatchQueue.main.asyncAfter(deadline: .now() + 5, execute: {isEditResult.toggle()})
-                        }
-                    }
-                    if isEditResult{
-                        Text(isEditReport).foregroundColor(.green).padding(.top, 5)
-                    }
-                }.padding(10).background(.white).clipShape(RoundedRectangle(cornerRadius: 5)).frame(width: 350).onTapGesture{
-                    isEditFocus = nil
-                }
-            }
-            if isGenderEdit{
-                VStack{
-                    ZStack{
-                        HStack{
-                            Image(systemName: "x.circle.fill").resizable().scaledToFit().frame(width: 25, height: 25)
-                        }.frame(maxWidth: .infinity, alignment: .topTrailing).onTapGesture{
-                            isGenderEdit.toggle()
-                            isOverlayView.toggle()
-                        }
-                    }
-                    Text("Change Gender")
-                }.padding(10).background(.white).border(.black, width: 1).clipShape(RoundedRectangle(cornerRadius: 5)).frame(width: 350).onTapGesture{
-                    isEditFocus = nil
-                }
-            }
-            if isBirthdayEdit{
-                VStack{
-                    ZStack{
-                        HStack{
-                            Image(systemName: "x.circle.fill").resizable().scaledToFit().frame(width: 25, height: 25)
-                        }.frame(maxWidth: .infinity, alignment: .topTrailing).onTapGesture{
-                            isBirthdayEdit.toggle()
-                            isOverlayView.toggle()
-                        }
-                    }
-                    Text("Change Birthday")
-                }.padding(10).background(.white).border(.black, width: 1).clipShape(RoundedRectangle(cornerRadius: 5)).frame(width: 350).onTapGesture{
-                    isEditFocus = nil
-                }
-            }
-            if isEmailEdit{
-                if !isUserVerified{
-                    VStack{
-                        ZStack{
-                            HStack{
-                                Image(systemName: "x.circle.fill").resizable().scaledToFit().frame(width: 25, height: 25)
-                            }.frame(maxWidth: .infinity, alignment: .topTrailing).onTapGesture{
-                                isEmailEdit.toggle()
-                                isOverlayView.toggle()
-                                isVerificationString = ""
-                                isVerificationFocus = false
-                                isVerificationVisible = false
-                                isVerificationError = false
-                                verificationErrorMessage = ""
-                            }
-                        }
-                        Text("Verify Password")
-                        HStack{
-                            Image(systemName: "lock.fill").resizable().scaledToFit().frame(width: 25, height: 25).padding(.leading, 1).foregroundStyle(.black)
-                            if(!isVerificationVisible){
-                                SecureField("Password", text: $isVerificationString).focused($isVerificationFocus).background(Color.white).frame(height:30).textInputAutocapitalization(.never).autocorrectionDisabled(true).onSubmit{
-                                    if !isVerificationString.isEmpty && isVerificationError{
-                                        isVerificationError.toggle()
-                                    }
-                                }.onChange(of: isVerificationFocus, {
-                                    if !isVerificationFocus{
-                                        if !isVerificationString.isEmpty && isVerificationError{
-                                            isVerificationError.toggle()
-                                        }
-                                    }
-                                })
-                            } else{
-                                TextField("Password", text: $isVerificationString).focused($isVerificationFocus).background(Color.white).frame(height:30).textInputAutocapitalization(.never).autocorrectionDisabled(true).onSubmit{
-                                    if !isVerificationString.isEmpty && isVerificationError{
-                                        isVerificationError.toggle()
-                                    }
-                                }.onChange(of: isVerificationFocus, {
-                                    if !isVerificationFocus{
-                                        if !isVerificationString.isEmpty && isVerificationError{
-                                            isVerificationError.toggle()
-                                        }
-                                    }
-                                })
-                            }
-                            Button(action:{isVerificationVisible.toggle()}){
-                                Image(systemName: !isVerificationVisible ? "eye.slash" : "eye").resizable().scaledToFit().frame(width: 25, height: 25).padding(.trailing, 2).foregroundStyle(.black)
-                            }
-                        }.overlay(RoundedRectangle(cornerRadius: 5).stroke(.black, lineWidth: 1))
-                        if isVerificationError{
-                            Text(verificationErrorMessage).foregroundColor(.red).frame(maxWidth: .infinity, alignment: .leading).padding(5)
-                        }
-                        Text("Confirm Password").padding(10).foregroundStyle(.blue).background(Color(UIColor.systemGray5)).clipShape(RoundedRectangle(cornerRadius: 5)).onTapGesture{
-                            isVerificationFocus = false
-                            if isVerificationString.isEmpty{
-                                verificationErrorMessage = "Please enter your password"
-                                isVerificationError = true
-                            } else if isVerificationString != isUserPassword{
-                                verificationErrorMessage = "Incorrect Password"
-                                isVerificationError = true
-                            } else{
-                                isUserVerified.toggle()
-                                isVerificationString = ""
-                                isVerificationFocus = false
-                                isVerificationVisible = false
-                                isVerificationError = false
-                                verificationErrorMessage = ""
-                            }
-                        }
-                    }.padding(10).background(.white).border(.black, width: 1).clipShape(RoundedRectangle(cornerRadius: 5)).frame(width: 350).onTapGesture{
-                        isVerificationFocus = false
-                    }
-                } else{
-                    VStack{
-                        ZStack{
-                            HStack{
-                                Image(systemName: "x.circle.fill").resizable().scaledToFit().frame(width: 25, height: 25)
-                            }.frame(maxWidth: .infinity, alignment: .topTrailing).onTapGesture{
-                                isUserVerified.toggle()
-                                isEmailEdit.toggle()
-                                isOverlayView.toggle()
-                                isEditString = ""
-                                isEditFocus = nil
-                                isEditError = false
-                                editErrorMessage = ""
-                            }
-                        }
-                        Text("Enter A New Email Address")
-                        Text("Email").frame(maxWidth: .infinity, alignment: .leading)
-                        HStack{
-                            Image(systemName: "envelope.fill").resizable().scaledToFit().frame(width: 25, height: 25).padding(.leading, 2).foregroundStyle(.gray)
-                            TextField("Email Address", text: $isEditString).focused($isEditFocus, equals: .editEmail).background(Color.white).frame(height:30).textInputAutocapitalization(.never).autocorrectionDisabled(true).onSubmit{
-                                if !isEditString.isEmpty && editErrorMessage.contains("enter") && isEditError{
-                                    isEditError.toggle()
-                                }
                             }.onChange(of: isEditFocus, {
-                                if isEditFocus != .editEmail{
-                                    if !isEditString.isEmpty && editErrorMessage.contains("enter") && isEditError{
+                                if isEditFocus != .editName{
+                                    if !isEditString.isEmpty && isEditError{
                                         isEditError.toggle()
                                     }
                                 }
@@ -1780,241 +1675,18 @@ struct userProfileView: View{
                         }
                         Text("Confirm").padding(10).foregroundStyle(.blue).background(Color(UIColor.systemGray5)).clipShape(RoundedRectangle(cornerRadius: 5)).onTapGesture{
                             if isEditString.isEmpty{
-                                editErrorMessage = "Please enter your email address"
+                                editErrorMessage = "Please enter your username"
                                 isEditError = true
-                            } else if isEditString == isUserEmail{
-                                editErrorMessage = "Please enter a new email address"
+                            } else if isEditString == isUserName{
+                                editErrorMessage = "Please a new username"
                                 isEditError = true
                             } else{
-                                let isEmailRegex: String = "[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\\.[a-zA-Z]{2,}"
-                                let isEmailPredicate = NSPredicate(format: "SELF MATCHES[c] %@", isEmailRegex)
-                                let isValidAddress = isEmailPredicate.evaluate(with: isEditString)
-                                if !isValidAddress{
-                                    editErrorMessage = "Invalid email address"
-                                    isEditError = true
-                                }
-                                if isValidAddress && isEditError{
-                                    isEditError.toggle()
-                                }
-                                if !isEditError{
-                                    isEditValid = updateUserEmail()
-                                    isEditResult.toggle()
-                                    if isEditValid{
-                                        isEditString = ""
-                                        isEditFocus = nil
-                                        editErrorMessage = ""
-                                    }
-                                    DispatchQueue.main.asyncAfter(deadline: .now() + 5, execute: {isEditResult.toggle()})
-                                }
-                            }
-                        }
-                        if isEditResult{
-                            Text(isEditReport).foregroundColor(.green).padding(.top, 5)
-                        }
-                    }.padding(10).background(.white).border(.black, width: 1).clipShape(RoundedRectangle(cornerRadius: 5)).frame(width: 350).onTapGesture{
-                        isEditFocus = nil
-                    }
-                }
-            }
-            if isPasswordEdit{
-                if !isUserVerified{
-                    VStack{
-                        ZStack{
-                            HStack{
-                                Image(systemName: "x.circle.fill").resizable().scaledToFit().frame(width: 25, height: 25)
-                            }.frame(maxWidth: .infinity, alignment: .topTrailing).onTapGesture{
-                                isPasswordEdit.toggle()
-                                isOverlayView.toggle()
-                                isVerificationString = ""
-                                isVerificationFocus = false
-                                isVerificationVisible = false
-                                isVerificationError = false
-                                verificationErrorMessage = ""
-                            }
-                        }
-                        Text("Verify Password")
-                        HStack{
-                            Image(systemName: "lock.fill").resizable().scaledToFit().frame(width: 25, height: 25).padding(.leading, 1).foregroundStyle(.black)
-                            if(!isVerificationVisible){
-                                SecureField("Password", text: $isVerificationString).focused($isVerificationFocus).background(Color.white).frame(height:30).textInputAutocapitalization(.never).autocorrectionDisabled(true).onSubmit{
-                                    if !isVerificationString.isEmpty && isVerificationError{
-                                        isVerificationError.toggle()
-                                    }
-                                }.onChange(of: isVerificationFocus, {
-                                    if !isVerificationFocus{
-                                        if !isVerificationString.isEmpty && isVerificationError{
-                                            isVerificationError.toggle()
-                                        }
-                                    }
-                                })
-                            } else{
-                                TextField("Password", text: $isVerificationString).focused($isVerificationFocus).background(Color.white).frame(height:30).textInputAutocapitalization(.never).autocorrectionDisabled(true).onSubmit{
-                                    if !isVerificationString.isEmpty && isVerificationError{
-                                        isVerificationError.toggle()
-                                    }
-                                }.onChange(of: isVerificationFocus, {
-                                    if !isVerificationFocus{
-                                        if !isVerificationString.isEmpty && isVerificationError{
-                                            isVerificationError.toggle()
-                                        }
-                                    }
-                                })
-                            }
-                            Button(action:{isVerificationVisible.toggle()}){
-                                Image(systemName: !isVerificationVisible ? "eye.slash" : "eye").resizable().scaledToFit().frame(width: 25, height: 25).padding(.trailing, 2).foregroundStyle(.black)
-                            }
-                        }.overlay(RoundedRectangle(cornerRadius: 5).stroke(.black, lineWidth: 1))
-                        if isVerificationError{
-                            Text(verificationErrorMessage).foregroundColor(.red).frame(maxWidth: .infinity, alignment: .leading).padding(5)
-                        }
-                        Text("Confirm Password").padding(10).foregroundStyle(.blue).background(Color(UIColor.systemGray5)).clipShape(RoundedRectangle(cornerRadius: 5)).onTapGesture{
-                            isVerificationFocus = false
-                            if isVerificationString.isEmpty{
-                                verificationErrorMessage = "Please enter your password"
-                                isVerificationError = true
-                            } else if isVerificationString != isUserPassword{
-                                verificationErrorMessage = "Incorrect Password"
-                                isVerificationError = true
-                            } else{
-                                isUserVerified.toggle()
-                                isVerificationString = ""
-                                isVerificationFocus = false
-                                isVerificationVisible = false
-                                isVerificationError = false
-                                verificationErrorMessage = ""
-                            }
-                        }
-                    }.padding(10).background(.white).border(.black, width: 1).clipShape(RoundedRectangle(cornerRadius: 5)).frame(width: 350).onTapGesture{
-                        isVerificationFocus = false
-                    }
-                } else{
-                    VStack{
-                        ZStack{
-                            HStack{
-                                Image(systemName: "x.circle.fill").resizable().scaledToFit().frame(width: 25, height: 25)
-                            }.frame(maxWidth: .infinity, alignment: .topTrailing).onTapGesture{
-                                isUserVerified.toggle()
-                                isPasswordEdit.toggle()
-                                isOverlayView.toggle()
-                                isEditString = ""
-                                isEditFocus = nil
-                                isEditError = false
-                                editErrorMessage = ""
-                                isEditConfirm = ""
-                                isEditConfirmVisible = false
-                                isEditConfirmError = false
-                                editConfirmErrorMessage = ""
-                            }
-                        }
-                        Text("Enter A New Password")
-                        Text("Password").frame(maxWidth: .infinity, alignment: .leading)
-                        HStack{
-                            Image(systemName: "lock.fill").resizable().scaledToFit().frame(width: 25, height: 25).padding(.leading, 1).foregroundStyle(.gray)
-                            if(!isEditVisible){
-                                SecureField("Password", text: $isEditString).focused($isEditFocus, equals: .editPassword).background(Color.white).frame(height:30).textInputAutocapitalization(.never).autocorrectionDisabled(true).onSubmit{
-                                    if !isEditString.isEmpty && isEditError{
-                                        isEditError.toggle()
-                                    }
-                                }.onChange(of: isEditFocus, {
-                                    if isEditFocus != .editPassword{
-                                        if !isEditString.isEmpty && isEditError{
-                                            isEditError.toggle()
-                                        }
-                                    }
-                                })
-                            } else{
-                                TextField("Password", text: $isEditString).focused($isEditFocus, equals: .editPassword).background(Color.white).frame(height:30).textInputAutocapitalization(.never).autocorrectionDisabled(true).onSubmit{
-                                    if !isEditString.isEmpty && isEditError{
-                                        isEditError.toggle()
-                                    }
-                                }.onChange(of: isEditFocus, {
-                                    if isEditFocus != .editPassword{
-                                        if !isEditString.isEmpty && isEditError{
-                                            isEditError.toggle()
-                                        }
-                                    }
-                                })
-                            }
-                            Button(action:{isEditVisible.toggle()}){
-                                Image(systemName: !isEditVisible ? "eye.slash" : "eye").resizable().scaledToFit().frame(width: 25, height: 25).padding(.trailing, 2).foregroundStyle(.black)
-                            }
-                        }.overlay(RoundedRectangle(cornerRadius: 5).stroke(lineWidth: 1))
-                        if isEditError{
-                            Text(editErrorMessage).foregroundColor(.red).frame(maxWidth: .infinity, alignment: .leading).padding(5)
-                        }
-                        Text("Confirm Password").frame(maxWidth: .infinity, alignment: .leading)
-                        HStack{
-                            Image(systemName: "lock.fill").resizable().scaledToFit().frame(width: 25, height: 25).padding(.leading, 1).foregroundStyle(.gray)
-                            if(!isEditConfirmVisible){
-                                SecureField("Confirm Password", text: $isEditConfirm).focused($isEditFocus, equals: .editPasswordConfirm).background(Color.white).frame(height:30).textInputAutocapitalization(.never).autocorrectionDisabled(true).onSubmit{
-                                    if !isEditConfirm.isEmpty && editConfirmErrorMessage.contains("enter") && isEditConfirmError{
-                                        isEditConfirmError.toggle()
-                                    }
-                                    if isEditConfirm == isEditString && editConfirmErrorMessage.contains("match") && isEditConfirmError{
-                                        isEditConfirmError.toggle()
-                                    }
-                                }.onChange(of: isEditFocus, {
-                                    if isEditFocus != .editPasswordConfirm{
-                                        if !isEditConfirm.isEmpty && editConfirmErrorMessage.contains("enter") && isEditConfirmError{
-                                            isEditConfirmError.toggle()
-                                        }
-                                        if isEditConfirm == isEditString && editConfirmErrorMessage.contains("match") && isEditConfirmError{
-                                            isEditConfirmError.toggle()
-                                        }
-                                    }
-                                })
-                            } else{
-                                TextField("Confirm Password", text: $isEditConfirm).focused($isEditFocus, equals: .editPasswordConfirm).background(Color.white).frame(height:30).textInputAutocapitalization(.never).autocorrectionDisabled(true).onSubmit{
-                                    if !isEditConfirm.isEmpty && editConfirmErrorMessage.contains("enter") && isEditConfirmError{
-                                        isEditConfirmError.toggle()
-                                    }
-                                    if isEditConfirm == isEditString && editConfirmErrorMessage.contains("match") && isEditConfirmError{
-                                        isEditConfirmError.toggle()
-                                    }
-                                }.onChange(of: isEditFocus, {
-                                    if isEditFocus != .editPasswordConfirm{
-                                        if !isEditConfirm.isEmpty && editConfirmErrorMessage.contains("enter") && isEditConfirmError{
-                                            isEditConfirmError.toggle()
-                                        }
-                                        if isEditConfirm == isEditString && editConfirmErrorMessage.contains("match") && isEditConfirmError{
-                                            isEditConfirmError.toggle()
-                                        }
-                                    }
-                                })
-                            }
-                            Button(action:{isEditConfirmVisible.toggle()}){
-                                Image(systemName: !isEditConfirmVisible ? "eye.slash" : "eye").resizable().scaledToFit().frame(width: 25, height: 25).padding(.trailing, 2).foregroundStyle(.black)
-                            }
-                        }.overlay(RoundedRectangle(cornerRadius: 5).stroke(lineWidth: 1))
-                        if isEditConfirmError{
-                            Text(editConfirmErrorMessage).foregroundColor(.red).frame(maxWidth: .infinity, alignment: .leading).padding(5)
-                        }
-                        Text("Confirm").padding(10).foregroundStyle(.blue).background(Color(UIColor.systemGray5)).clipShape(RoundedRectangle(cornerRadius: 5)).onTapGesture{
-                            if isEditString.isEmpty{
-                                editErrorMessage = "Please enter your password"
-                                isEditError = true
-                            } else if isEditString == isUserPassword{
-                                editErrorMessage = "Please a new password"
-                                isEditError = true
-                            }
-                            if isEditConfirm.isEmpty{
-                                editConfirmErrorMessage = "Please enter your password"
-                                isEditConfirmError = true
-                            } else if isEditConfirm != isEditString{
-                                editConfirmErrorMessage = "Passwords dont match"
-                                isEditConfirmError = true
-                            }
-                            if !isEditError && !isEditConfirmError{
-                                isEditValid = updateUserPassword()
+                                isEditValid = updateUserName()
                                 isEditResult.toggle()
                                 if isEditValid{
                                     isEditString = ""
-                                    isEditFocus = nil
+                                    isEditError = false
                                     editErrorMessage = ""
-                                    isEditConfirm = ""
-                                    isEditConfirmVisible = false
-                                    isEditConfirmError = false
-                                    editConfirmErrorMessage = ""
                                 }
                                 DispatchQueue.main.asyncAfter(deadline: .now() + 5, execute: {isEditResult.toggle()})
                             }
@@ -2022,12 +1694,397 @@ struct userProfileView: View{
                         if isEditResult{
                             Text(isEditReport).foregroundColor(.green).padding(.top, 5)
                         }
+                    }.padding(10).background(.white).clipShape(RoundedRectangle(cornerRadius: 5)).frame(width: 350).onTapGesture{
+                        isEditFocus = nil
+                    }
+                }
+                if isGenderEdit{
+                    VStack{
+                        ZStack{
+                            HStack{
+                                Image(systemName: "x.circle.fill").resizable().scaledToFit().frame(width: 25, height: 25)
+                            }.frame(maxWidth: .infinity, alignment: .topTrailing).onTapGesture{
+                                isGenderEdit.toggle()
+                                isOverlayView.toggle()
+                            }
+                        }
+                        Text("Change Gender")
                     }.padding(10).background(.white).border(.black, width: 1).clipShape(RoundedRectangle(cornerRadius: 5)).frame(width: 350).onTapGesture{
                         isEditFocus = nil
                     }
                 }
-            }
-        }//END
+                if isBirthdayEdit{
+                    VStack{
+                        ZStack{
+                            HStack{
+                                Image(systemName: "x.circle.fill").resizable().scaledToFit().frame(width: 25, height: 25)
+                            }.frame(maxWidth: .infinity, alignment: .topTrailing).onTapGesture{
+                                isBirthdayEdit.toggle()
+                                isOverlayView.toggle()
+                            }
+                        }
+                        Text("Change Birthday")
+                    }.padding(10).background(.white).border(.black, width: 1).clipShape(RoundedRectangle(cornerRadius: 5)).frame(width: 350).onTapGesture{
+                        isEditFocus = nil
+                    }
+                }
+                if isEmailEdit{
+                    if !isUserVerified{
+                        VStack{
+                            ZStack{
+                                HStack{
+                                    Image(systemName: "x.circle.fill").resizable().scaledToFit().frame(width: 25, height: 25)
+                                }.frame(maxWidth: .infinity, alignment: .topTrailing).onTapGesture{
+                                    isEmailEdit.toggle()
+                                    isOverlayView.toggle()
+                                    isVerificationString = ""
+                                    isVerificationFocus = false
+                                    isVerificationVisible = false
+                                    isVerificationError = false
+                                    verificationErrorMessage = ""
+                                }
+                            }
+                            Text("Verify Password")
+                            HStack{
+                                Image(systemName: "lock.fill").resizable().scaledToFit().frame(width: 25, height: 25).padding(.leading, 1).foregroundStyle(.black)
+                                if(!isVerificationVisible){
+                                    SecureField("Password", text: $isVerificationString).focused($isVerificationFocus).background(Color.white).frame(height:30).textInputAutocapitalization(.never).autocorrectionDisabled(true).onSubmit{
+                                        if !isVerificationString.isEmpty && isVerificationError{
+                                            isVerificationError.toggle()
+                                        }
+                                    }.onChange(of: isVerificationFocus, {
+                                        if !isVerificationFocus{
+                                            if !isVerificationString.isEmpty && isVerificationError{
+                                                isVerificationError.toggle()
+                                            }
+                                        }
+                                    })
+                                } else{
+                                    TextField("Password", text: $isVerificationString).focused($isVerificationFocus).background(Color.white).frame(height:30).textInputAutocapitalization(.never).autocorrectionDisabled(true).onSubmit{
+                                        if !isVerificationString.isEmpty && isVerificationError{
+                                            isVerificationError.toggle()
+                                        }
+                                    }.onChange(of: isVerificationFocus, {
+                                        if !isVerificationFocus{
+                                            if !isVerificationString.isEmpty && isVerificationError{
+                                                isVerificationError.toggle()
+                                            }
+                                        }
+                                    })
+                                }
+                                Button(action:{isVerificationVisible.toggle()}){
+                                    Image(systemName: !isVerificationVisible ? "eye.slash" : "eye").resizable().scaledToFit().frame(width: 25, height: 25).padding(.trailing, 2).foregroundStyle(.black)
+                                }
+                            }.overlay(RoundedRectangle(cornerRadius: 5).stroke(.black, lineWidth: 1))
+                            if isVerificationError{
+                                Text(verificationErrorMessage).foregroundColor(.red).frame(maxWidth: .infinity, alignment: .leading).padding(5)
+                            }
+                            Text("Confirm Password").padding(10).foregroundStyle(.blue).background(Color(UIColor.systemGray5)).clipShape(RoundedRectangle(cornerRadius: 5)).onTapGesture{
+                                isVerificationFocus = false
+                                if isVerificationString.isEmpty{
+                                    verificationErrorMessage = "Please enter your password"
+                                    isVerificationError = true
+                                } else if isVerificationString != isUserPassword{
+                                    verificationErrorMessage = "Incorrect Password"
+                                    isVerificationError = true
+                                } else{
+                                    isUserVerified.toggle()
+                                    isVerificationString = ""
+                                    isVerificationFocus = false
+                                    isVerificationVisible = false
+                                    isVerificationError = false
+                                    verificationErrorMessage = ""
+                                }
+                            }
+                        }.padding(10).background(.white).border(.black, width: 1).clipShape(RoundedRectangle(cornerRadius: 5)).frame(width: 350).onTapGesture{
+                            isVerificationFocus = false
+                        }
+                    } else{
+                        VStack{
+                            ZStack{
+                                HStack{
+                                    Image(systemName: "x.circle.fill").resizable().scaledToFit().frame(width: 25, height: 25)
+                                }.frame(maxWidth: .infinity, alignment: .topTrailing).onTapGesture{
+                                    isUserVerified.toggle()
+                                    isEmailEdit.toggle()
+                                    isOverlayView.toggle()
+                                    isEditString = ""
+                                    isEditFocus = nil
+                                    isEditError = false
+                                    editErrorMessage = ""
+                                }
+                            }
+                            Text("Enter A New Email Address")
+                            Text("Email").frame(maxWidth: .infinity, alignment: .leading)
+                            HStack{
+                                Image(systemName: "envelope.fill").resizable().scaledToFit().frame(width: 25, height: 25).padding(.leading, 2).foregroundStyle(.gray)
+                                TextField("Email Address", text: $isEditString).focused($isEditFocus, equals: .editEmail).background(Color.white).frame(height:30).textInputAutocapitalization(.never).autocorrectionDisabled(true).onSubmit{
+                                    if !isEditString.isEmpty && editErrorMessage.contains("enter") && isEditError{
+                                        isEditError.toggle()
+                                    }
+                                }.onChange(of: isEditFocus, {
+                                    if isEditFocus != .editEmail{
+                                        if !isEditString.isEmpty && editErrorMessage.contains("enter") && isEditError{
+                                            isEditError.toggle()
+                                        }
+                                    }
+                                })
+                            }.overlay(RoundedRectangle(cornerRadius: 5).stroke(lineWidth: 1))
+                            if isEditError{
+                                Text(editErrorMessage).foregroundColor(.red).frame(maxWidth: .infinity, alignment: .leading).padding(5)
+                            }
+                            Text("Confirm").padding(10).foregroundStyle(.blue).background(Color(UIColor.systemGray5)).clipShape(RoundedRectangle(cornerRadius: 5)).onTapGesture{
+                                if isEditString.isEmpty{
+                                    editErrorMessage = "Please enter your email address"
+                                    isEditError = true
+                                } else if isEditString == isUserEmail{
+                                    editErrorMessage = "Please enter a new email address"
+                                    isEditError = true
+                                } else{
+                                    let isEmailRegex: String = "[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\\.[a-zA-Z]{2,}"
+                                    let isEmailPredicate = NSPredicate(format: "SELF MATCHES[c] %@", isEmailRegex)
+                                    let isValidAddress = isEmailPredicate.evaluate(with: isEditString)
+                                    if !isValidAddress{
+                                        editErrorMessage = "Invalid email address"
+                                        isEditError = true
+                                    }
+                                    if isValidAddress && isEditError{
+                                        isEditError.toggle()
+                                    }
+                                    if !isEditError{
+                                        isEditValid = updateUserEmail()
+                                        isEditResult.toggle()
+                                        if isEditValid{
+                                            isEditString = ""
+                                            isEditFocus = nil
+                                            editErrorMessage = ""
+                                        }
+                                        DispatchQueue.main.asyncAfter(deadline: .now() + 5, execute: {isEditResult.toggle()})
+                                    }
+                                }
+                            }
+                            if isEditResult{
+                                Text(isEditReport).foregroundColor(.green).padding(.top, 5)
+                            }
+                        }.padding(10).background(.white).border(.black, width: 1).clipShape(RoundedRectangle(cornerRadius: 5)).frame(width: 350).onTapGesture{
+                            isEditFocus = nil
+                        }
+                    }
+                }
+                if isPasswordEdit{
+                    if !isUserVerified{
+                        VStack{
+                            ZStack{
+                                HStack{
+                                    Image(systemName: "x.circle.fill").resizable().scaledToFit().frame(width: 25, height: 25)
+                                }.frame(maxWidth: .infinity, alignment: .topTrailing).onTapGesture{
+                                    isPasswordEdit.toggle()
+                                    isOverlayView.toggle()
+                                    isVerificationString = ""
+                                    isVerificationFocus = false
+                                    isVerificationVisible = false
+                                    isVerificationError = false
+                                    verificationErrorMessage = ""
+                                }
+                            }
+                            Text("Verify Password")
+                            HStack{
+                                Image(systemName: "lock.fill").resizable().scaledToFit().frame(width: 25, height: 25).padding(.leading, 1).foregroundStyle(.black)
+                                if(!isVerificationVisible){
+                                    SecureField("Password", text: $isVerificationString).focused($isVerificationFocus).background(Color.white).frame(height:30).textInputAutocapitalization(.never).autocorrectionDisabled(true).onSubmit{
+                                        if !isVerificationString.isEmpty && isVerificationError{
+                                            isVerificationError.toggle()
+                                        }
+                                    }.onChange(of: isVerificationFocus, {
+                                        if !isVerificationFocus{
+                                            if !isVerificationString.isEmpty && isVerificationError{
+                                                isVerificationError.toggle()
+                                            }
+                                        }
+                                    })
+                                } else{
+                                    TextField("Password", text: $isVerificationString).focused($isVerificationFocus).background(Color.white).frame(height:30).textInputAutocapitalization(.never).autocorrectionDisabled(true).onSubmit{
+                                        if !isVerificationString.isEmpty && isVerificationError{
+                                            isVerificationError.toggle()
+                                        }
+                                    }.onChange(of: isVerificationFocus, {
+                                        if !isVerificationFocus{
+                                            if !isVerificationString.isEmpty && isVerificationError{
+                                                isVerificationError.toggle()
+                                            }
+                                        }
+                                    })
+                                }
+                                Button(action:{isVerificationVisible.toggle()}){
+                                    Image(systemName: !isVerificationVisible ? "eye.slash" : "eye").resizable().scaledToFit().frame(width: 25, height: 25).padding(.trailing, 2).foregroundStyle(.black)
+                                }
+                            }.overlay(RoundedRectangle(cornerRadius: 5).stroke(.black, lineWidth: 1))
+                            if isVerificationError{
+                                Text(verificationErrorMessage).foregroundColor(.red).frame(maxWidth: .infinity, alignment: .leading).padding(5)
+                            }
+                            Text("Confirm Password").padding(10).foregroundStyle(.blue).background(Color(UIColor.systemGray5)).clipShape(RoundedRectangle(cornerRadius: 5)).onTapGesture{
+                                isVerificationFocus = false
+                                if isVerificationString.isEmpty{
+                                    verificationErrorMessage = "Please enter your password"
+                                    isVerificationError = true
+                                } else if isVerificationString != isUserPassword{
+                                    verificationErrorMessage = "Incorrect Password"
+                                    isVerificationError = true
+                                } else{
+                                    isUserVerified.toggle()
+                                    isVerificationString = ""
+                                    isVerificationFocus = false
+                                    isVerificationVisible = false
+                                    isVerificationError = false
+                                    verificationErrorMessage = ""
+                                }
+                            }
+                        }.padding(10).background(.white).border(.black, width: 1).clipShape(RoundedRectangle(cornerRadius: 5)).frame(width: 350).onTapGesture{
+                            isVerificationFocus = false
+                        }
+                    } else{
+                        VStack{
+                            ZStack{
+                                HStack{
+                                    Image(systemName: "x.circle.fill").resizable().scaledToFit().frame(width: 25, height: 25)
+                                }.frame(maxWidth: .infinity, alignment: .topTrailing).onTapGesture{
+                                    isUserVerified.toggle()
+                                    isPasswordEdit.toggle()
+                                    isOverlayView.toggle()
+                                    isEditString = ""
+                                    isEditFocus = nil
+                                    isEditError = false
+                                    editErrorMessage = ""
+                                    isEditConfirm = ""
+                                    isEditConfirmVisible = false
+                                    isEditConfirmError = false
+                                    editConfirmErrorMessage = ""
+                                }
+                            }
+                            Text("Enter A New Password")
+                            Text("Password").frame(maxWidth: .infinity, alignment: .leading)
+                            HStack{
+                                Image(systemName: "lock.fill").resizable().scaledToFit().frame(width: 25, height: 25).padding(.leading, 1).foregroundStyle(.gray)
+                                if(!isEditVisible){
+                                    SecureField("Password", text: $isEditString).focused($isEditFocus, equals: .editPassword).background(Color.white).frame(height:30).textInputAutocapitalization(.never).autocorrectionDisabled(true).onSubmit{
+                                        if !isEditString.isEmpty && isEditError{
+                                            isEditError.toggle()
+                                        }
+                                    }.onChange(of: isEditFocus, {
+                                        if isEditFocus != .editPassword{
+                                            if !isEditString.isEmpty && isEditError{
+                                                isEditError.toggle()
+                                            }
+                                        }
+                                    })
+                                } else{
+                                    TextField("Password", text: $isEditString).focused($isEditFocus, equals: .editPassword).background(Color.white).frame(height:30).textInputAutocapitalization(.never).autocorrectionDisabled(true).onSubmit{
+                                        if !isEditString.isEmpty && isEditError{
+                                            isEditError.toggle()
+                                        }
+                                    }.onChange(of: isEditFocus, {
+                                        if isEditFocus != .editPassword{
+                                            if !isEditString.isEmpty && isEditError{
+                                                isEditError.toggle()
+                                            }
+                                        }
+                                    })
+                                }
+                                Button(action:{isEditVisible.toggle()}){
+                                    Image(systemName: !isEditVisible ? "eye.slash" : "eye").resizable().scaledToFit().frame(width: 25, height: 25).padding(.trailing, 2).foregroundStyle(.black)
+                                }
+                            }.overlay(RoundedRectangle(cornerRadius: 5).stroke(lineWidth: 1))
+                            if isEditError{
+                                Text(editErrorMessage).foregroundColor(.red).frame(maxWidth: .infinity, alignment: .leading).padding(5)
+                            }
+                            Text("Confirm Password").frame(maxWidth: .infinity, alignment: .leading)
+                            HStack{
+                                Image(systemName: "lock.fill").resizable().scaledToFit().frame(width: 25, height: 25).padding(.leading, 1).foregroundStyle(.gray)
+                                if(!isEditConfirmVisible){
+                                    SecureField("Confirm Password", text: $isEditConfirm).focused($isEditFocus, equals: .editPasswordConfirm).background(Color.white).frame(height:30).textInputAutocapitalization(.never).autocorrectionDisabled(true).onSubmit{
+                                        if !isEditConfirm.isEmpty && editConfirmErrorMessage.contains("enter") && isEditConfirmError{
+                                            isEditConfirmError.toggle()
+                                        }
+                                        if isEditConfirm == isEditString && editConfirmErrorMessage.contains("match") && isEditConfirmError{
+                                            isEditConfirmError.toggle()
+                                        }
+                                    }.onChange(of: isEditFocus, {
+                                        if isEditFocus != .editPasswordConfirm{
+                                            if !isEditConfirm.isEmpty && editConfirmErrorMessage.contains("enter") && isEditConfirmError{
+                                                isEditConfirmError.toggle()
+                                            }
+                                            if isEditConfirm == isEditString && editConfirmErrorMessage.contains("match") && isEditConfirmError{
+                                                isEditConfirmError.toggle()
+                                            }
+                                        }
+                                    })
+                                } else{
+                                    TextField("Confirm Password", text: $isEditConfirm).focused($isEditFocus, equals: .editPasswordConfirm).background(Color.white).frame(height:30).textInputAutocapitalization(.never).autocorrectionDisabled(true).onSubmit{
+                                        if !isEditConfirm.isEmpty && editConfirmErrorMessage.contains("enter") && isEditConfirmError{
+                                            isEditConfirmError.toggle()
+                                        }
+                                        if isEditConfirm == isEditString && editConfirmErrorMessage.contains("match") && isEditConfirmError{
+                                            isEditConfirmError.toggle()
+                                        }
+                                    }.onChange(of: isEditFocus, {
+                                        if isEditFocus != .editPasswordConfirm{
+                                            if !isEditConfirm.isEmpty && editConfirmErrorMessage.contains("enter") && isEditConfirmError{
+                                                isEditConfirmError.toggle()
+                                            }
+                                            if isEditConfirm == isEditString && editConfirmErrorMessage.contains("match") && isEditConfirmError{
+                                                isEditConfirmError.toggle()
+                                            }
+                                        }
+                                    })
+                                }
+                                Button(action:{isEditConfirmVisible.toggle()}){
+                                    Image(systemName: !isEditConfirmVisible ? "eye.slash" : "eye").resizable().scaledToFit().frame(width: 25, height: 25).padding(.trailing, 2).foregroundStyle(.black)
+                                }
+                            }.overlay(RoundedRectangle(cornerRadius: 5).stroke(lineWidth: 1))
+                            if isEditConfirmError{
+                                Text(editConfirmErrorMessage).foregroundColor(.red).frame(maxWidth: .infinity, alignment: .leading).padding(5)
+                            }
+                            Text("Confirm").padding(10).foregroundStyle(.blue).background(Color(UIColor.systemGray5)).clipShape(RoundedRectangle(cornerRadius: 5)).onTapGesture{
+                                if isEditString.isEmpty{
+                                    editErrorMessage = "Please enter your password"
+                                    isEditError = true
+                                } else if isEditString == isUserPassword{
+                                    editErrorMessage = "Please a new password"
+                                    isEditError = true
+                                }
+                                if isEditConfirm.isEmpty{
+                                    editConfirmErrorMessage = "Please enter your password"
+                                    isEditConfirmError = true
+                                } else if isEditConfirm != isEditString{
+                                    editConfirmErrorMessage = "Passwords dont match"
+                                    isEditConfirmError = true
+                                }
+                                if !isEditError && !isEditConfirmError{
+                                    isEditValid = updateUserPassword()
+                                    isEditResult.toggle()
+                                    if isEditValid{
+                                        isEditString = ""
+                                        isEditFocus = nil
+                                        editErrorMessage = ""
+                                        isEditConfirm = ""
+                                        isEditConfirmVisible = false
+                                        isEditConfirmError = false
+                                        editConfirmErrorMessage = ""
+                                    }
+                                    DispatchQueue.main.asyncAfter(deadline: .now() + 5, execute: {isEditResult.toggle()})
+                                }
+                            }
+                            if isEditResult{
+                                Text(isEditReport).foregroundColor(.green).padding(.top, 5)
+                            }
+                        }.padding(10).background(.white).border(.black, width: 1).clipShape(RoundedRectangle(cornerRadius: 5)).frame(width: 350).onTapGesture{
+                            isEditFocus = nil
+                        }
+                    }
+                }
+            }//END
+        }
+    
     }
     
     private func updateUserName()->Bool{
@@ -2087,99 +2144,239 @@ struct userProfileView: View{
 }
 
 struct userStoreView: View{
+    @State private var isHomeNavigation: Bool = false
+    @State private var isFavouritesNavigation: Bool = false
+    @State private var isWordInputNavigation: Bool = false
+    @State private var isStoreNavigation: Bool = false
+    @State private var isTaskNavigation: Bool = false
+    
     var body: some View{
-        VStack{
-            Text("Store").font(.largeTitle)
+        NavigationStack{
+            VStack{
+                Text("Store").font(.largeTitle)
+                HStack{
+                    HStack{
+                        Image(systemName:"house.fill").resizable().scaledToFit().frame(width: 50, height: 50)
+                    }.padding(.horizontal, 10).onTapGesture{isHomeNavigation.toggle()}.navigationDestination(isPresented: $isHomeNavigation){userHomeView().navigationBarBackButtonHidden(true)}
+                    HStack{
+                        Image(systemName:"heart.fill").resizable().scaledToFit().frame(width: 50, height: 50)
+                    }.padding(.horizontal, 10).onTapGesture{isFavouritesNavigation.toggle()}.navigationDestination(isPresented: $isFavouritesNavigation){userFavouriteCardsView().navigationBarBackButtonHidden(true)}
+                    HStack{
+                        Image(systemName:"plus.square.fill").resizable().scaledToFit().frame(width: 50, height: 50)
+                    }.padding(.horizontal, 10).onTapGesture{isWordInputNavigation.toggle()}.navigationDestination(isPresented: $isWordInputNavigation){/*languageThemeView().navigationBarBackButtonHidden(true)*/} // Dont forget to change word redirection to new word input page
+                    HStack{
+                        Image(systemName:"cart.fill").resizable().scaledToFit().frame(width: 50, height: 50)
+                    }.padding(.horizontal, 10).onTapGesture{isStoreNavigation.toggle()}.navigationDestination(isPresented: $isStoreNavigation){userStoreView().navigationBarBackButtonHidden(true)}
+                    HStack{
+                        Image(systemName:"sparkles").resizable().scaledToFit().frame(width: 50, height: 50)
+                    }.padding(.horizontal, 10).onTapGesture{isTaskNavigation.toggle()}.navigationDestination(isPresented: $isTaskNavigation){userTaskView().navigationBarBackButtonHidden(true)}
+                }.frame(maxHeight: .infinity, alignment: .bottom).padding(.bottom, 10)
+            }
         }
     }
 }
 
-
 struct userFavouriteCardsView: View{ // add feature when user clicks the star it removes the word from favourites
     @State private var isFavouriteWords: [String] = ["Text1", "Text2", "Text3", "Text4", "Text5"]
+    @State private var isHomeNavigation: Bool = false
+    @State private var isWordInputNavigation: Bool = false
+    @State private var isStoreNavigation: Bool = false
+    @State private var isTaskNavigation: Bool = false
     
     var body: some View{
-        ScrollView{
+        NavigationStack{
             VStack{
                 Text("Favourite Words").font(.largeTitle).frame(maxWidth: .infinity, alignment: .center).padding(.top, 10)
-                ForEach(isFavouriteWords, id: \.self){ isWord in
+                ScrollView{
                     VStack{
-                        ZStack{
+                        ForEach(isFavouriteWords, id: \.self){ isWord in
                             VStack{
-                                HStack{
-                                    Image(systemName: "x.circle.fill").resizable().scaledToFit().frame(width: 25, height: 25).padding(.top, 5).onTapGesture{
-                                        if let isCardWordIndex = isFavouriteWords.firstIndex(of: isWord){
-                                            isFavouriteWords.remove(at: isCardWordIndex)
-                                        }
-                                    }
-                                }.frame(maxWidth: .infinity, alignment: .trailing).padding(.trailing, 5)
-                            }.frame(maxHeight: .infinity, alignment: .top)
-                            Text("\(isWord)").foregroundStyle(.blue).font(.largeTitle)
+                                ZStack{
+                                    VStack{
+                                        HStack{
+                                            Image(systemName: "x.circle.fill").resizable().scaledToFit().frame(width: 25, height: 25).padding(.top, 5).onTapGesture{
+                                                if let isCardWordIndex = isFavouriteWords.firstIndex(of: isWord){
+                                                    isFavouriteWords.remove(at: isCardWordIndex)
+                                                }
+                                            }
+                                        }.frame(maxWidth: .infinity, alignment: .trailing).padding(.trailing, 5)
+                                    }.frame(maxHeight: .infinity, alignment: .top)
+                                    Text("\(isWord)").foregroundStyle(.blue).font(.largeTitle)
+                                }
+                            }.frame(width: 350, height: 200).background(Color(UIColor.systemGray5)).clipShape(RoundedRectangle(cornerRadius: 5)).padding(.vertical, 10)
                         }
-                    }.frame(width: 350, height: 200).background(Color(UIColor.systemGray5)).clipShape(RoundedRectangle(cornerRadius: 5)).padding(.vertical, 10)
-                }
+                    }
+                }.frame(height: 600)
+                HStack{
+                    HStack{
+                        Image(systemName:"house.fill").resizable().scaledToFit().frame(width: 50, height: 50)
+                    }.padding(.horizontal, 10).onTapGesture{isHomeNavigation.toggle()}.navigationDestination(isPresented: $isHomeNavigation){userHomeView().navigationBarBackButtonHidden(true)}
+                    HStack{
+                        Image(systemName:"heart.fill").resizable().scaledToFit().frame(width: 50, height: 50)
+                    }.padding(.horizontal, 10)// return to the top of current view
+                    HStack{
+                        Image(systemName:"plus.square.fill").resizable().scaledToFit().frame(width: 50, height: 50)
+                    }.padding(.horizontal, 10).onTapGesture{isWordInputNavigation.toggle()}.navigationDestination(isPresented: $isWordInputNavigation){/*languageThemeView().navigationBarBackButtonHidden(true)*/} // Dont forget to change word redirection to new word input page
+                    HStack{
+                        Image(systemName:"cart.fill").resizable().scaledToFit().frame(width: 50, height: 50)
+                    }.padding(.horizontal, 10).onTapGesture{isStoreNavigation.toggle()}.navigationDestination(isPresented: $isStoreNavigation){userStoreView().navigationBarBackButtonHidden(true)}
+                    HStack{
+                        Image(systemName:"sparkles").resizable().scaledToFit().frame(width: 50, height: 50)
+                    }.padding(.horizontal, 10).onTapGesture{isTaskNavigation.toggle()}.navigationDestination(isPresented: $isTaskNavigation){userTaskView().navigationBarBackButtonHidden(true)}
+                }.frame(maxHeight: .infinity, alignment: .bottom).padding(.bottom, 10)
             }
         }
     }
 }
 
 struct isFavouriteCardView: View{ // Add a little section at the bottom that shows the language , theme , phonetic spelling and an example of the word being used gramticaly (AI)
+    @State private var isHomeNavigation: Bool = false
+    @State private var isFavouritesNavigation: Bool = false
+    @State private var isWordInputNavigation: Bool = false
+    @State private var isStoreNavigation: Bool = false
+    @State private var isTaskNavigation: Bool = false
+    
     var body: some View{
-        ScrollView{
-            VStack{
-                HStack{
-                    Image(systemName:"arrow.left.square.fill").resizable().scaledToFit().frame(width: 25, height: 25).frame(maxWidth: .infinity, alignment: .leading).padding(.leading, 15)
-                    Image(systemName:"arrow.right.square.fill").resizable().scaledToFit().frame(width: 25, height: 25).frame(maxWidth: .infinity, alignment: .trailing).padding(.trailing, 15)
-                }
+        VStack{
+            ScrollView{
                 VStack{
-                    ZStack{
-                        VStack{
-                            HStack{
-                                Image(systemName: "star.fill").resizable().scaledToFit().frame(width: 25, height: 25).padding(.top, 5)
-                            }.frame(maxWidth: .infinity, alignment: .trailing).padding(.trailing, 5)
-                        }.frame(maxHeight: .infinity, alignment: .top)
-                        Text("Word")
-                        VStack{
-                            HStack{
-                                Image(systemName: "speaker.wave.3.fill").resizable().scaledToFit().frame(width: 25, height: 25).padding(.bottom, 5)
-                            }.frame(maxWidth: .infinity, alignment: .trailing).padding(.trailing, 5)
-                        }.frame(maxHeight: .infinity, alignment: .bottom)
+                    HStack{
+                        Image(systemName:"arrow.left.square.fill").resizable().scaledToFit().frame(width: 25, height: 25).frame(maxWidth: .infinity, alignment: .leading).padding(.leading, 15)
+                        Image(systemName:"arrow.right.square.fill").resizable().scaledToFit().frame(width: 25, height: 25).frame(maxWidth: .infinity, alignment: .trailing).padding(.trailing, 15)
                     }
-                }.frame(width: 350, height: 200).background(Color(UIColor.systemGray5)).clipShape(RoundedRectangle(cornerRadius: 10))
-                VStack{
-                    Text("Information")
-                }.frame(width: 375, height: 500).background(Color(UIColor.systemGray3)).clipShape(RoundedRectangle(cornerRadius: 5)).padding(.top, 10)
+                    VStack{
+                        ZStack{
+                            VStack{
+                                HStack{
+                                    Image(systemName: "star.fill").resizable().scaledToFit().frame(width: 25, height: 25).padding(.top, 5)
+                                }.frame(maxWidth: .infinity, alignment: .trailing).padding(.trailing, 5)
+                            }.frame(maxHeight: .infinity, alignment: .top)
+                            Text("Word")
+                            VStack{
+                                HStack{
+                                    Image(systemName: "speaker.wave.3.fill").resizable().scaledToFit().frame(width: 25, height: 25).padding(.bottom, 5)
+                                }.frame(maxWidth: .infinity, alignment: .trailing).padding(.trailing, 5)
+                            }.frame(maxHeight: .infinity, alignment: .bottom)
+                        }
+                    }.frame(width: 350, height: 200).background(Color(UIColor.systemGray5)).clipShape(RoundedRectangle(cornerRadius: 10))
+                    VStack{
+                        Text("Information")
+                    }.frame(width: 375, height: 500).background(Color(UIColor.systemGray3)).clipShape(RoundedRectangle(cornerRadius: 5)).padding(.top, 10)
+                }
+                
             }
+            HStack{
+                HStack{
+                    Image(systemName:"house.fill").resizable().scaledToFit().frame(width: 50, height: 50)
+                }.padding(.horizontal, 10).onTapGesture{isHomeNavigation.toggle()}.navigationDestination(isPresented: $isHomeNavigation){userHomeView().navigationBarBackButtonHidden(true)}
+                HStack{
+                    Image(systemName:"heart.fill").resizable().scaledToFit().frame(width: 50, height: 50)
+                }.padding(.horizontal, 10).onTapGesture{isFavouritesNavigation.toggle()}.navigationDestination(isPresented: $isFavouritesNavigation){userFavouriteCardsView().navigationBarBackButtonHidden(true)}
+                HStack{
+                    Image(systemName:"plus.square.fill").resizable().scaledToFit().frame(width: 50, height: 50)
+                }.padding(.horizontal, 10).onTapGesture{isWordInputNavigation.toggle()}.navigationDestination(isPresented: $isWordInputNavigation){/*languageThemeView().navigationBarBackButtonHidden(true)*/} // Dont forget to change word redirection to new word input page
+                HStack{
+                    Image(systemName:"cart.fill").resizable().scaledToFit().frame(width: 50, height: 50)
+                }.padding(.horizontal, 10).onTapGesture{isStoreNavigation.toggle()}.navigationDestination(isPresented: $isStoreNavigation){userStoreView().navigationBarBackButtonHidden(true)}
+                HStack{
+                    Image(systemName:"sparkles").resizable().scaledToFit().frame(width: 50, height: 50)
+                }.padding(.horizontal, 10).onTapGesture{isTaskNavigation.toggle()}.navigationDestination(isPresented: $isTaskNavigation){userTaskView().navigationBarBackButtonHidden(true)}
+            }.frame(maxHeight: .infinity, alignment: .bottom).padding(.bottom, 10)
         }
     }
 }
 
 struct userSettingView: View{
+    @State private var isHomeNavigation: Bool = false
+    @State private var isFavouritesNavigation: Bool = false
+    @State private var isWordInputNavigation: Bool = false
+    @State private var isStoreNavigation: Bool = false
+    @State private var isTaskNavigation: Bool = false
+    
     var body: some View{
-        ZStack{
-            VStack{
-                Text("Setting").font(.largeTitle).frame(maxWidth: .infinity, alignment: .center).padding(.top, 10)
-                HStack{
-                    Text("Language").font(.title3).frame(maxWidth: .infinity, alignment: .leading).padding(.leading, 10)
-                    Image(systemName:  "chevron.right").frame(maxWidth: .infinity, alignment: .trailing).padding(.trailing, 5)
-                }.padding(10)
-                HStack{
-                    Text("Delete Account").font(.title3).frame(maxWidth: .infinity, alignment: .leading).padding(.leading, 10)
-                    Image(systemName:  "chevron.right").frame(maxWidth: .infinity, alignment: .trailing).padding(.trailing, 5)
-                }.padding(10)
-            }
-        }//.overlay(alignment: .center){}
+        NavigationStack{
+            ZStack{
+                VStack{
+                    Text("Setting").font(.largeTitle).frame(maxWidth: .infinity, alignment: .center).padding(.top, 10)
+                    HStack{
+                        Text("Language").font(.title3).frame(maxWidth: .infinity, alignment: .leading).padding(.leading, 10)
+                        Image(systemName:  "chevron.right").frame(maxWidth: .infinity, alignment: .trailing).padding(.trailing, 5)
+                    }.padding(10)
+                    HStack{
+                        Text("Delete Account").font(.title3).frame(maxWidth: .infinity, alignment: .leading).padding(.leading, 10)
+                        Image(systemName:  "chevron.right").frame(maxWidth: .infinity, alignment: .trailing).padding(.trailing, 5)
+                    }.padding(10)
+                    HStack{
+                        HStack{
+                            Image(systemName:"house.fill").resizable().scaledToFit().frame(width: 50, height: 50)
+                        }.padding(.horizontal, 10).onTapGesture{isHomeNavigation.toggle()}.navigationDestination(isPresented: $isHomeNavigation){userHomeView().navigationBarBackButtonHidden(true)}
+                        HStack{
+                            Image(systemName:"heart.fill").resizable().scaledToFit().frame(width: 50, height: 50)
+                        }.padding(.horizontal, 10).onTapGesture{isFavouritesNavigation.toggle()}.navigationDestination(isPresented: $isFavouritesNavigation){userFavouriteCardsView().navigationBarBackButtonHidden(true)}
+                        HStack{
+                            Image(systemName:"plus.square.fill").resizable().scaledToFit().frame(width: 50, height: 50)
+                        }.padding(.horizontal, 10).onTapGesture{isWordInputNavigation.toggle()}.navigationDestination(isPresented: $isWordInputNavigation){/*languageThemeView().navigationBarBackButtonHidden(true)*/} // Dont forget to change word redirection to new word input page
+                        HStack{
+                            Image(systemName:"cart.fill").resizable().scaledToFit().frame(width: 50, height: 50)
+                        }.padding(.horizontal, 10).onTapGesture{isStoreNavigation.toggle()}.navigationDestination(isPresented: $isStoreNavigation){userStoreView().navigationBarBackButtonHidden(true)}
+                        HStack{
+                            Image(systemName:"sparkles").resizable().scaledToFit().frame(width: 50, height: 50)
+                        }.padding(.horizontal, 10).onTapGesture{isTaskNavigation.toggle()}.navigationDestination(isPresented: $isTaskNavigation){userTaskView().navigationBarBackButtonHidden(true)}
+                    }.frame(maxHeight: .infinity, alignment: .bottom).padding(.bottom, 10)
+                }
+            }//.overlay(alignment: .center){}
+        }
     }
     
     private func userAccountDeletion()->Bool{
         var isRemovalValid: Bool = true
-        userHomePageView.isUser?.delete{ error in
+        userHomeView.isUser?.delete{ error in
             if let hasSignOutError = error{
                 isRemovalValid.toggle()
                 print(hasSignOutError.localizedDescription)
             }
         }
         return isRemovalValid
+    }
+}
+
+struct userTaskView: View{
+    @State private var isHomeNavigation: Bool = false
+    @State private var isFavouritesNavigation: Bool = false
+    @State private var isWordInputNavigation: Bool = false
+    @State private var isStoreNavigation: Bool = false
+    
+    var body: some View{
+        NavigationStack{
+            VStack{
+                Text("task")
+                HStack{
+                    HStack{
+                        Image(systemName:"house.fill").resizable().scaledToFit().frame(width: 50, height: 50)
+                    }.padding(.horizontal, 10).onTapGesture{isHomeNavigation.toggle()}.navigationDestination(isPresented: $isHomeNavigation){userHomeView().navigationBarBackButtonHidden(true)}
+                    HStack{
+                        Image(systemName:"heart.fill").resizable().scaledToFit().frame(width: 50, height: 50)
+                    }.padding(.horizontal, 10).onTapGesture{isFavouritesNavigation.toggle()}.navigationDestination(isPresented: $isFavouritesNavigation){userFavouriteCardsView().navigationBarBackButtonHidden(true)}
+                    HStack{
+                        Image(systemName:"plus.square.fill").resizable().scaledToFit().frame(width: 50, height: 50)
+                    }.padding(.horizontal, 10).onTapGesture{isWordInputNavigation.toggle()}.navigationDestination(isPresented: $isWordInputNavigation){/*languageThemeView().navigationBarBackButtonHidden(true)*/} // Dont forget to change word redirection to new word input page
+                    HStack{
+                        Image(systemName:"cart.fill").resizable().scaledToFit().frame(width: 50, height: 50)
+                    }.padding(.horizontal, 10).onTapGesture{isStoreNavigation.toggle()}.navigationDestination(isPresented: $isStoreNavigation){userStoreView().navigationBarBackButtonHidden(true)}
+                    HStack{
+                        Image(systemName:"sparkles").resizable().scaledToFit().frame(width: 50, height: 50)
+                    }.padding(.horizontal, 10)
+                }.frame(maxHeight: .infinity, alignment: .bottom).padding(.bottom, 10)
+            }
+        }
+    }
+}
+
+struct errorView: View {
+    var body: some View{
+        VStack{
+            Text("Error")
+        }
     }
 }
 
