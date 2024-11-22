@@ -2233,7 +2233,7 @@ struct userFavouriteCardsView: View{ // add feature when user clicks the star it
                                                 HStack{
                                                     Image(systemName: "x.circle.fill").resizable().scaledToFit().frame(width: 25, height: 25).padding(.top, 5).onTapGesture{
                                                         _ = Task{
-                                                            let isEntryRemoved =  await Task{ return await removeWord(isWordLanguage: hasLanguageEntry, isLanguageEntryID: hasLanguageEntryID)}.value
+                                                            let isEntryRemoved = await removeWord(isWordLanguage: hasLanguageEntry, isLanguageEntryID: hasLanguageEntryID)
                                                             if isEntryRemoved{
                                                                 isFavouriteWords[hasLanguageEntry]?.removeAll{$0 == hasLanguageEntryID}
                                                                 getFavourtieWords.removeValue(forKey: "\(hasLanguageEntry)_\(hasLanguageEntryID)")
@@ -2272,7 +2272,7 @@ struct userFavouriteCardsView: View{ // add feature when user clicks the star it
                 }.frame(maxHeight: .infinity, alignment: .bottom).padding(.bottom, 10)
             }.onAppear{
                 _ = Task{
-                    let hasLoaded = try await Task{return try await initialLoading()}.value
+                    let hasLoaded = try await initialLoading()
                     if hasLoaded{
                         isDataLoaded.toggle()
                     }
