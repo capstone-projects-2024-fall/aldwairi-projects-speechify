@@ -2211,9 +2211,8 @@ struct userStoreView: View{
 
 struct userFavouriteCardsView: View{ // add feature when user clicks the star it removes the word from favourites
     @State private var isFavouriteWords: [String:[Int]] = [:]
-    @State private var isWord: String = ""
-    @State private var isWordLanguage: String = ""
-    @State private var isLanguageEntryID: Int = -1
+    @State private var getFavourtieWords: [String:String] = [:]
+    @State private var isDataLoaded: Bool = false
     @State private var isHomeNavigation: Bool = false
     @State private var isWordInputNavigation: Bool = false
     @State private var isStoreNavigation: Bool = false
@@ -2223,38 +2222,37 @@ struct userFavouriteCardsView: View{ // add feature when user clicks the star it
         NavigationStack{
             VStack{
                 Text("Favourite Words").font(.largeTitle).frame(maxWidth: .infinity, alignment: .center).padding(.top, 10)
-                ScrollView{
-                    VStack{
-                        ForEach(isFavouriteWords.keys.sorted(), id: \.self){ hasLanguageEntry in
-                            ForEach(isFavouriteWords[hasLanguageEntry] ?? [], id: \.self){ hasLanguageEntryID in
-                                VStack{
-                                    ZStack{
-                                        VStack{
-                                            HStack{
-                                                Image(systemName: "x.circle.fill").resizable().scaledToFit().frame(width: 25, height: 25).padding(.top, 5).onTapGesture{
-                                                    isFavouriteWords[isWord]?.removeAll{$0 == isLanguageEntryID}
-                                                    _ = Task{
-                                                        _ = await removeWord()
+                if isDataLoaded{
+                    ScrollView{
+                        VStack{
+                            ForEach(isFavouriteWords.keys.sorted(), id: \.self){ hasLanguageEntry in
+                                ForEach(isFavouriteWords[hasLanguageEntry] ?? [], id: \.self){ hasLanguageEntryID in
+                                    VStack{
+                                        ZStack{
+                                            VStack{
+                                                HStack{
+                                                    Image(systemName: "x.circle.fill").resizable().scaledToFit().frame(width: 25, height: 25).padding(.top, 5).onTapGesture{
+                                                        _ = Task{
+                                                            let isEntryRemoved =  await Task{ return await removeWord(isWordLanguage: hasLanguageEntry, isLanguageEntryID: hasLanguageEntryID)}.value
+                                                            if isEntryRemoved{
+                                                                isFavouriteWords[hasLanguageEntry]?.removeAll{$0 == hasLanguageEntryID}
+                                                                getFavourtieWords.removeValue(forKey: "\(hasLanguageEntry)_\(hasLanguageEntryID)")
+                                                            }
+                                                            
+                                                        }
                                                     }
-                                                }
-                                            }.frame(maxWidth: .infinity, alignment: .trailing).padding(.trailing, 5)
-                                        }.frame(maxHeight: .infinity, alignment: .top)
-                                        Text("\(isWord)").foregroundStyle(.blue).font(.largeTitle)
-                                    }.task{
-                                        isWordLanguage = hasLanguageEntry
-                                        isLanguageEntryID = hasLanguageEntryID
-                                        
-                                        do{
-                                            _ = await getFavouriteWord()
-                                        } catch{
-                                            print(error.localizedDescription)
+                                                }.frame(maxWidth: .infinity, alignment: .trailing).padding(.trailing, 5)
+                                            }.frame(maxHeight: .infinity, alignment: .top)
+                                            Text(getFavourtieWords["\(hasLanguageEntry)_\(hasLanguageEntryID)"] ?? "Error)").foregroundStyle(.blue).font(.largeTitle)
                                         }
-                                    }
-                                }.frame(width: 350, height: 200).background(Color(UIColor.systemGray5)).clipShape(RoundedRectangle(cornerRadius: 5)).padding(.vertical, 10)
+                                    }.frame(width: 350, height: 200).background(Color(UIColor.systemGray5)).clipShape(RoundedRectangle(cornerRadius: 5)).padding(.vertical, 10)
+                                }
                             }
                         }
-                    }
-                }.frame(height: 600)
+                    }.frame(height: 600)
+                } else{
+                    Text("Loading...").font(.headline)
+                }
                 HStack{
                     HStack{
                         Image(systemName:"house.fill").resizable().scaledToFit().frame(width: 50, height: 50)
@@ -2272,19 +2270,18 @@ struct userFavouriteCardsView: View{ // add feature when user clicks the star it
                         Image(systemName:"sparkles").resizable().scaledToFit().frame(width: 50, height: 50)
                     }.padding(.horizontal, 10).onTapGesture{isTaskNavigation.toggle()}.navigationDestination(isPresented: $isTaskNavigation){userTaskView().navigationBarBackButtonHidden(true)}
                 }.frame(maxHeight: .infinity, alignment: .bottom).padding(.bottom, 10)
-            }.task{
-                do{
-                    _ = await initialLoading()
-                    print(isFavouriteWords)
-                    //isErrorOccurrence.toggle()
-                } catch{
-                    print(error.localizedDescription)
+            }.onAppear{
+                _ = Task{
+                    let hasLoaded = try await Task{return try await initialLoading()}.value
+                    if hasLoaded{
+                        isDataLoaded.toggle()
+                    }
                 }
-            }
+            }.onDisappear{if isDataLoaded{isDataLoaded.toggle()}}
         }
     }
     
-    private func initialLoading()async->Bool{
+    private func initialLoading()async throws->Bool{
         var hasUserFavourites: Bool = false
         guard let isUserID = userHomeView.isUser?.uid else{return false}
         do{
@@ -2292,6 +2289,16 @@ struct userFavouriteCardsView: View{ // add feature when user clicks the star it
             guard isUserDocument.exists else{return false}
             guard let isLanguageFavourites = isUserDocument.data()?["favouriteWords"] as? [String:[Int]] else{return false}
             isFavouriteWords = isLanguageFavourites
+            for (hasLanguageEntry, hasLanguageEntryReference) in isLanguageFavourites{
+                for hasLanguageEntryID in hasLanguageEntryReference{
+                    try await Task{
+                        let isLanguageEntry = try await Firestore.firestore().collection(hasLanguageEntry).document(String(hasLanguageEntryID)).getDocument()
+                        let isWordReference = "\(hasLanguageEntry)_\(hasLanguageEntryID)"
+                        guard let getWordField = isLanguageEntry.data()?["isWord"] as? String else{return}
+                        getFavourtieWords[isWordReference] = getWordField
+                    }.value
+                }
+            }
             hasUserFavourites.toggle()
         } catch{
             print(error.localizedDescription)
@@ -2299,23 +2306,7 @@ struct userFavouriteCardsView: View{ // add feature when user clicks the star it
         return hasUserFavourites
     }
     
-    private func getFavouriteWord()async->Bool{
-        var hasWord: Bool = false
-        guard let isUserID = userHomeView.isUser?.uid else{return false}
-        do{
-            let isUserDocument = try await Firestore.firestore().collection("users").document(isUserID).getDocument()
-            guard isUserDocument.exists else{return false}
-            let isLanguageEntry = try await Firestore.firestore().collection(isWordLanguage).document(String(isLanguageEntryID)).getDocument()
-            guard let getWordField = isLanguageEntry.data()?["isWord"] as? String else{return false}
-            isWord = getWordField
-            hasWord.toggle()
-        } catch{
-            print(error.localizedDescription)
-        }
-        return hasWord
-    }
-    
-    private func removeWord()async->Bool{
+    private func removeWord(isWordLanguage: String, isLanguageEntryID: Int)async->Bool{
         var isWordRemoved: Bool = false
         guard let isUserID = userHomeView.isUser?.uid else{return false}
         do{
