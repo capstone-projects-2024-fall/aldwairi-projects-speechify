@@ -938,6 +938,11 @@ struct userHomeView: View{
     
     @State private var isWordInputNavigation: Bool = false
     @State private var isTaskNavigation: Bool = false
+
+    @State private var isAPIOutput: String = ""
+    @State private var isAPILoading: Bool = false
+    @State private var isAPIError: Bool = false
+    @State private var isAPIErrorMessage: String?
     
     init(){
         guard userHomeView.isUser != nil else{
@@ -1447,6 +1452,88 @@ struct userHomeView: View{
             print(error.localizedDescription)
         }
         return isSignOutValid
+    }
+
+    private func getAPIPhonetic(){
+        isAPILoading.toggle()
+        isAPIErrorMessage = nil
+        guard let getServerURL = URL(string: "https://stunning-lamp-qrvjpwp7rjrf6xrj-5000.app.github.dev/phonemize") else{return}
+        var isServerRequest = URLRequest(url: getServerURL)
+        isServerRequest.httpMethod = "POST"
+        isServerRequest.setValue("application/json", forHTTPHeaderField: "Content-Type")
+        isServerRequest.setValue("capstone@24", forHTTPHeaderField: "Authorization")
+        let isMessage: [String:String] = ["isMessage" : isWord]
+        do{
+            let isMessageDataPost = try JSONSerialization.data(withJSONObject: isMessage, options: [])
+            isServerRequest.httpBody = isMessageDataPost
+        } catch{
+            isAPIErrorMessage = "Error: \(error.localizedDescription)"
+            isAPIError.toggle()
+            print(error.localizedDescription)
+            return
+        }
+        let isURLSession = URLSession.shared
+        isURLSession.dataTask(with: isServerRequest){ isData, isURLResponse, isError in
+            DispatchQueue.main.async{
+                isAPILoading.toggle()
+            }
+            if let hasError = isError{
+                DispatchQueue.main.async{
+                    isAPIErrorMessage = hasError.localizedDescription
+                    isAPIError.toggle()
+                    print("Request Error: \(hasError.localizedDescription)")
+                }
+                return
+            }
+            if let isHTTPResponse = isURLResponse as? HTTPURLResponse, !(200...299).contains(isHTTPResponse.statusCode){
+                DispatchQueue.main.async{
+                    isAPIErrorMessage = "Server responded with error code: \(isHTTPResponse.statusCode)"
+                    print("Server responded with error code: \(isHTTPResponse.statusCode)")
+                    if let serverErrorResponse = isData{
+                        do{
+                            if let isErrorMessage = try JSONSerialization.jsonObject(with: serverErrorResponse, options: []) as? [String: Any]{
+                                isAPIErrorMessage? += "\n\(isErrorMessage)"
+                                print("Error Response: \(isErrorMessage)")
+                            }
+                        } catch{
+                            isAPIErrorMessage = error.localizedDescription
+                            print("Error parsing error response: \(error.localizedDescription)")
+                        }
+                    }
+                    isAPIError.toggle()
+                }
+                return
+            }
+            guard let hasData = isData else{
+                DispatchQueue.main.async{
+                    isAPIErrorMessage = "No data received from the server"
+                    isAPIError.toggle()
+                    print("No data received from the server")
+                }
+                return
+            }
+            do{
+                guard let isJsonServerResponse = try JSONSerialization.jsonObject(with: hasData, options: []) as? [String:Any] else{
+                    DispatchQueue.main.async{
+                        isAPIErrorMessage = "Invalid Response Format"
+                        isAPIError.toggle()
+                        print("Invalid Response Format")
+                    }
+                    return
+                }
+                guard let isWordPhonetic = isJsonServerResponse["isMessagePhonetic"] as? String else{return}
+                DispatchQueue.main.async{
+                    print("Phonetic: \(isWordPhonetic)")
+                    isAPIOutput = isWordPhonetic
+                }
+            } catch{
+                DispatchQueue.main.async{
+                    isAPIErrorMessage = "Error: \(error.localizedDescription)"
+                    isAPIError.toggle()
+                    print("Error: \(error.localizedDescription)")
+                }
+            }
+        }.resume()
     }
     
     private func uploadFile() async -> Bool{
