@@ -1610,6 +1610,108 @@ struct languageThemeView: View{
     }
 }
 
+struct wordSearchView : View{
+    @State private var isSearchInput:String = ""
+    @FocusState private var isSearchFocus:Bool
+    @State private var isSearchResult:[String:[Int]] = [:]
+    @State private var getSearchResult:[String:String] = [:]
+    @State private var viewSearchResult:Bool = false
+    @State private var isHomeNavigation:Bool = false
+    @State private var isFavouritesNavigation:Bool = false
+    @State private var isWordInputNavigation:Bool = false
+    @State private var isStoreNavigation:Bool = false
+    @State private var isTaskNavigation:Bool = false
+    
+    init(){
+        isSearchFocus = true
+    }
+    
+    var body: some View{
+        NavigationStack{
+            VStack{
+                HStack{
+                    TextField("Search", text: $isSearchInput).focused($isSearchFocus).background(Color.white).frame(height:45).padding(.leading, 15).textInputAutocapitalization(.never).autocorrectionDisabled(true)
+                    Image(systemName: "magnifyingglass").resizable().scaledToFit().frame(width: 25, height: 25).padding(.trailing, 5).foregroundStyle(.gray).onTapGesture{
+                        Task{
+                            await searchQueryThrottled()
+                            viewSearchResult = true
+                        }
+                    }
+                }.overlay(RoundedRectangle(cornerRadius: 20).stroke(lineWidth: 1))
+                if viewSearchResult{
+                    ScrollView{
+                        VStack{
+                            ForEach(isSearchResult.keys.sorted(), id: \.self){ hasLanguageEntry in
+                                ForEach(isSearchResult[hasLanguageEntry] ?? [], id: \.self){ hasLanguageEntryID in
+                                    VStack{
+                                        Text(getSearchResult["\(hasLanguageEntry)_\(hasLanguageEntryID)"] ?? "Error)").foregroundStyle(.blue).font(.largeTitle)
+                                    }.frame(maxWidth:.infinity, minHeight: 45).background(Color(UIColor.systemGray5)).clipShape(RoundedRectangle(cornerRadius: 10)).padding(.vertical, 10)
+                                }
+                            }
+                        }
+                    }.frame(height: 600)
+                }
+            }.padding(5)
+            HStack{
+                HStack{
+                    Image(systemName:"house.fill").resizable().scaledToFit().frame(width: 50, height: 50)
+                }.padding(.horizontal, 10).onTapGesture{isHomeNavigation.toggle()}.navigationDestination(isPresented: $isHomeNavigation){userHomeView().navigationBarBackButtonHidden(true)}
+                HStack{
+                    Image(systemName:"star.fill").resizable().scaledToFit().frame(width: 50, height: 50)
+                }.padding(.horizontal, 10).onTapGesture{isFavouritesNavigation.toggle()}.navigationDestination(isPresented: $isFavouritesNavigation){userFavouriteCardsView().navigationBarBackButtonHidden(true)}
+                HStack{
+                    Image(systemName:"plus.square.fill").resizable().scaledToFit().frame(width: 50, height: 50)
+                }.padding(.horizontal, 10).onTapGesture{isWordInputNavigation.toggle()}.navigationDestination(isPresented: $isWordInputNavigation){/*languageThemeView().navigationBarBackButtonHidden(true)*/} // Dont forget to change word redirection to new word input page
+                HStack{
+                    Image(systemName:"cart.fill").resizable().scaledToFit().frame(width: 50, height: 50)
+                }.padding(.horizontal, 10).onTapGesture{isStoreNavigation.toggle()}.navigationDestination(isPresented: $isStoreNavigation){userStoreView().navigationBarBackButtonHidden(true)}
+                HStack{
+                    Image(systemName:"sparkles").resizable().scaledToFit().frame(width: 50, height: 50)
+                }.padding(.horizontal, 10).onTapGesture{isTaskNavigation.toggle()}.navigationDestination(isPresented: $isTaskNavigation){userTaskView().navigationBarBackButtonHidden(true)}
+            }.frame(maxHeight: .infinity, alignment: .bottom).padding(.bottom, 10)
+        }
+    }
+    
+    private func searchQueryThrottled()async{
+        isSearchResult = [:]
+        if isSearchInput.isEmpty{return}
+        guard let isUserID = userHomeView.isUser?.uid else{return}
+        //var getSearchResult: [String:[Int]] = [:]
+        do{
+            let isUserDocument = try await Firestore.firestore().collection("users").document(isUserID).getDocument()
+            guard isUserDocument.exists else{return}
+            guard let isUserLearnLanguages = isUserDocument.data()?["learnLanguage"] as? [String] else{return}
+            //get server info
+            let isLanguageEntrySearch = ["eng_US"]
+            print("test")
+            for isLanguage in isLanguageEntrySearch{
+                let isEntryDocument = try await Firestore.firestore().collection(isLanguage).whereField("isWord", isEqualTo: isSearchInput).getDocuments() //Modify to search for contains instead of euqalTo
+                for isDocument in isEntryDocument.documents{
+                    guard let isEntryID = isDocument.data()["isID"] as? Int else{return}
+                    if isSearchResult.keys.contains(isLanguage){
+                        isSearchResult[isLanguage]?.append(isEntryID)
+                    } else{
+                        isSearchResult[isLanguage] = [isEntryID]
+                    }
+                }
+            }
+            for (hasLanguageEntry, hasLanguageEntryReference) in isSearchResult{
+                for hasLanguageEntryID in hasLanguageEntryReference{
+                    try await Task{
+                        let isLanguageEntry = try await Firestore.firestore().collection(hasLanguageEntry).document(String(hasLanguageEntryID)).getDocument()
+                        let isWordReference = "\(hasLanguageEntry)_\(hasLanguageEntryID)"
+                        guard let getWordField = isLanguageEntry.data()?["isWord"] as? String else{return}
+                        getSearchResult[isWordReference] = getWordField
+                    }.value
+                }
+            }
+            print("Done")
+        } catch{
+            print(error.localizedDescription)
+        }
+    }
+}
+
 struct userProfileView: View{
     let isUser = userHomeView.isUser
     enum editFocus: Hashable{
