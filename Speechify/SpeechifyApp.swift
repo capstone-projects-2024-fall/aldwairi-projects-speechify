@@ -892,57 +892,57 @@ class AudioPlayerDelegate: NSObject, AVAudioPlayerDelegate{
 }
 
 struct userHomeView: View{
-    @State private var isInitialLoad = true
+    @State private var isInitialLoad:Bool = true
     static let isUser = Auth.auth().currentUser
-    @State private var isErrorOccurrence: Bool = false
-    @State private var isCardWord: Bool = true
-    @State private var isFavourite: Bool = false
-    @State private var isLearnLanguages: [String] = []
-    @State private var isWordLanguage: String = ""
-    @State private var isWord: String = "Word"
-    @State private var isPhonetic: String = "Phonetic-Spelling"
-    @State private var isPronunciation: String = ""
-    @State private var isLanguageEntryID: Int = 0
-    @State private var isPreviousWords: [String:[Int]] = [:]
-    @State private var indexingPreviousWords: (isLanguage: String, isIndex: Int, isCurrent: Bool) = ("", -1, true)
-    @State private var isLanguageIndex: Int = -1
-    @State private var isSpeechSynthesizer: AVSpeechSynthesizer?
-    @State private var speechSynthesizerLanguages: [String] = []
+    @State private var isErrorOccurrence:Bool = false
+    @State private var isCardWord:Bool = true
+    @State private var isFavourite:Bool = false
+    @State private var isLearnLanguages:[String] = []
+    @State private var isWordLanguage:String = ""
+    @State private var isWord:String = "Word"
+    @State private var isPhonetic:String = "Phonetic-Spelling"
+    @State private var isPronunciation:String = ""
+    @State private var isLanguageEntryID:Int = 0
+    @State private var isPreviousWords:[String:[Int]] = [:]
+    @State private var indexingPreviousWords:(isLanguage:String, isIndex:Int, isCurrent:Bool) = ("", -1, true)
+    @State private var isLanguageIndex:Int = -1
+    @State private var isSpeechSynthesizer:AVSpeechSynthesizer?
+    @State private var speechSynthesizerLanguages:[String] = []
     
+    @State private var hasUserImage:Bool = false
     
-    @State private var hasUserImage: Bool = false
-    @State private var viewSettings: Bool = false
-    @State private var isProfileNavigation: Bool = false
-    @State private var isStoreNavigation: Bool = false
-    @State private var isFavouritesNavigation: Bool = false
-    @State private var isSettingNavigation: Bool = false
-    @State private var signOutNavigation: Bool = false
-    @State private var isThemeNavigation: Bool = false
-    @State private var hasMicrophoneAccess: Bool = false
-    @State private var isAudioRecording: Bool = false
-    @State private var hasRecorderError: Bool = false
-    @State private var isAudioRecorder: AVAudioRecorder?
-    @State private var isAudioSession: AVAudioSession?
-    @State private var isAudioURL: URL?
-    @State private var isAudioPlayer: AVAudioPlayer?
-    @State private var isAudioPlaying: Bool = false
-    @State private var hasPlayerError: Bool = false
+    @State private var hasMicrophoneAccess:Bool = false
+    @State private var isAudioRecording:Bool = false
+    @State private var hasRecorderError:Bool = false
+    @State private var isAudioRecorder:AVAudioRecorder?
+    @State private var isAudioSession:AVAudioSession?
+    @State private var isAudioURL:URL?
+    @State private var isAudioPlayer:AVAudioPlayer?
+    @State private var isAudioPlaying:Bool = false
+    @State private var hasPlayerError:Bool = false
     @State private var hasSpeechRecognizer = SFSpeechRecognizer(locale: Locale(identifier: "en_US"))
-    @State private var hasSpeechRecognizerAccess: Bool = false
-    @State private var isAudioEngine = AVAudioEngine()
-    @State private var speechRecognitionTask: SFSpeechRecognitionTask?
-    @State private var isBufferRecognitionRequest: SFSpeechAudioBufferRecognitionRequest?
+    @State private var hasSpeechRecognizerAccess:Bool = false
+    @State private var isAudioEngine:AVAudioEngine = AVAudioEngine()
+    @State private var speechRecognitionTask:SFSpeechRecognitionTask?
+    @State private var isBufferRecognitionRequest:SFSpeechAudioBufferRecognitionRequest?
     
-    @State private var isAudioText: String = ""
-    @State private var isAudioDelegate: AudioPlayerDelegate?
+    @State private var isAudioText:String = ""
+    @State private var isAudioDelegate:AudioPlayerDelegate?
     
-    @State private var isWordInputNavigation: Bool = false
-    @State private var isTaskNavigation: Bool = false
-
-    @State private var isAPIOutput: String = ""
-    @State private var isAPILoading: Bool = false
-    @State private var isAPIError: Bool = false
-    @State private var isAPIErrorMessage: String?
+    @State private var isAPIOutput:String = ""
+    @State private var isAPILoading:Bool = false
+    @State private var isAPIError:Bool = false
+    @State private var isAPIErrorMessage:String?
+    @State private var viewSettings:Bool = false
+    @State private var isThemeNavigation:Bool = false
+    @State private var isSearchNavigation:Bool = false
+    @State private var isProfileNavigation:Bool = false
+    @State private var isStoreNavigation:Bool = false
+    @State private var isFavouritesNavigation:Bool = false
+    @State private var isSettingNavigation:Bool = false
+    @State private var signOutNavigation:Bool = false
+    @State private var isWordInputNavigation:Bool = false
+    @State private var isTaskNavigation:Bool = false
     
     init(){
         guard userHomeView.isUser != nil else{
@@ -960,8 +960,13 @@ struct userHomeView: View{
                             Image(systemName:"square.grid.2x2.fill").resizable().scaledToFit().frame(width: 50, height: 50)
                         }.frame(maxWidth: .infinity, alignment: .leading).padding(.leading, 10).onTapGesture{isThemeNavigation.toggle()}.navigationDestination(isPresented: $isThemeNavigation){languageThemeView().navigationBarBackButtonHidden(true)}
                         HStack{
-                            Image(systemName:"person.circle.fill").resizable().scaledToFit().frame(width: 50, height: 50)
-                        }.frame(maxWidth: .infinity, alignment: .trailing).padding(.trailing, 10).onTapGesture{viewSettings.toggle()}
+                            HStack{
+                                Image(systemName:"magnifyingglass").resizable().scaledToFit().frame(width: 50, height: 50)
+                            }.padding(.trailing, 10).onTapGesture{isSearchNavigation.toggle()}.navigationDestination(isPresented: $isSearchNavigation){wordSearchView().navigationBarBackButtonHidden(true)}
+                            HStack{
+                                Image(systemName:"person.circle.fill").resizable().scaledToFit().frame(width: 50, height: 50)
+                            }.padding(.trailing, 10).onTapGesture{viewSettings.toggle()}
+                        }.frame(maxWidth: .infinity, alignment: .trailing)
                     }.frame(maxHeight: .infinity, alignment:.top).padding(.top, 10)
                     VStack{
                         VStack{
@@ -1027,7 +1032,7 @@ struct userHomeView: View{
                             Image(systemName:"house.fill").resizable().scaledToFit().frame(width: 50, height: 50)
                         }.padding(.horizontal, 10)
                         HStack{
-                            Image(systemName:"heart.fill").resizable().scaledToFit().frame(width: 50, height: 50)
+                            Image(systemName:"star.fill").resizable().scaledToFit().frame(width: 50, height: 50)
                         }.padding(.horizontal, 10).onTapGesture{isFavouritesNavigation.toggle()}.navigationDestination(isPresented: $isFavouritesNavigation){userFavouriteCardsView().navigationBarBackButtonHidden(true)}
                         HStack{
                             Image(systemName:"plus.square.fill").resizable().scaledToFit().frame(width: 50, height: 50)
@@ -1044,6 +1049,7 @@ struct userHomeView: View{
                         do{
                             _ = try await initialLoading()
                             isInitialLoad.toggle()
+                            //isPhonemizerAPI()
                         } catch{
                             print(error.localizedDescription)
                             isErrorOccurrence.toggle()
@@ -1073,7 +1079,7 @@ struct userHomeView: View{
                             Image(systemName:"rectangle.portrait.and.arrow.right").resizable().scaledToFit().frame(width: 25, height: 25)
                             Text("Sign Out").font(.title2)
                         }.onTapGesture{signOutNavigation = userSignOut()}
-                    }.padding(10).background(Color(UIColor.systemGray4)).clipShape(RoundedRectangle(cornerRadius: 5))/*.frame(maxWidth: .infinity, alignment: .trailing)*/.padding(.trailing, 5).offset(y: -215)
+                    }.padding(10).background(Color(UIColor.systemGray4)).clipShape(RoundedRectangle(cornerRadius: 5)).frame(maxWidth: .infinity, alignment: .trailing).padding(.trailing, 5).offset(y: -215)
                 }
             }
         }
@@ -1108,7 +1114,7 @@ struct userHomeView: View{
         //let isEntriesCount = isLanguageEntries.count
         return isPropertySet
     }
-
+    
     private func isWordFavourite() async -> Bool{
         var isFavouriteSet: Bool = false
         var hasFavouriteField: Bool = false
@@ -1150,6 +1156,109 @@ struct userHomeView: View{
             print(error.localizedDescription)
         }
         return isFavouriteSet
+    }
+    
+    private func isWordRomanization(){}
+    
+    private func wordSyllabicSeperation(){ // Update to include other languages
+        //var isSyllablesSeperated: Bool = false
+        //let isEnglishVowels = "aeiouy"
+        //let isEnglishConsonant = "bcdfghjklmnpqrstvwxyz"
+        //return isSyllablesSeperated
+    }
+    
+    private func isPhonemizerAPI(){
+        isAPILoading.toggle()
+        isAPIErrorMessage = nil
+        guard let getServerURL = URL(string: "https://stunning-lamp-qrvjpwp7rjrf6xrj-5000.app.github.dev/phonemize") else{return}
+        var isServerRequest = URLRequest(url: getServerURL)
+        isServerRequest.httpMethod = "POST"
+        isServerRequest.setValue("application/json", forHTTPHeaderField: "Content-Type")
+        isServerRequest.setValue("capstone@24", forHTTPHeaderField: "Authorization")
+        let isMessage: [String:String] = ["isMessage" : isWord]
+        do{
+            let isMessageDataPost = try JSONSerialization.data(withJSONObject: isMessage, options: [])
+            isServerRequest.httpBody = isMessageDataPost
+        } catch{
+            isAPIErrorMessage = "Error: \(error.localizedDescription)"
+            isAPIError.toggle()
+            print(error.localizedDescription)
+            return
+        }
+        let isURLSession = URLSession.shared
+        isURLSession.dataTask(with: isServerRequest){ isData, isURLResponse, isError in
+            DispatchQueue.main.async{
+                isAPILoading.toggle()
+            }
+            if let hasError = isError{
+                DispatchQueue.main.async{
+                    isAPIErrorMessage = hasError.localizedDescription
+                    isAPIError.toggle()
+                    print("Request Error: \(hasError.localizedDescription)")
+                }
+                return
+            }
+            if let isHTTPResponse = isURLResponse as? HTTPURLResponse, !(200...299).contains(isHTTPResponse.statusCode){
+                DispatchQueue.main.async{
+                    isAPIErrorMessage = "Server responded with error code: \(isHTTPResponse.statusCode)"
+                    print("Server responded with error code: \(isHTTPResponse.statusCode)")
+                    if let serverErrorResponse = isData{
+                        do{
+                            if let isErrorMessage = try JSONSerialization.jsonObject(with: serverErrorResponse, options: []) as? [String: Any]{
+                                isAPIErrorMessage? += "\n\(isErrorMessage)"
+                                print("Error Response: \(isErrorMessage)")
+                            }
+                        } catch{
+                            isAPIErrorMessage = error.localizedDescription
+                            print("Error parsing error response: \(error.localizedDescription)")
+                        }
+                    }
+                    isAPIError.toggle()
+                }
+                return
+            }
+            guard let hasData = isData else{
+                DispatchQueue.main.async{
+                    isAPIErrorMessage = "No data received from the server"
+                    isAPIError.toggle()
+                    print("No data received from the server")
+                }
+                return
+            }
+            do{
+                guard let isJsonServerResponse = try JSONSerialization.jsonObject(with: hasData, options: []) as? [String:Any] else{
+                    DispatchQueue.main.async{
+                        isAPIErrorMessage = "Invalid Response Format"
+                        isAPIError.toggle()
+                        print("Invalid Response Format")
+                    }
+                    return
+                }
+                guard let isWordPhonetic = isJsonServerResponse["isMessagePhonetic"] as? String else{return}
+                DispatchQueue.main.async{
+                    print("Phonetic: \(isWordPhonetic)")
+                    isAPIOutput = isWordPhonetic
+                }
+            } catch{
+                DispatchQueue.main.async{
+                    isAPIErrorMessage = "Error: \(error.localizedDescription)"
+                    isAPIError.toggle()
+                    print("Error: \(error.localizedDescription)")
+                }
+            }
+        }.resume()
+    }
+    
+    private func generateWordDerivedPhonetic(){
+        //var isPhoneticGenerated: Bool = false
+        //return isPhoneticGenerated
+    }
+    
+    private func generateAudioDerivedPhonetic(){}
+    
+    private func generatePronunciation(){
+        //var isPronunciationGenerated: Bool = false
+        //return isPronunciationGenerated
     }
     
     private func navigateWordSelection(navigationChoice: String)async->Bool{ // check favourites
@@ -1282,22 +1391,11 @@ struct userHomeView: View{
                     print(error.localizedDescription)
                 }
             }
-            
         }
         return hasNavigated
     }
     
     private func accessAudioFile(){}
-    
-    private func generatePhoneticSpelling()->Bool{
-        var isPhoneticGenerated: Bool = false
-        return isPhoneticGenerated
-    }
-    
-    private func generatePronunciation()->Bool{
-        var isPronunciationGenerated: Bool = false
-        return isPronunciationGenerated
-    }
     
     private func textToSpeech()->Bool{ // Allow user to change male or female voice
         var isTextSynthesized: Bool = false
@@ -1453,88 +1551,6 @@ struct userHomeView: View{
         }
         return isSignOutValid
     }
-
-    private func getAPIPhonetic(){
-        isAPILoading.toggle()
-        isAPIErrorMessage = nil
-        guard let getServerURL = URL(string: "https://stunning-lamp-qrvjpwp7rjrf6xrj-5000.app.github.dev/phonemize") else{return}
-        var isServerRequest = URLRequest(url: getServerURL)
-        isServerRequest.httpMethod = "POST"
-        isServerRequest.setValue("application/json", forHTTPHeaderField: "Content-Type")
-        isServerRequest.setValue("capstone@24", forHTTPHeaderField: "Authorization")
-        let isMessage: [String:String] = ["isMessage" : isWord]
-        do{
-            let isMessageDataPost = try JSONSerialization.data(withJSONObject: isMessage, options: [])
-            isServerRequest.httpBody = isMessageDataPost
-        } catch{
-            isAPIErrorMessage = "Error: \(error.localizedDescription)"
-            isAPIError.toggle()
-            print(error.localizedDescription)
-            return
-        }
-        let isURLSession = URLSession.shared
-        isURLSession.dataTask(with: isServerRequest){ isData, isURLResponse, isError in
-            DispatchQueue.main.async{
-                isAPILoading.toggle()
-            }
-            if let hasError = isError{
-                DispatchQueue.main.async{
-                    isAPIErrorMessage = hasError.localizedDescription
-                    isAPIError.toggle()
-                    print("Request Error: \(hasError.localizedDescription)")
-                }
-                return
-            }
-            if let isHTTPResponse = isURLResponse as? HTTPURLResponse, !(200...299).contains(isHTTPResponse.statusCode){
-                DispatchQueue.main.async{
-                    isAPIErrorMessage = "Server responded with error code: \(isHTTPResponse.statusCode)"
-                    print("Server responded with error code: \(isHTTPResponse.statusCode)")
-                    if let serverErrorResponse = isData{
-                        do{
-                            if let isErrorMessage = try JSONSerialization.jsonObject(with: serverErrorResponse, options: []) as? [String: Any]{
-                                isAPIErrorMessage? += "\n\(isErrorMessage)"
-                                print("Error Response: \(isErrorMessage)")
-                            }
-                        } catch{
-                            isAPIErrorMessage = error.localizedDescription
-                            print("Error parsing error response: \(error.localizedDescription)")
-                        }
-                    }
-                    isAPIError.toggle()
-                }
-                return
-            }
-            guard let hasData = isData else{
-                DispatchQueue.main.async{
-                    isAPIErrorMessage = "No data received from the server"
-                    isAPIError.toggle()
-                    print("No data received from the server")
-                }
-                return
-            }
-            do{
-                guard let isJsonServerResponse = try JSONSerialization.jsonObject(with: hasData, options: []) as? [String:Any] else{
-                    DispatchQueue.main.async{
-                        isAPIErrorMessage = "Invalid Response Format"
-                        isAPIError.toggle()
-                        print("Invalid Response Format")
-                    }
-                    return
-                }
-                guard let isWordPhonetic = isJsonServerResponse["isMessagePhonetic"] as? String else{return}
-                DispatchQueue.main.async{
-                    print("Phonetic: \(isWordPhonetic)")
-                    isAPIOutput = isWordPhonetic
-                }
-            } catch{
-                DispatchQueue.main.async{
-                    isAPIErrorMessage = "Error: \(error.localizedDescription)"
-                    isAPIError.toggle()
-                    print("Error: \(error.localizedDescription)")
-                }
-            }
-        }.resume()
-    }
     
     private func uploadFile() async -> Bool{
         var isUploadSucess: Bool = false
@@ -1593,7 +1609,7 @@ struct languageThemeView: View{
                         Image(systemName:"house.fill").resizable().scaledToFit().frame(width: 50, height: 50)
                     }.padding(.horizontal, 10).onTapGesture{isHomeNavigation.toggle()}.navigationDestination(isPresented: $isHomeNavigation){userHomeView().navigationBarBackButtonHidden(true)}
                     HStack{
-                        Image(systemName:"heart.fill").resizable().scaledToFit().frame(width: 50, height: 50)
+                        Image(systemName:"star.fill").resizable().scaledToFit().frame(width: 50, height: 50)
                     }.padding(.horizontal, 10).onTapGesture{isFavouritesNavigation.toggle()}.navigationDestination(isPresented: $isFavouritesNavigation){userFavouriteCardsView().navigationBarBackButtonHidden(true)}
                     HStack{
                         Image(systemName:"plus.square.fill").resizable().scaledToFit().frame(width: 50, height: 50)
@@ -1706,10 +1722,15 @@ struct wordSearchView : View{
                 }
             }
             print("Done")
-        } catch{
+        }catch{
             print(error.localizedDescription)
         }
     }
+    
+    // datasetSearchQueryConcurrentThrottled
+    // let isSearchDispatchGroup = DispatchGroup()
+    // isSearchDispatchGroup.enter()
+    // isSearchDispatchGroup.leave()
 }
 
 struct userProfileView: View{
@@ -1849,7 +1870,7 @@ struct userProfileView: View{
                             Image(systemName:"house.fill").resizable().scaledToFit().frame(width: 50, height: 50)
                         }.padding(.horizontal, 10).onTapGesture{isHomeNavigation.toggle()}.navigationDestination(isPresented: $isHomeNavigation){userHomeView().navigationBarBackButtonHidden(true)}
                         HStack{
-                            Image(systemName:"heart.fill").resizable().scaledToFit().frame(width: 50, height: 50)
+                            Image(systemName:"star.fill").resizable().scaledToFit().frame(width: 50, height: 50)
                         }.padding(.horizontal, 10).onTapGesture{isFavouritesNavigation.toggle()}.navigationDestination(isPresented: $isFavouritesNavigation){userFavouriteCardsView().navigationBarBackButtonHidden(true)}
                         HStack{
                             Image(systemName:"plus.square.fill").resizable().scaledToFit().frame(width: 50, height: 50)
@@ -2381,7 +2402,7 @@ struct userStoreView: View{
                         Image(systemName:"house.fill").resizable().scaledToFit().frame(width: 50, height: 50)
                     }.padding(.horizontal, 10).onTapGesture{isHomeNavigation.toggle()}.navigationDestination(isPresented: $isHomeNavigation){userHomeView().navigationBarBackButtonHidden(true)}
                     HStack{
-                        Image(systemName:"heart.fill").resizable().scaledToFit().frame(width: 50, height: 50)
+                        Image(systemName:"star.fill").resizable().scaledToFit().frame(width: 50, height: 50)
                     }.padding(.horizontal, 10).onTapGesture{isFavouritesNavigation.toggle()}.navigationDestination(isPresented: $isFavouritesNavigation){userFavouriteCardsView().navigationBarBackButtonHidden(true)}
                     HStack{
                         Image(systemName:"plus.square.fill").resizable().scaledToFit().frame(width: 50, height: 50)
@@ -2397,6 +2418,7 @@ struct userStoreView: View{
         }
     }
 }
+
 
 struct userFavouriteCardsView: View{ // add feature when user clicks the star it removes the word from favourites
     @State private var isFavouriteWords: [String:[Int]] = [:]
@@ -2422,12 +2444,12 @@ struct userFavouriteCardsView: View{ // add feature when user clicks the star it
                                                 HStack{
                                                     Image(systemName: "x.circle.fill").resizable().scaledToFit().frame(width: 25, height: 25).padding(.top, 5).onTapGesture{
                                                         _ = Task{
+                                                            //let isEntryRemoved =  await Task{ return await removeWord(isWordLanguage: hasLanguageEntry, isLanguageEntryID: hasLanguageEntryID)}.value
                                                             let isEntryRemoved = await removeWord(isWordLanguage: hasLanguageEntry, isLanguageEntryID: hasLanguageEntryID)
                                                             if isEntryRemoved{
                                                                 isFavouriteWords[hasLanguageEntry]?.removeAll{$0 == hasLanguageEntryID}
                                                                 getFavourtieWords.removeValue(forKey: "\(hasLanguageEntry)_\(hasLanguageEntryID)")
                                                             }
-                                                            
                                                         }
                                                     }
                                                 }.frame(maxWidth: .infinity, alignment: .trailing).padding(.trailing, 5)
@@ -2447,7 +2469,7 @@ struct userFavouriteCardsView: View{ // add feature when user clicks the star it
                         Image(systemName:"house.fill").resizable().scaledToFit().frame(width: 50, height: 50)
                     }.padding(.horizontal, 10).onTapGesture{isHomeNavigation.toggle()}.navigationDestination(isPresented: $isHomeNavigation){userHomeView().navigationBarBackButtonHidden(true)}
                     HStack{
-                        Image(systemName:"heart.fill").resizable().scaledToFit().frame(width: 50, height: 50)
+                        Image(systemName:"star.fill").resizable().scaledToFit().frame(width: 50, height: 50)
                     }.padding(.horizontal, 10)// return to the top of current view
                     HStack{
                         Image(systemName:"plus.square.fill").resizable().scaledToFit().frame(width: 50, height: 50)
@@ -2461,6 +2483,7 @@ struct userFavouriteCardsView: View{ // add feature when user clicks the star it
                 }.frame(maxHeight: .infinity, alignment: .bottom).padding(.bottom, 10)
             }.onAppear{
                 _ = Task{
+                    //let hasLoaded = try await Task{return try await initialLoading()}.value
                     let hasLoaded = try await initialLoading()
                     if hasLoaded{
                         isDataLoaded.toggle()
@@ -2471,7 +2494,7 @@ struct userFavouriteCardsView: View{ // add feature when user clicks the star it
     }
     
     private func initialLoading()async throws->Bool{
-        var hasUserFavourites: Bool = false
+        var hasUserFavourites:Bool = false
         guard let isUserID = userHomeView.isUser?.uid else{return false}
         do{
             let isUserDocument = try await Firestore.firestore().collection("users").document(isUserID).getDocument()
@@ -2560,7 +2583,7 @@ struct isFavouriteCardView: View{ // Add a little section at the bottom that sho
                     Image(systemName:"house.fill").resizable().scaledToFit().frame(width: 50, height: 50)
                 }.padding(.horizontal, 10).onTapGesture{isHomeNavigation.toggle()}.navigationDestination(isPresented: $isHomeNavigation){userHomeView().navigationBarBackButtonHidden(true)}
                 HStack{
-                    Image(systemName:"heart.fill").resizable().scaledToFit().frame(width: 50, height: 50)
+                    Image(systemName:"star.fill").resizable().scaledToFit().frame(width: 50, height: 50)
                 }.padding(.horizontal, 10).onTapGesture{isFavouritesNavigation.toggle()}.navigationDestination(isPresented: $isFavouritesNavigation){userFavouriteCardsView().navigationBarBackButtonHidden(true)}
                 HStack{
                     Image(systemName:"plus.square.fill").resizable().scaledToFit().frame(width: 50, height: 50)
@@ -2601,7 +2624,7 @@ struct userSettingView: View{
                             Image(systemName:"house.fill").resizable().scaledToFit().frame(width: 50, height: 50)
                         }.padding(.horizontal, 10).onTapGesture{isHomeNavigation.toggle()}.navigationDestination(isPresented: $isHomeNavigation){userHomeView().navigationBarBackButtonHidden(true)}
                         HStack{
-                            Image(systemName:"heart.fill").resizable().scaledToFit().frame(width: 50, height: 50)
+                            Image(systemName:"star.fill").resizable().scaledToFit().frame(width: 50, height: 50)
                         }.padding(.horizontal, 10).onTapGesture{isFavouritesNavigation.toggle()}.navigationDestination(isPresented: $isFavouritesNavigation){userFavouriteCardsView().navigationBarBackButtonHidden(true)}
                         HStack{
                             Image(systemName:"plus.square.fill").resizable().scaledToFit().frame(width: 50, height: 50)
@@ -2619,14 +2642,14 @@ struct userSettingView: View{
     }
     
     private func userAccountDeletion()->Bool{
-        var isRemovalValid: Bool = true
+        var isUserDeleted: Bool = true
         userHomeView.isUser?.delete{ error in
             if let hasSignOutError = error{
-                isRemovalValid.toggle()
+                isUserDeleted.toggle()
                 print(hasSignOutError.localizedDescription)
             }
         }
-        return isRemovalValid
+        return isUserDeleted
     }
 }
 
@@ -2645,7 +2668,7 @@ struct userTaskView: View{
                         Image(systemName:"house.fill").resizable().scaledToFit().frame(width: 50, height: 50)
                     }.padding(.horizontal, 10).onTapGesture{isHomeNavigation.toggle()}.navigationDestination(isPresented: $isHomeNavigation){userHomeView().navigationBarBackButtonHidden(true)}
                     HStack{
-                        Image(systemName:"heart.fill").resizable().scaledToFit().frame(width: 50, height: 50)
+                        Image(systemName:"star.fill").resizable().scaledToFit().frame(width: 50, height: 50)
                     }.padding(.horizontal, 10).onTapGesture{isFavouritesNavigation.toggle()}.navigationDestination(isPresented: $isFavouritesNavigation){userFavouriteCardsView().navigationBarBackButtonHidden(true)}
                     HStack{
                         Image(systemName:"plus.square.fill").resizable().scaledToFit().frame(width: 50, height: 50)
