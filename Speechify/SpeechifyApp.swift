@@ -890,6 +890,79 @@ class AudioPlayerDelegate: NSObject, AVAudioPlayerDelegate{
         }
     }
 }
+//For managing point system
+class PointsViewModel: ObservableObject{
+    @Published var points: Int = 0
+    @Published var dailyBonusFeedback: String? = nil
+    private var db = Firestore.firestore()
+    private var user: User?
+    
+    init() {
+        self.user = Auth.auth().currentUser
+        if let user = self.user {
+            getPoints(for: user)
+        } else {
+            print("Error: No authenticated user found")
+        }
+    }
+    
+    func getPoints(for user: User){
+        let userRef = db.collection("users").document(user.uid)
+        userRef.getDocument { [weak self] (document, error) in
+            guard let self = self else { return }
+            
+            if let document = document, document.exists {
+                if let points = document.data()? ["points"] as? Int {
+                    DispatchQueue.main.async{
+                        self.points = points //why the question mark
+                    }
+                }
+                if let lastSignInDate = user.metadata.lastSignInDate{
+                    if !Calendar.current.isDateInToday(lastSignInDate) {
+                        self.giveDailyLoginBonus()
+                    }
+              }
+            } else {
+                self.setDefaultPoints(for: user) //here too
+            }
+        }
+    }
+    
+    private func giveDailyLoginBonus(){
+        let dailyBonus = 10
+        updatePoints(by: dailyBonus)
+        
+        self.dailyBonusFeedback = "Welcome Back! You got 10 bonus points for logging in today!"
+        
+        DispatchQueue.main.asyncAfter(deadline: .now() + 3){
+            self.dailyBonusFeedback = nil
+        }
+    }
+    
+    func setDefaultPoints(for user: User){
+        let userRef = db.collection("users").document(user.uid)
+        userRef.setData(["points": 0], merge: true) { error in
+            if let error = error {
+                print("Error setting default points: \(error)")
+            }
+        }
+    }
+    
+    func updatePoints(by value: Int){
+        guard let user = user else {return}
+        let userRef = db.collection("users").document(user.uid)
+        
+        userRef.updateData(["points": FieldValue.increment(Int64(value))]) {error in
+            if let error = error {
+                print("Error updating the points: \(error)")
+            } else {
+                DispatchQueue.main.async{
+                    self.points += value
+                }
+            }
+        }
+    }
+}
 
 struct userHomeView: View{
     @State private var isInitialLoad:Bool = true
@@ -944,6 +1017,8 @@ struct userHomeView: View{
     @State private var isWordInputNavigation:Bool = false
     @State private var isTaskNavigation:Bool = false
     
+    @StateObject var pointsViewModel = PointsViewModel()
+    
     init(){
         guard userHomeView.isUser != nil else{
             isErrorOccurrence.toggle()
@@ -955,10 +1030,25 @@ struct userHomeView: View{
         NavigationStack{
             ZStack{
                 VStack{
+                    if let feedback = pointsViewModel.dailyBonusFeedback{
+                        Text(feedback)
+                            .font(.headline)
+                            .foregroundColor(.green)
+                            .padding()
+                            .background(Color.black.opacity(0.7))
+                            .cornerRadius(10)
+                            .transition(.slide)
+                            .animation(.easeInOut(duration: 0.5), value: pointsViewModel.dailyBonusFeedback)
+                            .padding(.top, 20)
+                    }
                     HStack{
                         HStack{
-                            Image(systemName:"square.grid.2x2.fill").resizable().scaledToFit().frame(width: 50, height: 50)
-                        }.frame(maxWidth: .infinity, alignment: .leading).padding(.leading, 10).onTapGesture{isThemeNavigation.toggle()}.navigationDestination(isPresented: $isThemeNavigation){languageThemeView().navigationBarBackButtonHidden(true)}
+                            /*Image(systemName:"square.grid.2x2.fill").resizable().scaledToFit().frame(width: 50, height: 50) */
+                            Text("Points: \(pointsViewModel.points)")
+                                .font(.title)
+                                .frame(maxWidth: .infinity, alignment: .leading)
+                                .padding(.leading, 10)
+                        }/*.frame(maxWidth: .infinity, alignment: .leading).padding(.leading, 10).onTapGesture{isThemeNavigation.toggle()}.navigationDestination(isPresented: $isThemeNavigation){languageThemeView().navigationBarBackButtonHidden(true)} */
                         HStack{
                             HStack{
                                 Image(systemName:"magnifyingglass").resizable().scaledToFit().frame(width: 50, height: 50)
@@ -1022,6 +1112,7 @@ struct userHomeView: View{
                             Image(systemName: "arrowshape.right.fill").resizable().scaledToFit().frame(width: 50, height: 50)
                         }.frame(maxWidth: .infinity, alignment: .trailing).padding(.trailing, 10).onTapGesture{
                             _ = Task{_ = await navigateWordSelection(navigationChoice: "proceeding")}
+                            pointsViewModel.updatePoints(by: 1)
                         }
                     }.padding(.vertical, 10)
                     VStack{
@@ -2392,6 +2483,10 @@ struct userStoreView: View{
     @State private var isWordInputNavigation: Bool = false
     @State private var isStoreNavigation: Bool = false
     @State private var isTaskNavigation: Bool = false
+    
+    @State private var showLanguageTheme = false
+    
+   // @ObservedObject var pointsViewModel: PointsViewModel
     
     var body: some View{
         NavigationStack{
