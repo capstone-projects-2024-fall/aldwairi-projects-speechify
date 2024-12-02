@@ -2,7 +2,7 @@
 //  SpeechifyUITestsLaunchTests.swift
 //  SpeechifyUITests
 //
-//  Created by Oladapo Emmanuel Oladele on 10/24/24.
+//  Created by Oladapo Oladele on 2024/11/08.
 //
 
 import XCTest
@@ -17,7 +17,6 @@ final class SpeechifyUITestsLaunchTests: XCTestCase {
         continueAfterFailure = false
     }
 
-    @MainActor
     func testLaunch() throws {
         let app = XCUIApplication()
         app.launch()
