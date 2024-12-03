@@ -891,7 +891,144 @@ class AudioPlayerDelegate: NSObject, AVAudioPlayerDelegate{
     }
 }
 
+
+struct topAndBottomView: View{
+    @State private var isErrorOccurrence:Bool = false
+    @State private var isSearchNavigation:Bool = false
+    @State private var viewSettings:Bool = false
+    @State private var isThemeNavigation:Bool = false
+    @State private var isProfileNavigation:Bool = false
+    @State private var isStoreNavigation:Bool = false
+    @State private var isFavouritesNavigation:Bool = false
+    @State private var isSettingNavigation:Bool = false
+    @State private var signOutNavigation:Bool = false
+    @State private var isWordInputNavigation:Bool = false
+    @State private var isTaskNavigation:Bool = false
+    @State private var isHomeView:Bool = false
+    
+    var body: some View{
+        NavigationStack{
+            ZStack{
+                VStack{
+                    HStack{
+                        HStack{
+                            HStack{
+                                Image(systemName:"magnifyingglass").resizable().scaledToFit().frame(width: 50, height: 50)
+                            }.padding(.trailing, 10).onTapGesture{isSearchNavigation.toggle()}.navigationDestination(isPresented: $isSearchNavigation){wordSearchView().navigationBarBackButtonHidden(true)}
+                            HStack{
+                                Image(systemName:"person.circle.fill").resizable().scaledToFit().frame(width: 50, height: 50)
+                            }.padding(.trailing, 10).onTapGesture{viewSettings.toggle()}
+                        }.frame(maxWidth: .infinity, alignment: .trailing)
+                    }.frame(maxHeight: .infinity, alignment:.top).padding(.top, 10)
+                    
+                }
+                HStack{
+                    HStack{
+                        Image(systemName:"house.fill").resizable().scaledToFit().frame(width: 50, height: 50)
+                    }.padding(.horizontal, 10).onTapGesture{isHomeView.toggle()}.navigationDestination(isPresented: $isHomeView){userHomeView().navigationBarBackButtonHidden(true)}
+                    HStack{
+                        Image(systemName:"star.fill").resizable().scaledToFit().frame(width: 50, height: 50)
+                    }.padding(.horizontal, 10).onTapGesture{isFavouritesNavigation.toggle()}.navigationDestination(isPresented: $isFavouritesNavigation){userFavouriteCardsView().navigationBarBackButtonHidden(true)}
+                    HStack{
+                        Image(systemName:"plus.square.fill").resizable().scaledToFit().frame(width: 50, height: 50)
+                    }.padding(.horizontal, 10).onTapGesture{isWordInputNavigation.toggle()}.navigationDestination(isPresented: $isWordInputNavigation){addDeckView().navigationBarBackButtonHidden(true)}
+                    HStack{
+                        Image(systemName:"cart.fill").resizable().scaledToFit().frame(width: 50, height: 50)
+                    }.padding(.horizontal, 10).onTapGesture{isStoreNavigation.toggle()}.navigationDestination(isPresented: $isStoreNavigation){userStoreView().navigationBarBackButtonHidden(true)}
+                    HStack{
+                        Image(systemName:"sparkles").resizable().scaledToFit().frame(width: 50, height: 50)
+                    }.padding(.horizontal, 10).onTapGesture{isTaskNavigation.toggle()}.navigationDestination(isPresented: $isTaskNavigation){userTaskView().navigationBarBackButtonHidden(true)}
+                }.frame(maxHeight: .infinity, alignment: .bottom).padding(.bottom, 10)
+            .overlay{
+                    if viewSettings{
+                        VStack{
+                            HStack{
+                                Image(systemName:"person.circle.fill").resizable().scaledToFit().frame(width: 25, height: 25)
+                                Text("Profile").font(.title2)
+                            }.onTapGesture{isProfileNavigation.toggle()}.navigationDestination(isPresented: $isProfileNavigation){userProfileView().navigationBarBackButtonHidden(true)}
+                            HStack{
+                                Image(systemName: "cart.fill").resizable().scaledToFit().frame(width: 25, height: 25)
+                                Text("Store").font(.title2)
+                            }.onTapGesture{isStoreNavigation.toggle()}.navigationDestination(isPresented: $isStoreNavigation){userStoreView().navigationBarBackButtonHidden(true)}
+                            HStack{
+                                Image(systemName:"star.fill").resizable().scaledToFit().frame(width: 25, height: 25)
+                                Text("Favourites").font(.title2)
+                            }.onTapGesture{isFavouritesNavigation.toggle()}.navigationDestination(isPresented: $isFavouritesNavigation){userFavouriteCardsView().navigationBarBackButtonHidden(true)}
+                            HStack{
+                                Image(systemName: "gear").resizable().scaledToFit().frame(width: 25, height: 25)
+                                Text("Setting").font(.title2)
+                            }.onTapGesture{isSettingNavigation.toggle()}.navigationDestination(isPresented: $isSettingNavigation){userSettingView().navigationBarBackButtonHidden(true)}
+                            HStack{
+                                Image(systemName:"rectangle.portrait.and.arrow.right").resizable().scaledToFit().frame(width: 25, height: 25)
+                                Text("Sign Out").font(.title2)
+                            }.onTapGesture{signOutNavigation = userSignOut()}
+                        }.padding(10).background(Color(UIColor.systemGray4)).clipShape(RoundedRectangle(cornerRadius: 5)).frame(maxWidth: .infinity, alignment: .trailing).padding(.trailing, 5).offset(y: -215)
+                    }
+                }
+            }
+               
+        }
+    }
+    private func userSignOut()->Bool{
+        var isSignOutValid: Bool = true
+        do{
+            try Auth.auth().signOut()
+        } catch{
+            isSignOutValid = false
+            print(error.localizedDescription)
+        }
+        return isSignOutValid
+    }
+    
+}
+
 struct userHomeView: View{
+    @StateObject private var deckModel = deckViewModel()
+    static let isUser = Auth.auth().currentUser
+    
+    var body:some View{
+        ZStack{
+            VStack{
+                Spacer(minLength:50)
+                NavigationView {
+                    ScrollView {
+                        VStack(alignment: .leading, spacing: 15) {
+                            NavigationLink( destination: cardHomeView()) {
+                                Text("Start Practicing")
+                                    .frame(width: 375, height: 100)
+                                    .foregroundColor(.black)
+                                    .background(Color(UIColor.systemGray5))
+                                    .cornerRadius(10)
+                                    .font(.headline)
+                            }
+                            
+                            ForEach(deckModel.decks, id: \.id) { deck in
+                                NavigationLink(destination: cardHomeView(words: deckModel.getWords(title: deck.title))) {
+                                    Text(deck.title)
+                                        .font(.headline)
+                                        .padding()
+                                        .frame(maxWidth: .infinity, alignment: .leading) // Align to the left
+                                        .background(Color(UIColor.systemGray5))
+                                        .cornerRadius(8)
+                                        .foregroundColor(.black)
+                                }
+                            }
+                        }
+                        .padding()
+                    }
+                }.onAppear {
+                    Task {
+                        await deckModel.readDecks() // Fetch the decks when the view appears
+                        deckModel.decks = deckModel.decks.sorted { $0.title < $1.title } // sort decks alphabetically
+                    }
+                }
+            }
+            topAndBottomView()
+        }
+    }
+}
+
+struct cardHomeView: View{
     @State private var isInitialLoad:Bool = true
     static let isUser = Auth.auth().currentUser
     @State private var isErrorOccurrence:Bool = false
@@ -944,7 +1081,13 @@ struct userHomeView: View{
     @State private var isWordInputNavigation:Bool = false
     @State private var isTaskNavigation:Bool = false
     
-    init(){
+
+    let words : [Int]?
+    @State private var index: Int = 1
+    
+    init(words: [Int] = []){ //words defaults to empty if no parameter is passed
+        self.words = words
+
         guard userHomeView.isUser != nil else{
             isErrorOccurrence.toggle()
             return
@@ -1085,6 +1228,7 @@ struct userHomeView: View{
         }
     }
     
+
     private func initialLoading()async throws->Bool{
         var isPropertySet: Bool = false
         guard let isUserID = userHomeView.isUser?.uid else{return false}
@@ -1096,7 +1240,15 @@ struct userHomeView: View{
             guard let getWordLanguage = getLearnLanguageField.randomElement() else{return false}
             isWordLanguage = getWordLanguage
             let isEntriesCount = 39849 + 1 // get actual size
-            let isRandomID = Int.random(in: 0...isEntriesCount)
+
+            var isRandomID = Int.random(in: 0...isEntriesCount)
+            
+            //If a user is opening their personal deck, then words will be an array containg wordIDs to the words in their deck
+            //In this case, randomID must be a number in the array words
+            if(!words!.isEmpty){
+                isRandomID = words![0]
+            }
+            
             let isRandomEntry = try await Firestore.firestore().collection(isWordLanguage).document(String(isRandomID)).getDocument()
             guard isRandomEntry.exists else{return false}
             isLanguageEntryID = isRandomID
@@ -1304,8 +1456,10 @@ struct userHomeView: View{
             } catch{
                 print(error.localizedDescription)
             }
-        } else if navigationChoice == "proceeding"{
+
+        }else if navigationChoice == "proceeding"  {
             if indexingPreviousWords.isCurrent{
+
                 let isPreviousCount = isPreviousWords.values.reduce(0){$0 + $1.count}
                 if isPreviousCount == 10{
                     guard let firstEntry = isPreviousWords.keys.first else{return false}
@@ -1319,11 +1473,27 @@ struct userHomeView: View{
                 } else{
                     isPreviousWords[isWordLanguage] = [isLanguageEntryID]
                 }
-                do{
+
+                 
+                scope: do{
                     guard let getLanguage = isLearnLanguages.randomElement() else{return false}
                     isWordLanguage = getLanguage
                     let isEntriesCount = 39849 + 1
-                    let isRandomID = Int.random(in: 0...isEntriesCount)
+                    var isRandomID = Int.random(in: 0...isEntriesCount)
+                    
+                    //If a user is opening their personal deck, then words will be an array containg wordIDs to the words in their deck
+                    //In this case, randomID must be in the bounds of the array words
+                    if(!words!.isEmpty){
+                        if(words!.count > index){
+                            isRandomID = words![index]
+                            index = index + 1
+                            //print("within navigatWord: this word is \(isRandomID)")
+                        } else{
+                            break scope
+                        }
+                    }
+                    
+
                     let isRandomEntry = try await Firestore.firestore().collection(isWordLanguage).document(String(isRandomID)).getDocument()
                     guard isRandomEntry.exists else{return false}
                     isLanguageEntryID = isRandomID
@@ -1334,9 +1504,12 @@ struct userHomeView: View{
                     //guard let getPronunciationField = isRandomEntry.data()?["isPronunciation"] as? String else{return false}
                     //isPronunciation = getPronunciationField
                     hasNavigated.toggle()
+
+                    
                 } catch{
                     print(error.localizedDescription)
                 }
+
                 guard let isUserID = userHomeView.isUser?.uid else{return false}
                 do{
                     let isUserDocument = try await Firestore.firestore().collection("users").document(isUserID).getDocument()
@@ -1348,6 +1521,7 @@ struct userHomeView: View{
                 } catch{
                     print(error.localizedDescription)
                 }
+
             } else{
                 var getCurrentWord: Bool = false
                 indexingPreviousWords.isIndex += (indexingPreviousWords.isIndex == -1) ? 2 : (indexingPreviousWords.isIndex < isPreviousWords[indexingPreviousWords.isLanguage]?.count ?? -1) ? 1 : 0
@@ -2587,7 +2761,9 @@ struct isFavouriteCardView: View{ // Add a little section at the bottom that sho
                 }.padding(.horizontal, 10).onTapGesture{isFavouritesNavigation.toggle()}.navigationDestination(isPresented: $isFavouritesNavigation){userFavouriteCardsView().navigationBarBackButtonHidden(true)}
                 HStack{
                     Image(systemName:"plus.square.fill").resizable().scaledToFit().frame(width: 50, height: 50)
-                }.padding(.horizontal, 10).onTapGesture{isWordInputNavigation.toggle()}.navigationDestination(isPresented: $isWordInputNavigation){/*languageThemeView().navigationBarBackButtonHidden(true)*/} // Dont forget to change word redirection to new word input page
+
+                }.padding(.horizontal, 10).onTapGesture{isWordInputNavigation.toggle()}.navigationDestination(isPresented: $isWordInputNavigation){addDeckView().navigationBarBackButtonHidden(true)}
+
                 HStack{
                     Image(systemName:"cart.fill").resizable().scaledToFit().frame(width: 50, height: 50)
                 }.padding(.horizontal, 10).onTapGesture{isStoreNavigation.toggle()}.navigationDestination(isPresented: $isStoreNavigation){userStoreView().navigationBarBackButtonHidden(true)}
