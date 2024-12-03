@@ -903,6 +903,7 @@ struct topAndBottomView: View{
     @State private var signOutNavigation:Bool = false
     @State private var isWordInputNavigation:Bool = false
     @State private var isTaskNavigation:Bool = false
+    @State private var isHomeView:Bool = false
     
     var body: some View{
         NavigationStack{
@@ -923,7 +924,7 @@ struct topAndBottomView: View{
                 HStack{
                     HStack{
                         Image(systemName:"house.fill").resizable().scaledToFit().frame(width: 50, height: 50)
-                    }.padding(.horizontal, 10)
+                    }.padding(.horizontal, 10).onTapGesture{isHomeView.toggle()}.navigationDestination(isPresented: $isHomeView){userHomeView().navigationBarBackButtonHidden(true)}
                     HStack{
                         Image(systemName:"star.fill").resizable().scaledToFit().frame(width: 50, height: 50)
                     }.padding(.horizontal, 10).onTapGesture{isFavouritesNavigation.toggle()}.navigationDestination(isPresented: $isFavouritesNavigation){userFavouriteCardsView().navigationBarBackButtonHidden(true)}
@@ -981,16 +982,10 @@ struct topAndBottomView: View{
 }
 
 struct userHomeView: View{
+    @StateObject private var deckModel = deckViewModel()
     static let isUser = Auth.auth().currentUser
-    let db = Firestore.firestore()
-    @State private var userdecks : [String: Any] = [:]
-    @State private var isDataLoaded: Bool = false
     
-    @StateObject private var viewModel = deckViewModel()
-
-   
     var body:some View{
-        
         ZStack{
             VStack{
                 Spacer(minLength:50)
@@ -1005,56 +1000,32 @@ struct userHomeView: View{
                                     .cornerRadius(10)
                                     .font(.headline)
                             }
-                            ForEach(viewModel.decks, id: \.self) { deck in
-                                NavigationLink(destination: cardHomeView()) {
+                            
+                            ForEach(deckModel.decks, id: \.id) { deck in
+                                NavigationLink(destination: cardHomeView(words: deckModel.getWords(title: deck.title))) {
                                     Text(deck.title)
                                         .font(.headline)
                                         .padding()
                                         .frame(maxWidth: .infinity, alignment: .leading) // Align to the left
-                                        .background(Color.gray.opacity(0.2)) // Optional styling
+                                        .background(Color(UIColor.systemGray5))
                                         .cornerRadius(8)
+                                        .foregroundColor(.black)
                                 }
                             }
                         }
                         .padding()
                     }
-                
-                    /*
-                    List{
-                        NavigationLink( destination: cardHomeView()) {
-                            Text("Start Practicing")
-                                .frame(width: 375, height: 100)
-                                .foregroundColor(.black)
-                                .background(Color(UIColor.systemGray5))
-                                .cornerRadius(10)
-                                .font(.headline)
-                        }
-                        //List(viewModel.decks) { deck in
-                          //  NavigationLink(destination: cardHomeView()) {
-                            //    Text(deck.title)
-                            //}
-                        //}
-                        
-                        .task {
-                            await viewModel.readDecks()
-                        }
-                    }
-                     */
-                    
                 }.onAppear {
                     Task {
-                        print("within onAppear")
-                        await viewModel.readDecks() // Fetch the decks when the view appears
-                        print("here printing decks: \(viewModel.decks)")
+                        await deckModel.readDecks() // Fetch the decks when the view appears
+                        deckModel.decks = deckModel.decks.sorted { $0.title < $1.title } // sort decks alphabetically
                     }
                 }
             }
             topAndBottomView()
         }
     }
-    
 }
-
 
 struct cardHomeView: View{
     @State private var isInitialLoad:Bool = true
@@ -1109,7 +1080,11 @@ struct cardHomeView: View{
     @State private var isWordInputNavigation:Bool = false
     @State private var isTaskNavigation:Bool = false
     
-    init(){
+    let words : [Int]?
+    @State private var index: Int = 1
+    
+    init(words: [Int] = []){ //words defaults to empty if no parameter is passed
+        self.words = words
         guard userHomeView.isUser != nil else{
             isErrorOccurrence.toggle()
             return
@@ -1250,6 +1225,8 @@ struct cardHomeView: View{
         }
     }
     
+    
+    
     private func initialLoading()async throws->Bool{
         var isPropertySet: Bool = false
         guard let isUserID = userHomeView.isUser?.uid else{return false}
@@ -1261,7 +1238,15 @@ struct cardHomeView: View{
             guard let getWordLanguage = getLearnLanguageField.randomElement() else{return false}
             isWordLanguage = getWordLanguage
             let isEntriesCount = 39849 + 1 // get actual size
-            let isRandomID = Int.random(in: 0...isEntriesCount)
+            var isRandomID = Int.random(in: 0...isEntriesCount)
+            
+            //If a user is opening their personal deck, then words will be an array containg wordIDs to the words in their deck
+            //In this case, randomID must be a number in the array words
+            if(!words!.isEmpty){
+                isRandomID = words![0]
+            }
+            
+            
             let isRandomEntry = try await Firestore.firestore().collection(isWordLanguage).document(String(isRandomID)).getDocument()
             guard isRandomEntry.exists else{return false}
             isLanguageEntryID = isRandomID
@@ -1469,8 +1454,9 @@ struct cardHomeView: View{
             } catch{
                 print(error.localizedDescription)
             }
-        } else if navigationChoice == "proceeding"{
+        }else if navigationChoice == "proceeding"  {
             if indexingPreviousWords.isCurrent{
+            
                 let isPreviousCount = isPreviousWords.values.reduce(0){$0 + $1.count}
                 if isPreviousCount == 10{
                     guard let firstEntry = isPreviousWords.keys.first else{return false}
@@ -1484,11 +1470,25 @@ struct cardHomeView: View{
                 } else{
                     isPreviousWords[isWordLanguage] = [isLanguageEntryID]
                 }
-                do{
+                 
+                scope: do{
                     guard let getLanguage = isLearnLanguages.randomElement() else{return false}
                     isWordLanguage = getLanguage
                     let isEntriesCount = 39849 + 1
-                    let isRandomID = Int.random(in: 0...isEntriesCount)
+                    var isRandomID = Int.random(in: 0...isEntriesCount)
+                    
+                    //If a user is opening their personal deck, then words will be an array containg wordIDs to the words in their deck
+                    //In this case, randomID must be in the bounds of the array words
+                    if(!words!.isEmpty){
+                        if(words!.count > index){
+                            isRandomID = words![index]
+                            index = index + 1
+                            //print("within navigatWord: this word is \(isRandomID)")
+                        } else{
+                            break scope
+                        }
+                    }
+                    
                     let isRandomEntry = try await Firestore.firestore().collection(isWordLanguage).document(String(isRandomID)).getDocument()
                     guard isRandomEntry.exists else{return false}
                     isLanguageEntryID = isRandomID
@@ -1499,9 +1499,11 @@ struct cardHomeView: View{
                     //guard let getPronunciationField = isRandomEntry.data()?["isPronunciation"] as? String else{return false}
                     //isPronunciation = getPronunciationField
                     hasNavigated.toggle()
+                    
                 } catch{
                     print(error.localizedDescription)
                 }
+                
                 guard let isUserID = userHomeView.isUser?.uid else{return false}
                 do{
                     let isUserDocument = try await Firestore.firestore().collection("users").document(isUserID).getDocument()
@@ -1513,6 +1515,7 @@ struct cardHomeView: View{
                 } catch{
                     print(error.localizedDescription)
                 }
+                
             } else{
                 var getCurrentWord: Bool = false
                 indexingPreviousWords.isIndex += (indexingPreviousWords.isIndex == -1) ? 2 : (indexingPreviousWords.isIndex < isPreviousWords[indexingPreviousWords.isLanguage]?.count ?? -1) ? 1 : 0
@@ -2752,7 +2755,7 @@ struct isFavouriteCardView: View{ // Add a little section at the bottom that sho
                 }.padding(.horizontal, 10).onTapGesture{isFavouritesNavigation.toggle()}.navigationDestination(isPresented: $isFavouritesNavigation){userFavouriteCardsView().navigationBarBackButtonHidden(true)}
                 HStack{
                     Image(systemName:"plus.square.fill").resizable().scaledToFit().frame(width: 50, height: 50)
-                }.padding(.horizontal, 10).onTapGesture{isWordInputNavigation.toggle()}.navigationDestination(isPresented: $isWordInputNavigation){/*languageThemeView().navigationBarBackButtonHidden(true)*/} // Dont forget to change word redirection to new word input page
+                }.padding(.horizontal, 10).onTapGesture{isWordInputNavigation.toggle()}.navigationDestination(isPresented: $isWordInputNavigation){addDeckView().navigationBarBackButtonHidden(true)}
                 HStack{
                     Image(systemName:"cart.fill").resizable().scaledToFit().frame(width: 50, height: 50)
                 }.padding(.horizontal, 10).onTapGesture{isStoreNavigation.toggle()}.navigationDestination(isPresented: $isStoreNavigation){userStoreView().navigationBarBackButtonHidden(true)}
