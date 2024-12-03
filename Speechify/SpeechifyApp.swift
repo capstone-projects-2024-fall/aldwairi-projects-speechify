@@ -891,6 +891,7 @@ class AudioPlayerDelegate: NSObject, AVAudioPlayerDelegate{
     }
 }
 
+
 struct topAndBottomView: View{
     @State private var isErrorOccurrence:Bool = false
     @State private var isSearchNavigation:Bool = false
@@ -1080,11 +1081,13 @@ struct cardHomeView: View{
     @State private var isWordInputNavigation:Bool = false
     @State private var isTaskNavigation:Bool = false
     
+
     let words : [Int]?
     @State private var index: Int = 1
     
     init(words: [Int] = []){ //words defaults to empty if no parameter is passed
         self.words = words
+
         guard userHomeView.isUser != nil else{
             isErrorOccurrence.toggle()
             return
@@ -1225,8 +1228,7 @@ struct cardHomeView: View{
         }
     }
     
-    
-    
+
     private func initialLoading()async throws->Bool{
         var isPropertySet: Bool = false
         guard let isUserID = userHomeView.isUser?.uid else{return false}
@@ -1238,6 +1240,7 @@ struct cardHomeView: View{
             guard let getWordLanguage = getLearnLanguageField.randomElement() else{return false}
             isWordLanguage = getWordLanguage
             let isEntriesCount = 39849 + 1 // get actual size
+
             var isRandomID = Int.random(in: 0...isEntriesCount)
             
             //If a user is opening their personal deck, then words will be an array containg wordIDs to the words in their deck
@@ -1245,7 +1248,6 @@ struct cardHomeView: View{
             if(!words!.isEmpty){
                 isRandomID = words![0]
             }
-            
             
             let isRandomEntry = try await Firestore.firestore().collection(isWordLanguage).document(String(isRandomID)).getDocument()
             guard isRandomEntry.exists else{return false}
@@ -1454,9 +1456,10 @@ struct cardHomeView: View{
             } catch{
                 print(error.localizedDescription)
             }
+
         }else if navigationChoice == "proceeding"  {
             if indexingPreviousWords.isCurrent{
-            
+
                 let isPreviousCount = isPreviousWords.values.reduce(0){$0 + $1.count}
                 if isPreviousCount == 10{
                     guard let firstEntry = isPreviousWords.keys.first else{return false}
@@ -1470,6 +1473,7 @@ struct cardHomeView: View{
                 } else{
                     isPreviousWords[isWordLanguage] = [isLanguageEntryID]
                 }
+
                  
                 scope: do{
                     guard let getLanguage = isLearnLanguages.randomElement() else{return false}
@@ -1489,6 +1493,7 @@ struct cardHomeView: View{
                         }
                     }
                     
+
                     let isRandomEntry = try await Firestore.firestore().collection(isWordLanguage).document(String(isRandomID)).getDocument()
                     guard isRandomEntry.exists else{return false}
                     isLanguageEntryID = isRandomID
@@ -1499,11 +1504,12 @@ struct cardHomeView: View{
                     //guard let getPronunciationField = isRandomEntry.data()?["isPronunciation"] as? String else{return false}
                     //isPronunciation = getPronunciationField
                     hasNavigated.toggle()
+
                     
                 } catch{
                     print(error.localizedDescription)
                 }
-                
+
                 guard let isUserID = userHomeView.isUser?.uid else{return false}
                 do{
                     let isUserDocument = try await Firestore.firestore().collection("users").document(isUserID).getDocument()
@@ -1515,7 +1521,7 @@ struct cardHomeView: View{
                 } catch{
                     print(error.localizedDescription)
                 }
-                
+
             } else{
                 var getCurrentWord: Bool = false
                 indexingPreviousWords.isIndex += (indexingPreviousWords.isIndex == -1) ? 2 : (indexingPreviousWords.isIndex < isPreviousWords[indexingPreviousWords.isLanguage]?.count ?? -1) ? 1 : 0
@@ -2755,7 +2761,9 @@ struct isFavouriteCardView: View{ // Add a little section at the bottom that sho
                 }.padding(.horizontal, 10).onTapGesture{isFavouritesNavigation.toggle()}.navigationDestination(isPresented: $isFavouritesNavigation){userFavouriteCardsView().navigationBarBackButtonHidden(true)}
                 HStack{
                     Image(systemName:"plus.square.fill").resizable().scaledToFit().frame(width: 50, height: 50)
+
                 }.padding(.horizontal, 10).onTapGesture{isWordInputNavigation.toggle()}.navigationDestination(isPresented: $isWordInputNavigation){addDeckView().navigationBarBackButtonHidden(true)}
+
                 HStack{
                     Image(systemName:"cart.fill").resizable().scaledToFit().frame(width: 50, height: 50)
                 }.padding(.horizontal, 10).onTapGesture{isStoreNavigation.toggle()}.navigationDestination(isPresented: $isStoreNavigation){userStoreView().navigationBarBackButtonHidden(true)}
