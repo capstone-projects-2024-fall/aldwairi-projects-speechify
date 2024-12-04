@@ -1080,6 +1080,7 @@ struct cardHomeView: View{
     @State private var signOutNavigation:Bool = false
     @State private var isWordInputNavigation:Bool = false
     @State private var isTaskNavigation:Bool = false
+    @State private var userPhoneme: String = ""
     
 
     let words : [Int]?
@@ -1169,6 +1170,7 @@ struct cardHomeView: View{
                     }.padding(.vertical, 10)
                     VStack{
                         Text("Transcribed Audio: \(isAudioText)")
+                        Text("Phenome: \(userPhoneme)")
                     }.frame(width: 375, height: 275).background(Color(UIColor.systemGray5)).clipShape(RoundedRectangle(cornerRadius: 5)).padding(.vertical, 10)
                     HStack{
                         HStack{
@@ -1670,9 +1672,37 @@ struct cardHomeView: View{
             }
             guard let hasResult = result else {return}
             isAudioText = hasResult.bestTranscription.formattedString
+            getuserPhoneme(word: isAudioText)
+            
+            
             isSpeechTranscriptionValid.toggle()
         }
         return isSpeechTranscriptionValid
+    }
+    private func getuserPhoneme(word: String){
+        var searchedWord = word.lowercased()
+       
+        let db = Firestore.firestore()
+        
+        print("lets see \(searchedWord)1")
+        db.collection("eng_US") //make this for all languages
+            .whereField("isWord", isEqualTo: searchedWord).limit(to:50)
+            .getDocuments(source: .server) { (snapshot, error) in
+                if let error = error {
+                    print("Error searching decks: \(error)")
+                    return
+                }else{
+                    let document = snapshot?.documents.first
+                    if(document?.documentID == nil){
+                        print("word not found")
+                        print("Error searching decks in getPhenome: \(String(describing: error))")
+                    }else{
+                            userPhoneme = document?.get("isPhonetic") as? String ?? "notFound"
+                        
+                    }
+                }
+            }
+ 
     }
     
     private func isRealTimeSpeechToText()->Bool{ // Not smart and outright bad to pause audio intake for this function
