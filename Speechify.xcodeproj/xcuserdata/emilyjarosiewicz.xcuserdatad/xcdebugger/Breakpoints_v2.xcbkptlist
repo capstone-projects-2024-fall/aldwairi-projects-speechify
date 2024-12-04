@@ -14,40 +14,10 @@
             filePath = "Speechify/SpeechifyApp.swift"
             startingColumnNumber = "9223372036854775807"
             endingColumnNumber = "9223372036854775807"
-            startingLineNumber = "1610"
-            endingLineNumber = "1610"
-            landmarkName = "playUserRecording()"
-            landmarkType = "7">
-            <Locations>
-               <Location
-                  uuid = "A906B258-0381-4ECA-ACF4-C813463F9721 - c2700c46d9d5b914"
-                  shouldBeEnabled = "Yes"
-                  ignoreCount = "0"
-                  continueAfterRunningActions = "No"
-                  symbolName = "closure #2 (Swift.Error) -&gt; () in Speechify.cardHomeView.playUserRecording() -&gt; Swift.Bool"
-                  moduleName = "Speechify.debug.dylib"
-                  usesParentBreakpointCondition = "Yes"
-                  urlString = "file:///Users/emilyjarosiewicz/Documents/aldwairi-projects-speechify/Speechify/SpeechifyApp.swift"
-                  startingColumnNumber = "9223372036854775807"
-                  endingColumnNumber = "9223372036854775807"
-                  startingLineNumber = "1610"
-                  endingLineNumber = "1610">
-               </Location>
-               <Location
-                  uuid = "A906B258-0381-4ECA-ACF4-C813463F9721 - a61a0554e95ae45d"
-                  shouldBeEnabled = "Yes"
-                  ignoreCount = "0"
-                  continueAfterRunningActions = "No"
-                  symbolName = "Speechify.cardHomeView.endTextToSpeech() -&gt; ()"
-                  moduleName = "Speechify.debug.dylib"
-                  usesParentBreakpointCondition = "Yes"
-                  urlString = "file:///Users/emilyjarosiewicz/Documents/aldwairi-projects-speechify/Speechify/SpeechifyApp.swift"
-                  startingColumnNumber = "9223372036854775807"
-                  endingColumnNumber = "9223372036854775807"
-                  startingLineNumber = "1611"
-                  endingLineNumber = "1611">
-               </Location>
-            </Locations>
+            startingLineNumber = "1630"
+            endingLineNumber = "1630"
+            landmarkName = "cardHomeView"
+            landmarkType = "14">
          </BreakpointContent>
       </BreakpointProxy>
    </Breakpoints>

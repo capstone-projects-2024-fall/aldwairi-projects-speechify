@@ -1081,6 +1081,11 @@ struct cardHomeView: View{
     @State private var isWordInputNavigation:Bool = false
     @State private var isTaskNavigation:Bool = false
     
+    @State private var isVoiceSelectionNavigation: Bool = false
+    @State private var selectedVoiceIdentifier: String = "en-US" // Default voice
+    @State private var availableVoices: [AVSpeechSynthesisVoice] = AVSpeechSynthesisVoice.speechVoices()
+
+
 
     let words : [Int]?
     @State private var index: Int = 1
@@ -1102,6 +1107,25 @@ struct cardHomeView: View{
                         HStack{
                             Image(systemName:"square.grid.2x2.fill").resizable().scaledToFit().frame(width: 50, height: 50)
                         }.frame(maxWidth: .infinity, alignment: .leading).padding(.leading, 10).onTapGesture{isThemeNavigation.toggle()}.navigationDestination(isPresented: $isThemeNavigation){languageThemeView().navigationBarBackButtonHidden(true)}
+                        Menu {
+                            ForEach(availableVoices.filter { $0.language == "en-US" }, id: \.identifier) { voice in
+                                Button(action: {
+                                    selectedVoiceIdentifier = voice.identifier
+                                    print("Selected voice: \(voice.language) - \(voice.name)")
+                                }) {
+                                    Text("\(voice.name)")
+                                }
+                            }
+                        } label: {
+                            Text("Voices")
+                                .font(.headline)
+                                .padding(.horizontal, 10)
+                                .frame(height: 40)
+                                .background(Color.black)
+                                .foregroundColor(.white)
+                                .cornerRadius(8)
+                        }
+
                         HStack{
                             HStack{
                                 Image(systemName:"magnifyingglass").resizable().scaledToFit().frame(width: 50, height: 50)
@@ -1575,37 +1599,33 @@ struct cardHomeView: View{
     private func accessAudioFile(){}
     
     private func textToSpeech() -> Bool {
-        // Ensure the word is not empty
         guard !isWord.isEmpty else {
             print("No word to synthesize.")
             return false
         }
 
-        // Create the utterance with the current word
         let speechUtterance = AVSpeechUtterance(string: isWord)
 
-        // Set a default voice (e.g., US English)
-        if let defaultVoice = AVSpeechSynthesisVoice(language: "en-US") {
-            speechUtterance.voice = defaultVoice
+        // Find the selected voice from the available voices
+        if let selectedVoice = availableVoices.first(where: { $0.identifier == selectedVoiceIdentifier }) {
+            speechUtterance.voice = selectedVoice
         } else {
-            print("Default voice not available.")
-            return false
+            print("Selected voice not found. Using default voice.")
+            speechUtterance.voice = AVSpeechSynthesisVoice(language: "en-US")
         }
 
-        // Configure the utterance properties
-        speechUtterance.rate = 0.5 // Medium speech rate
-        speechUtterance.pitchMultiplier = 1.0 // Neutral pitch
+        // Configure utterance properties
+        speechUtterance.rate = 0.5
+        speechUtterance.pitchMultiplier = 1.0
 
-        // Initialize the speech synthesizer
         isSpeechSynthesizer = AVSpeechSynthesizer()
-
-        // Speak the utterance
         isSpeechSynthesizer?.speak(speechUtterance)
 
-        // Log success and return
-        print("Speaking the word: \(isWord)")
+        print("Speaking the word: \(isWord) with voice: \(speechUtterance.voice?.name ?? "Unknown")")
         return true
     }
+
+
 
     
     private func endTextToSpeech(){
