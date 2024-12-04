@@ -1126,6 +1126,9 @@ struct cardHomeView: View{
                             HStack{
                                 if isCardWord{
                                     Image(systemName: "speaker.wave.3.fill").resizable().scaledToFit().frame(width: 25, height: 25).padding(.bottom, 5)
+                                        .onTapGesture {
+                                            _ = textToSpeech()
+                                        }
                                 }
                             }.frame(maxWidth: .infinity, alignment: .trailing).padding(.trailing, 5)
                         }.frame(maxHeight: .infinity, alignment: .bottom)
@@ -1571,23 +1574,39 @@ struct cardHomeView: View{
     
     private func accessAudioFile(){}
     
-    private func textToSpeech()->Bool{ // Allow user to change male or female voice
-        var isTextSynthesized: Bool = false
-        let isSpeechUtterance = AVSpeechUtterance(string: isWord)
-        for isVoice in AVSpeechSynthesisVoice.speechVoices(){
-            if !speechSynthesizerLanguages.contains(isVoice.language){
-                speechSynthesizerLanguages.append(isVoice.language)
-            }
+    private func textToSpeech() -> Bool {
+        // Ensure the word is not empty
+        guard !isWord.isEmpty else {
+            print("No word to synthesize.")
+            return false
         }
-        if !speechSynthesizerLanguages.contains(isWordLanguage){return false}
-        isSpeechUtterance.voice = AVSpeechSynthesisVoice(language: isWordLanguage)
-        isSpeechUtterance.rate = 0.5 // Add a function for user to modify
-        isSpeechUtterance.pitchMultiplier = 1.0 // Add function for user to modify
+
+        // Create the utterance with the current word
+        let speechUtterance = AVSpeechUtterance(string: isWord)
+
+        // Set a default voice (e.g., US English)
+        if let defaultVoice = AVSpeechSynthesisVoice(language: "en-US") {
+            speechUtterance.voice = defaultVoice
+        } else {
+            print("Default voice not available.")
+            return false
+        }
+
+        // Configure the utterance properties
+        speechUtterance.rate = 0.5 // Medium speech rate
+        speechUtterance.pitchMultiplier = 1.0 // Neutral pitch
+
+        // Initialize the speech synthesizer
         isSpeechSynthesizer = AVSpeechSynthesizer()
-        isSpeechSynthesizer?.speak(isSpeechUtterance)
-        isTextSynthesized.toggle()
-        return isTextSynthesized
+
+        // Speak the utterance
+        isSpeechSynthesizer?.speak(speechUtterance)
+
+        // Log success and return
+        print("Speaking the word: \(isWord)")
+        return true
     }
+
     
     private func endTextToSpeech(){
         //if isSpeechSynthesizer?.isSpeaking{
