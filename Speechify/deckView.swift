@@ -124,7 +124,9 @@ struct addDeckView: View{
                     .padding()
                     .disableAutocorrection(true)
                 // Search button (optional for manual trigger)
-                Button(action: searchWordDB){
+                Button(action:{
+                    let result = searchWordDB(word: searchedWord)}
+                ){
                     Text("Add")
                 }
                 Button(action: {
@@ -143,8 +145,10 @@ struct addDeckView: View{
         }
     }
     
-    private func searchWordDB(){
-        searchedWord = searchedWord.lowercased()
+    //returns word's phonetic for
+    private func searchWordDB(word: String) -> String{
+        searchedWord = word.lowercased()
+        var phonetic :String?
         
         db.collection("eng_US") //make this for all languages
             .whereField("isWord", isEqualTo: searchedWord).limit(to:50)
@@ -163,14 +167,15 @@ struct addDeckView: View{
                             wordsAdded.append(searchedWord)
                             let wordIDString = document?.documentID ?? "0"
                             let wordID = Int(wordIDString)!
-
                             wordIDAdded.append(wordID)
-                            
+                            phonetic = document?.get("isPhonetic") as? String
+                            print("Phonetic: \(String(describing: phonetic))") // This will print the phonetic representation
                         }
                     }
                     
                 }
             }
+        return phonetic ?? "nil"
     }
     
 }
