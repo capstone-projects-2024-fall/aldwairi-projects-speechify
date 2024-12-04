@@ -8,6 +8,7 @@
 
 /* Begin PBXBuildFile section */
 		229932422CFD05A600FEAF48 /* deckView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 229932412CFD05A300FEAF48 /* deckView.swift */; };
+		6C0CD9332CFFA2D000E57875 /* GoogleService-Info.plist in Resources */ = {isa = PBXBuildFile; fileRef = 6C0CD9322CFFA2D000E57875 /* GoogleService-Info.plist */; };
 		BE7B010F2CDEED940050F456 /* SpeechifyApp.swift in Sources */ = {isa = PBXBuildFile; fileRef = BE7B010E2CDEED940050F456 /* SpeechifyApp.swift */; };
 		BE7B01132CDEED950050F456 /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = BE7B01122CDEED950050F456 /* Assets.xcassets */; };
 		BE7B01162CDEED950050F456 /* Preview Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = BE7B01152CDEED950050F456 /* Preview Assets.xcassets */; };
@@ -19,8 +20,8 @@
 		BE7B013E2CDEEE670050F456 /* FirebaseDatabase in Frameworks */ = {isa = PBXBuildFile; productRef = BE7B013D2CDEEE670050F456 /* FirebaseDatabase */; };
 		BE7B01402CDEEE670050F456 /* FirebaseFirestore in Frameworks */ = {isa = PBXBuildFile; productRef = BE7B013F2CDEEE670050F456 /* FirebaseFirestore */; };
 		BE7B01422CDEEE670050F456 /* FirebaseFunctions in Frameworks */ = {isa = PBXBuildFile; productRef = BE7B01412CDEEE670050F456 /* FirebaseFunctions */; };
-		E96F88592D00B65800F04D75 /* GoogleService-Info.plist in Resources */ = {isa = PBXBuildFile; fileRef = E96F88582D00B65800F04D75 /* GoogleService-Info.plist */; };
 		E96F88812D00F6FD00F04D75 /* AuthViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = E96F88802D00F6FD00F04D75 /* AuthViewModel.swift */; };
+
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -122,9 +123,9 @@
 				E96F88802D00F6FD00F04D75 /* AuthViewModel.swift */,
 				BE7B01472CE1E6520050F456 /* Info.plist */,
 				BE7B010E2CDEED940050F456 /* SpeechifyApp.swift */,
-				E96F88582D00B65800F04D75 /* GoogleService-Info.plist */,
 				BE7B01122CDEED950050F456 /* Assets.xcassets */,
 				BE7B01142CDEED950050F456 /* Preview Content */,
+				6C0CD9322CFFA2D000E57875 /* GoogleService-Info.plist */,
 			);
 			path = Speechify;
 			sourceTree = "<group>";
@@ -274,7 +275,7 @@
 			files = (
 				BE7B01162CDEED950050F456 /* Preview Assets.xcassets in Resources */,
 				BE7B01132CDEED950050F456 /* Assets.xcassets in Resources */,
-				E96F88592D00B65800F04D75 /* GoogleService-Info.plist in Resources */,
+				6C0CD9332CFFA2D000E57875 /* GoogleService-Info.plist in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};

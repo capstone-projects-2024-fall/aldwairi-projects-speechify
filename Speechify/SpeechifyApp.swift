@@ -1119,6 +1119,12 @@ struct cardHomeView: View {
     
     // SpeechAce service
     private let speechAceService = NetworkService(apiKey: "9Tj%2Fgrnan4OBTpnMQzKHP5cQTTo35Dbo3VF3emMavxX8QfC6B%2FqxZ6TsD7bvZSzAfTJ7n8DLN6NeXMF4A8boaH9L5IdtqfwDbTcMN%2F%2Fp7PNMXTbUN1QvM5Ey9p6p7mgf")
+    
+    @State private var isVoiceSelectionNavigation: Bool = false
+    @State private var selectedVoiceIdentifier: String = "en-US" // Default voice
+    @State private var availableVoices: [AVSpeechSynthesisVoice] = AVSpeechSynthesisVoice.speechVoices()
+
+
 
     let words : [Int]?
     @State private var index: Int = 1
@@ -1140,6 +1146,25 @@ struct cardHomeView: View {
                         HStack{
                             Image(systemName:"square.grid.2x2.fill").resizable().scaledToFit().frame(width: 50, height: 50)
                         }.frame(maxWidth: .infinity, alignment: .leading).padding(.leading, 10).onTapGesture{isThemeNavigation.toggle()}.navigationDestination(isPresented: $isThemeNavigation){languageThemeView().navigationBarBackButtonHidden(true)}
+                        Menu {
+                            ForEach(availableVoices.filter { $0.language == "en-US" }, id: \.identifier) { voice in
+                                Button(action: {
+                                    selectedVoiceIdentifier = voice.identifier
+                                    print("Selected voice: \(voice.language) - \(voice.name)")
+                                }) {
+                                    Text("\(voice.name)")
+                                }
+                            }
+                        } label: {
+                            Text("Voices")
+                                .font(.headline)
+                                .padding(.horizontal, 10)
+                                .frame(height: 40)
+                                .background(Color.black)
+                                .foregroundColor(.white)
+                                .cornerRadius(8)
+                        }
+
                         HStack{
                             HStack{
                                 Image(systemName:"magnifyingglass").resizable().scaledToFit().frame(width: 50, height: 50)
@@ -1175,6 +1200,9 @@ struct cardHomeView: View {
                             HStack{
                                 if isCardWord{
                                     Image(systemName: "speaker.wave.3.fill").resizable().scaledToFit().frame(width: 25, height: 25).padding(.bottom, 5)
+                                        .onTapGesture {
+                                            _ = textToSpeech()
+                                        }
                                 }
                             }.frame(maxWidth: .infinity, alignment: .trailing).padding(.trailing, 5)
                         }.frame(maxHeight: .infinity, alignment: .bottom)
@@ -1661,23 +1689,35 @@ struct cardHomeView: View {
     
     private func accessAudioFile(){}
     
-    private func textToSpeech()->Bool{ // Allow user to change male or female voice
-        var isTextSynthesized: Bool = false
-        let isSpeechUtterance = AVSpeechUtterance(string: isWord)
-        for isVoice in AVSpeechSynthesisVoice.speechVoices(){
-            if !speechSynthesizerLanguages.contains(isVoice.language){
-                speechSynthesizerLanguages.append(isVoice.language)
-            }
+    private func textToSpeech() -> Bool {
+        guard !isWord.isEmpty else {
+            print("No word to synthesize.")
+            return false
         }
-        if !speechSynthesizerLanguages.contains(isWordLanguage){return false}
-        isSpeechUtterance.voice = AVSpeechSynthesisVoice(language: isWordLanguage)
-        isSpeechUtterance.rate = 0.5 // Add a function for user to modify
-        isSpeechUtterance.pitchMultiplier = 1.0 // Add function for user to modify
+
+        let speechUtterance = AVSpeechUtterance(string: isWord)
+
+        // Find the selected voice from the available voices
+        if let selectedVoice = availableVoices.first(where: { $0.identifier == selectedVoiceIdentifier }) {
+            speechUtterance.voice = selectedVoice
+        } else {
+            print("Selected voice not found. Using default voice.")
+            speechUtterance.voice = AVSpeechSynthesisVoice(language: "en-US")
+        }
+
+        // Configure utterance properties
+        speechUtterance.rate = 0.5
+        speechUtterance.pitchMultiplier = 1.0
+
         isSpeechSynthesizer = AVSpeechSynthesizer()
-        isSpeechSynthesizer?.speak(isSpeechUtterance)
-        isTextSynthesized.toggle()
-        return isTextSynthesized
+        isSpeechSynthesizer?.speak(speechUtterance)
+
+        print("Speaking the word: \(isWord) with voice: \(speechUtterance.voice?.name ?? "Unknown")")
+        return true
     }
+
+
+
     
     private func endTextToSpeech(){
         //if isSpeechSynthesizer?.isSpeaking{
@@ -1844,6 +1884,31 @@ struct cardHomeView: View {
             isSpeechTranscriptionValid.toggle()
         }
         return isSpeechTranscriptionValid
+    }
+    private func getuserPhoneme(word: String){
+        var searchedWord = word.lowercased()
+       
+        let db = Firestore.firestore()
+        
+        print("lets see \(searchedWord)1")
+        db.collection("eng_US") //make this for all languages
+            .whereField("isWord", isEqualTo: searchedWord).limit(to:50)
+            .getDocuments(source: .server) { (snapshot, error) in
+                if let error = error {
+                    print("Error searching decks: \(error)")
+                    return
+                }else{
+                    let document = snapshot?.documents.first
+                    if(document?.documentID == nil){
+                        print("word not found")
+                        print("Error searching decks in getPhenome: \(String(describing: error))")
+                    }else{
+                            userPhoneme = document?.get("isPhonetic") as? String ?? "notFound"
+                        
+                    }
+                }
+            }
+ 
     }
     
     private func getuserPhoneme(word: String) {
