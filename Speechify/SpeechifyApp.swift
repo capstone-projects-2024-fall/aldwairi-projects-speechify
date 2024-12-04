@@ -12,7 +12,7 @@ import FirebaseFirestore
 import AVFoundation
 import Speech
 
-class AppDelegate: NSObject, UIApplicationDelegate{
+class AppDelegate: NSObject, UIApplicationDelegate {
     func application(_ application: UIApplication, didFinishLaunchingWithOptions launchOptions: [UIApplication.LaunchOptionsKey : Any]? = nil) -> Bool{
         FirebaseApp.configure()
         return true
@@ -29,21 +29,33 @@ struct SpeechifyApp: App{
     }
 }
 
-struct contentPageView: View{
+struct contentPageView: View {
+    
+    @StateObject private var authViewModel = AuthViewModel()
+    
     @State var loginNavigate: Bool = false
     @State var signupNavigate: Bool = false
     
-    var body: some View{
-        NavigationStack{
-            VStack{
-                Text("Speechify").font(.largeTitle).multilineTextAlignment(.center).padding(10)
-                Text("Login").font(.title).padding(10).foregroundStyle(.blue).background(Color(UIColor.systemGray5)).clipShape(RoundedRectangle(cornerRadius: 5)).onTapGesture{loginNavigate.toggle()}.navigationDestination(isPresented: $loginNavigate){
-                    authenticationView().navigationBarBackButtonHidden(true)
-                }
-                Text("Sign-Up").font(.title).padding(10).foregroundStyle(.blue).background(Color(UIColor.systemGray5)).clipShape(RoundedRectangle(cornerRadius: 5)).onTapGesture{signupNavigate.toggle()}.navigationDestination(isPresented: $signupNavigate){
-                    registrationView().navigationBarBackButtonHidden(true)
+    var body: some View {
+        NavigationStack {
+            
+            if authViewModel.isLoggedIn {
+                
+                userHomeView()
+                    .navigationBarBackButtonHidden(true)
+            } else {
+                
+                VStack {
+                    Text("Speechify").font(.largeTitle).multilineTextAlignment(.center).padding(10)
+                    Text("Login").font(.title).padding(10).foregroundStyle(.blue).background(Color(UIColor.systemGray5)).clipShape(RoundedRectangle(cornerRadius: 5)).onTapGesture{loginNavigate.toggle()}.navigationDestination(isPresented: $loginNavigate){
+                        authenticationView().navigationBarBackButtonHidden(true)
+                    }
+                    Text("Sign-Up").font(.title).padding(10).foregroundStyle(.blue).background(Color(UIColor.systemGray5)).clipShape(RoundedRectangle(cornerRadius: 5)).onTapGesture{signupNavigate.toggle()}.navigationDestination(isPresented: $signupNavigate){
+                        registrationView().navigationBarBackButtonHidden(true)
+                    }
                 }
             }
+            
         }
     }
 }
@@ -644,7 +656,10 @@ struct initialUserConfigurationView: View{
     }
 }
 
-struct authenticationView: View{
+struct authenticationView: View {
+    
+    @StateObject private var authViewModel = AuthViewModel()
+    
     @State private var isUserEmail: String = ""
     @State private var isUserPassword: String = ""
     @State private var isResetEdit: String = ""
@@ -671,181 +686,194 @@ struct authenticationView: View{
         self.resetEditFocus = false
     }
     
-    var body: some View{
-        NavigationStack{
-            ZStack{
-                VStack{
-                    Text("Login").font(.largeTitle).frame(maxWidth: .infinity, alignment: .center).padding(.top, 10)
-                    Text("Email").frame(maxWidth: .infinity, alignment: .leading)
-                    HStack{
-                        Image(systemName: "envelope.fill").resizable().scaledToFit().frame(width: 25, height: 25).padding(.leading, 2).foregroundStyle(.gray)
-                        TextField("Email Address", text: $isUserEmail).focused($isEmailFocus).background(Color.white).frame(height:30).textInputAutocapitalization(.never).autocorrectionDisabled(true).onSubmit{
-                            isPasswordFocus = true
-                            if !isUserEmail.isEmpty && emailErrorMessage.contains("enter") && isEmailError{
-                                isEmailError.toggle()
-                            }
-                        }.onChange(of: isEmailFocus, {
-                            if !isEmailFocus{
-                                if !isUserEmail.isEmpty && emailErrorMessage.contains("enter") && isEmailError{
-                                    isEmailError.toggle()
-                                }
-                            }
-                        })
-                    }.overlay(RoundedRectangle(cornerRadius: 5).stroke(lineWidth: 1))
-                    if isEmailError{
-                        Text(emailErrorMessage).foregroundColor(.red).frame(maxWidth: .infinity, alignment: .leading).padding(5)
-                    }
-                    Text("Password").frame(maxWidth: .infinity, alignment: .leading)
-                    HStack{
-                        Image(systemName: "lock.fill").resizable().scaledToFit().frame(width: 25, height: 25).padding(.leading, 1).foregroundStyle(.gray)
-                        if(!isPasswordVisible){
-                            SecureField("Password", text: $isUserPassword).focused($isPasswordFocus).background(Color.white).frame(height:30).textInputAutocapitalization(.never).autocorrectionDisabled(true).onSubmit{
-                                if !isUserPassword.isEmpty && isPasswordError{
-                                    isPasswordError.toggle()
-                                }
-                            }.onChange(of: isPasswordFocus, {
-                                if !isPasswordFocus{
-                                    if !isUserPassword.isEmpty && isPasswordError{
-                                        isPasswordError.toggle()
-                                    }
-                                }
-                            })
-                        } else{
-                            TextField("Password", text: $isUserPassword).focused($isPasswordFocus).background(Color.white).frame(height:30).textInputAutocapitalization(.never).autocorrectionDisabled(true).onSubmit{
-                                if !isUserPassword.isEmpty && isPasswordError{
-                                    isPasswordError.toggle()
-                                }
-                            }.onChange(of: isPasswordFocus, {
-                                if !isPasswordFocus{
-                                    if !isUserPassword.isEmpty && isPasswordError{
-                                        isPasswordError.toggle()
-                                    }
-                                }
-                            })
-                        }
-                        Button(action:{isPasswordVisible.toggle()}){
-                            Image(systemName: !isPasswordVisible ? "eye.slash" : "eye").resizable().scaledToFit().frame(width: 25, height: 25).padding(.trailing, 2).foregroundStyle(.black)
-                        }
-                    }.overlay(RoundedRectangle(cornerRadius: 5).stroke(lineWidth: 1))
-                    if isPasswordError{
-                        Text(passwordErrorMessage).foregroundColor(.red).frame(maxWidth: .infinity, alignment: .leading).padding(5)
-                    }
-                    Text("Login").padding(10).foregroundStyle(.blue).background(Color(UIColor.systemGray5)).clipShape(RoundedRectangle(cornerRadius: 5)).onTapGesture{
-                        if isUserEmail.isEmpty{
-                            emailErrorMessage = "Please enter your email address"
-                            isEmailError = true
-                        } else{
-                            let isEmailRegex: String = "[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\\.[a-zA-Z]{2,}"
-                            let isEmailPredicate = NSPredicate(format: "SELF MATCHES[c] %@", isEmailRegex)
-                            let isValidAddress = isEmailPredicate.evaluate(with: isUserEmail)
-                            if !isValidAddress{
-                                emailErrorMessage = "Invalid email address"
-                                isEmailError = true
-                            }
-                            if isValidAddress && isEmailError{
-                                isEmailError.toggle()
-                            }
-                        }
-                        if isUserPassword.isEmpty{
-                            passwordErrorMessage = "Please enter your password"
-                            isPasswordError = true
-                        } else if !isUserPassword.isEmpty && isPasswordError{
-                            isPasswordError = false
-                        }
-                        if !isEmailError && !isPasswordError{
-                            print("login reached")
-                            _ = Task{isUserValid = await validateCredentials()}
-                        }
-                    }.padding(10).navigationDestination(isPresented: $isUserValid){
-                        userHomeView().navigationBarBackButtonHidden(true)
-                    }
-                    if isLoginError{
-                        Text("Invalid Email Or Password").foregroundColor(.red).padding(.top, 5)
-                    }
-                    Text("Forgot Password?").onTapGesture{ // highlight blue on hover
-                        isPasswordReset.toggle()
-                    }
-                    HStack{
-                        Text("Don't have an account? ")
-                        NavigationLink(destination: registrationView().navigationBarBackButtonHidden(true)){
-                            Text("Sign Up")
-                        }
-                    }
-                }.padding(15).onTapGesture{
-                    isEmailFocus = false
-                    isPasswordFocus = false
-                }
-            }.overlay(alignment: .center){
-                if isPasswordReset{
+    var body: some View {
+        
+        NavigationStack {
+            
+            if authViewModel.isLoggedIn {
+                userHomeView()
+                    .navigationBarBackButtonHidden(true)
+                
+            } else {
+                
+                ZStack {
+                    
                     VStack{
-                        ZStack{
-                            HStack{
-                                Image(systemName: "x.circle.fill").resizable().scaledToFit().frame(width: 25, height: 25)
-                            }.frame(maxWidth: .infinity, alignment: .topTrailing).onTapGesture{
-                                isPasswordReset.toggle()
-                                isResetEdit = ""
-                                resetEditError = false
-                                resetEditErrorMessage = ""
-                            }
-                        }
-                        Text("Reset Password")
+                        
+                        Text("Login").font(.largeTitle).frame(maxWidth: .infinity, alignment: .center).padding(.top, 10)
                         Text("Email").frame(maxWidth: .infinity, alignment: .leading)
                         HStack{
                             Image(systemName: "envelope.fill").resizable().scaledToFit().frame(width: 25, height: 25).padding(.leading, 2).foregroundStyle(.gray)
-                            TextField("Email Address", text: $isResetEdit).focused($resetEditFocus).background(Color.white).frame(height:30).textInputAutocapitalization(.never).autocorrectionDisabled(true).onSubmit{
-                                if !isResetEdit.isEmpty && resetEditErrorMessage.contains("enter") && resetEditError{
-                                    resetEditError.toggle()
+                            TextField("Email Address", text: $isUserEmail).focused($isEmailFocus).background(Color.white).frame(height:30).textInputAutocapitalization(.never).autocorrectionDisabled(true).onSubmit{
+                                isPasswordFocus = true
+                                if !isUserEmail.isEmpty && emailErrorMessage.contains("enter") && isEmailError{
+                                    isEmailError.toggle()
                                 }
-                            }.onChange(of: resetEditFocus, {
-                                if !resetEditFocus{
-                                    if !isResetEdit.isEmpty && resetEditErrorMessage.contains("enter") && resetEditError{
-                                        resetEditError = false
+                            }.onChange(of: isEmailFocus, {
+                                if !isEmailFocus{
+                                    if !isUserEmail.isEmpty && emailErrorMessage.contains("enter") && isEmailError{
+                                        isEmailError.toggle()
                                     }
-                                }
-                                if resetEditFocus && isResetResult{
-                                    isResetResult.toggle()
                                 }
                             })
                         }.overlay(RoundedRectangle(cornerRadius: 5).stroke(lineWidth: 1))
-                        if resetEditError{
-                            Text(resetEditErrorMessage).foregroundColor(.red).frame(maxWidth: .infinity, alignment: .leading).padding(5)
+                        if isEmailError{
+                            Text(emailErrorMessage).foregroundColor(.red).frame(maxWidth: .infinity, alignment: .leading).padding(5)
                         }
-                        Text("Confirm").padding(10).foregroundStyle(.blue).background(Color(UIColor.systemGray5)).clipShape(RoundedRectangle(cornerRadius: 5)).onTapGesture{
-                            resetEditFocus = false
-                            if isResetEdit.isEmpty{
-                                resetEditErrorMessage = "Please enter your email address"
-                                resetEditError = true
+                        Text("Password").frame(maxWidth: .infinity, alignment: .leading)
+                        HStack{
+                            Image(systemName: "lock.fill").resizable().scaledToFit().frame(width: 25, height: 25).padding(.leading, 1).foregroundStyle(.gray)
+                            if(!isPasswordVisible){
+                                SecureField("Password", text: $isUserPassword).focused($isPasswordFocus).background(Color.white).frame(height:30).textInputAutocapitalization(.never).autocorrectionDisabled(true).onSubmit{
+                                    if !isUserPassword.isEmpty && isPasswordError{
+                                        isPasswordError.toggle()
+                                    }
+                                }.onChange(of: isPasswordFocus, {
+                                    if !isPasswordFocus{
+                                        if !isUserPassword.isEmpty && isPasswordError{
+                                            isPasswordError.toggle()
+                                        }
+                                    }
+                                })
+                            } else{
+                                TextField("Password", text: $isUserPassword).focused($isPasswordFocus).background(Color.white).frame(height:30).textInputAutocapitalization(.never).autocorrectionDisabled(true).onSubmit{
+                                    if !isUserPassword.isEmpty && isPasswordError{
+                                        isPasswordError.toggle()
+                                    }
+                                }.onChange(of: isPasswordFocus, {
+                                    if !isPasswordFocus{
+                                        if !isUserPassword.isEmpty && isPasswordError{
+                                            isPasswordError.toggle()
+                                        }
+                                    }
+                                })
+                            }
+                            Button(action:{isPasswordVisible.toggle()}){
+                                Image(systemName: !isPasswordVisible ? "eye.slash" : "eye").resizable().scaledToFit().frame(width: 25, height: 25).padding(.trailing, 2).foregroundStyle(.black)
+                            }
+                        }.overlay(RoundedRectangle(cornerRadius: 5).stroke(lineWidth: 1))
+                        if isPasswordError{
+                            Text(passwordErrorMessage).foregroundColor(.red).frame(maxWidth: .infinity, alignment: .leading).padding(5)
+                        }
+                        Text("Login").padding(10).foregroundStyle(.blue).background(Color(UIColor.systemGray5)).clipShape(RoundedRectangle(cornerRadius: 5)).onTapGesture{
+                            if isUserEmail.isEmpty{
+                                emailErrorMessage = "Please enter your email address"
+                                isEmailError = true
                             } else{
                                 let isEmailRegex: String = "[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\\.[a-zA-Z]{2,}"
                                 let isEmailPredicate = NSPredicate(format: "SELF MATCHES[c] %@", isEmailRegex)
-                                let isValidAddress = isEmailPredicate.evaluate(with: isResetEdit)
+                                let isValidAddress = isEmailPredicate.evaluate(with: isUserEmail)
                                 if !isValidAddress{
-                                    resetEditErrorMessage = "Invalid email address"
-                                    resetEditError = true
+                                    emailErrorMessage = "Invalid email address"
+                                    isEmailError = true
                                 }
-                                if isValidAddress && resetEditError{
-                                    resetEditError.toggle()
-                                }
-                                if !resetEditError{
-                                    _ = Task{isResetValid = await userPasswordReset()}
-                                    if isResetValid{
-                                        isResetEdit = ""
-                                        resetEditError = false
-                                        resetEditErrorMessage = ""
-                                    }
-                                    isResetResult.toggle()
-                                    DispatchQueue.main.asyncAfter(deadline: .now() + 5, execute: {isResetResult.toggle()})
+                                if isValidAddress && isEmailError{
+                                    isEmailError.toggle()
                                 }
                             }
+                            if isUserPassword.isEmpty{
+                                passwordErrorMessage = "Please enter your password"
+                                isPasswordError = true
+                            } else if !isUserPassword.isEmpty && isPasswordError{
+                                isPasswordError = false
+                            }
+                            if !isEmailError && !isPasswordError{
+                                print("login reached")
+                                _ = Task{isUserValid = await validateCredentials()}
+                            }
+                        }.padding(10).navigationDestination(isPresented: $isUserValid){
+                            userHomeView().navigationBarBackButtonHidden(true)
                         }
-                        if isResetResult{
-                            Text(isResetMessage).foregroundColor(.green).padding(.top, 5)
+                        if isLoginError{
+                            Text("Invalid Email Or Password").foregroundColor(.red).padding(.top, 5)
                         }
-                    }.padding(10).background(.white).border(.black, width: 1).clipShape(RoundedRectangle(cornerRadius: 5)).frame(width: 350).onTapGesture{
-                        resetEditFocus = false
+                        Text("Forgot Password?").onTapGesture{ // highlight blue on hover
+                            isPasswordReset.toggle()
+                        }
+                        HStack{
+                            Text("Don't have an account? ")
+                            NavigationLink(destination: registrationView().navigationBarBackButtonHidden(true)){
+                                Text("Sign Up")
+                            }
+                        }
+                    }.padding(15).onTapGesture{
+                        isEmailFocus = false
+                        isPasswordFocus = false
+                    }
+                }.overlay(alignment: .center){
+                    if isPasswordReset{
+                        VStack{
+                            ZStack{
+                                HStack{
+                                    Image(systemName: "x.circle.fill").resizable().scaledToFit().frame(width: 25, height: 25)
+                                }.frame(maxWidth: .infinity, alignment: .topTrailing).onTapGesture{
+                                    isPasswordReset.toggle()
+                                    isResetEdit = ""
+                                    resetEditError = false
+                                    resetEditErrorMessage = ""
+                                }
+                            }
+                            Text("Reset Password")
+                            Text("Email").frame(maxWidth: .infinity, alignment: .leading)
+                            HStack{
+                                Image(systemName: "envelope.fill").resizable().scaledToFit().frame(width: 25, height: 25).padding(.leading, 2).foregroundStyle(.gray)
+                                TextField("Email Address", text: $isResetEdit).focused($resetEditFocus).background(Color.white).frame(height:30).textInputAutocapitalization(.never).autocorrectionDisabled(true).onSubmit{
+                                    if !isResetEdit.isEmpty && resetEditErrorMessage.contains("enter") && resetEditError{
+                                        resetEditError.toggle()
+                                    }
+                                }.onChange(of: resetEditFocus, {
+                                    if !resetEditFocus{
+                                        if !isResetEdit.isEmpty && resetEditErrorMessage.contains("enter") && resetEditError{
+                                            resetEditError = false
+                                        }
+                                    }
+                                    if resetEditFocus && isResetResult{
+                                        isResetResult.toggle()
+                                    }
+                                })
+                            }.overlay(RoundedRectangle(cornerRadius: 5).stroke(lineWidth: 1))
+                            if resetEditError{
+                                Text(resetEditErrorMessage).foregroundColor(.red).frame(maxWidth: .infinity, alignment: .leading).padding(5)
+                            }
+                            Text("Confirm").padding(10).foregroundStyle(.blue).background(Color(UIColor.systemGray5)).clipShape(RoundedRectangle(cornerRadius: 5)).onTapGesture{
+                                resetEditFocus = false
+                                if isResetEdit.isEmpty{
+                                    resetEditErrorMessage = "Please enter your email address"
+                                    resetEditError = true
+                                } else{
+                                    let isEmailRegex: String = "[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\\.[a-zA-Z]{2,}"
+                                    let isEmailPredicate = NSPredicate(format: "SELF MATCHES[c] %@", isEmailRegex)
+                                    let isValidAddress = isEmailPredicate.evaluate(with: isResetEdit)
+                                    if !isValidAddress{
+                                        resetEditErrorMessage = "Invalid email address"
+                                        resetEditError = true
+                                    }
+                                    if isValidAddress && resetEditError{
+                                        resetEditError.toggle()
+                                    }
+                                    if !resetEditError{
+                                        _ = Task{isResetValid = await userPasswordReset()}
+                                        if isResetValid{
+                                            isResetEdit = ""
+                                            resetEditError = false
+                                            resetEditErrorMessage = ""
+                                        }
+                                        isResetResult.toggle()
+                                        DispatchQueue.main.asyncAfter(deadline: .now() + 5, execute: {isResetResult.toggle()})
+                                    }
+                                }
+                            }
+                            if isResetResult{
+                                Text(isResetMessage).foregroundColor(.green).padding(.top, 5)
+                            }
+                        }.padding(10).background(.white).border(.black, width: 1).clipShape(RoundedRectangle(cornerRadius: 5)).frame(width: 350).onTapGesture{
+                            resetEditFocus = false
+                        }
                     }
                 }
             }
+            
+            
         }
     }
     
@@ -982,7 +1010,8 @@ struct topAndBottomView: View{
     
 }
 
-struct userHomeView: View{
+struct userHomeView: View {
+    
     @StateObject private var deckModel = deckViewModel()
     static let isUser = Auth.auth().currentUser
     
@@ -1028,7 +1057,10 @@ struct userHomeView: View{
     }
 }
 
-struct cardHomeView: View{
+struct cardHomeView: View {
+    
+    @StateObject private var authViewModel = AuthViewModel()
+    
     @State private var isInitialLoad:Bool = true
     static let isUser = Auth.auth().currentUser
     @State private var isErrorOccurrence:Bool = false
@@ -1081,6 +1113,12 @@ struct cardHomeView: View{
     @State private var isWordInputNavigation:Bool = false
     @State private var isTaskNavigation:Bool = false
     @State private var userPhoneme: String = ""
+    
+    @State private var isScoring = false
+    @State private var pronunciationScore: Double? = nil
+    
+    // SpeechAce service
+    private let speechAceService = NetworkService(apiKey: "9Tj%2Fgrnan4OBTpnMQzKHP5cQTTo35Dbo3VF3emMavxX8QfC6B%2FqxZ6TsD7bvZSzAfTJ7n8DLN6NeXMF4A8boaH9L5IdtqfwDbTcMN%2F%2Fp7PNMXTbUN1QvM5Ey9p6p7mgf")
     
     @State private var isVoiceSelectionNavigation: Bool = false
     @State private var selectedVoiceIdentifier: String = "en-US" // Default voice
@@ -1144,9 +1182,20 @@ struct cardHomeView: View{
                                         _ = Task{ _ = await isWordFavourite()}
                                     }
                                 }
+                                
                             }.frame(maxWidth: .infinity, alignment: .trailing).padding(.trailing, 5)
                         }.frame(maxHeight: .infinity, alignment: .top)
                         Text(isCardWord ? "\(isWord)" : "\(isPhonetic)").rotation3DEffect(.degrees(isCardWord ? 0 : 180), axis: (x: 0, y: 1, z: 0))
+                        // Display pronunciation score or loading indicator
+                        if isScoring && isCardWord {
+                            ProgressView()
+                                .progressViewStyle(CircularProgressViewStyle())
+                                .padding()
+                        } else if let score = pronunciationScore, isCardWord {
+                            Text("Pronunciation Accuracy: \(Int(score))%")
+                                .foregroundColor(getScoreColor(score))
+                                .padding()
+                        }
                         VStack{
                             HStack{
                                 if isCardWord{
@@ -1164,6 +1213,7 @@ struct cardHomeView: View{
                         HStack{
                             Image(systemName: "arrowshape.left.fill").resizable().scaledToFit().frame(width: 50, height: 50)
                         }.frame(maxWidth: .infinity, alignment: .leading).padding(.leading, 10).onTapGesture{
+                            pronunciationScore = nil
                             _ = Task{_ = await navigateWordSelection(navigationChoice: "preceding")}
                         }
                         HStack{
@@ -1184,6 +1234,9 @@ struct cardHomeView: View{
                             if isAudioRecording{
                                 isAudioRecorder?.stop()
                                 isAudioRecording.toggle()
+                                if let hasAudioURL = isAudioURL {
+                                    scorePronunciation(audioFileURL: hasAudioURL)
+                                }
                                 var isTranslation = speechToText()
                             } else{
                                 _ = Task{hasRecorderError = await getUserRecording()}
@@ -1192,6 +1245,7 @@ struct cardHomeView: View{
                         HStack{
                             Image(systemName: "arrowshape.right.fill").resizable().scaledToFit().frame(width: 50, height: 50)
                         }.frame(maxWidth: .infinity, alignment: .trailing).padding(.trailing, 10).onTapGesture{
+                            pronunciationScore = nil
                             _ = Task{_ = await navigateWordSelection(navigationChoice: "proceeding")}
                         }
                     }.padding(.vertical, 10)
@@ -1250,10 +1304,44 @@ struct cardHomeView: View{
                         HStack{
                             Image(systemName:"rectangle.portrait.and.arrow.right").resizable().scaledToFit().frame(width: 25, height: 25)
                             Text("Sign Out").font(.title2)
-                        }.onTapGesture{signOutNavigation = userSignOut()}
+                        }
+                        .onTapGesture {
+                            authViewModel.logout()
+//                            signOutNavigation = userSignOut()
+                        }
                     }.padding(10).background(Color(UIColor.systemGray4)).clipShape(RoundedRectangle(cornerRadius: 5)).frame(maxWidth: .infinity, alignment: .trailing).padding(.trailing, 5).offset(y: -215)
                 }
             }
+        }
+    }
+    
+    private func scorePronunciation(audioFileURL: URL) {
+        guard let hasAudioURL = isAudioURL else { return }
+        speechAceService.scorePronunciation(word: isWord, audioFileURL: hasAudioURL) { result in
+            DispatchQueue.main.async {
+                isScoring = false
+                switch result {
+                case .success(let score):
+                    self.pronunciationScore = score
+                case .failure(let error):
+                    print("Pronunciation scoring error: \(error.localizedDescription)")
+                    // Optionally, you could show an error message to the user
+                }
+            }
+        }
+    }
+    
+    // Helper function to color code the score
+    private func getScoreColor(_ score: Double) -> Color {
+        switch score {
+        case 0..<50:
+            return .red
+        case 50..<75:
+            return .orange
+        case 75...100:
+            return .green
+        default:
+            return .gray
         }
     }
     
@@ -1328,6 +1416,7 @@ struct cardHomeView: View{
                     try await Firestore.firestore().collection("users").document(isUserID).setData(["favouriteWords": isUserWord], merge: true)
                 }
             } else{
+                
                 let isUserWord: [String:[Int]] = [isWordLanguage : [isLanguageEntryID]]
                 try await Firestore.firestore().collection("users").document(isUserID).setData(["favouriteWords": isUserWord], merge: true)
             }
@@ -1662,7 +1751,77 @@ struct cardHomeView: View{
         return isPlayerValid
     }
     
-    private func getUserRecording() async->Bool{
+    private func getUserRecording() async -> Bool {
+        do {
+            // Request microphone permission
+            let microphonePermission = await AVAudioApplication.requestRecordPermission()
+            guard microphonePermission else {
+                print("Microphone access denied")
+                return false
+            }
+            
+            // Request speech recognizer authorization
+            let speechAuthStatus = await withCheckedContinuation { continuation in
+                SFSpeechRecognizer.requestAuthorization { status in
+                    continuation.resume(returning: status)
+                }
+            }
+            
+            guard speechAuthStatus == .authorized else {
+                print("Speech recognizer access denied")
+                return false
+            }
+            
+            // Configure audio session
+            let audioSession = AVAudioSession.sharedInstance()
+            try audioSession.setCategory(.playAndRecord, mode: .default)
+            try audioSession.setActive(true)
+            
+            // Prepare recording URL
+            let documentsPath = FileManager.default.urls(for: .documentDirectory, in: .userDomainMask)[0]
+            let audioURL = documentsPath.appendingPathComponent("userRecording.m4a")
+            
+            // Configure recorder settings
+            let recorderSettings: [String: Any] = [
+                AVFormatIDKey: Int(kAudioFormatMPEG4AAC),
+                AVSampleRateKey: 44100,
+                AVNumberOfChannelsKey: 1,
+                AVEncoderAudioQualityKey: AVAudioQuality.high.rawValue
+            ]
+            
+            // Create and start audio recorder
+            let audioRecorder = try AVAudioRecorder(url: audioURL, settings: recorderSettings)
+            audioRecorder.record()
+            
+            // Update state
+            hasMicrophoneAccess = true
+            hasSpeechRecognizerAccess = true
+            isAudioRecording = true
+            isAudioURL = audioURL
+            isAudioRecorder = audioRecorder
+            
+            return true
+            
+        } catch {
+            // Handle any errors during setup
+            print("Audio Recording Setup Error: \(error.localizedDescription)")
+            stopRecording()
+            return false
+        }
+    }
+
+    // Helper method to stop recording and reset state
+    private func stopRecording() {
+        isAudioRecorder?.stop()
+        isAudioRecording = false
+        hasMicrophoneAccess = false
+        hasSpeechRecognizerAccess = false
+        isAudioRecorder = nil
+        isAudioURL = nil
+    }
+    
+    /*
+    private func getUserRecording() async-> Bool {
         var isRecordingValid: Bool = false
         if await AVAudioApplication.requestRecordPermission(){
             hasMicrophoneAccess.toggle()
@@ -1681,22 +1840,30 @@ struct cardHomeView: View{
             isAudioURL = pathURL.appendingPathComponent("userRecording.m4a")
             let recorderSetting = [AVFormatIDKey: Int(kAudioFormatMPEG4AAC), AVSampleRateKey: 44100, AVNumberOfChannelsKey: 1, AVEncoderAudioQualityKey: AVAudioQuality.high.rawValue]
             guard let hasAudioURL = isAudioURL else {return false}
+            
             isAudioRecorder = try AVAudioRecorder(url: hasAudioURL, settings: recorderSetting)
             isAudioRecorder?.record()
-            isRecordingValid.toggle()
-            isAudioRecording.toggle()
+            isRecordingValid = true
+            ///*isRecordingValid.toggle(*/)
+            isAudioRecording = true
+            
+//            isAudioRecording.toggle()
         } catch{
+            isAudioRecorder?.stop()
+            isRecordingValid = false
+            isAudioRecording = false
             print("Audio Recording Error \(error.localizedDescription)")
         }
         return isRecordingValid
-    }
+    }*/
     
     private func stopPlayerOrRecorder()->Bool{
         var isStopValid = false
         return isStopValid
     }
     
-    private func speechToText()->Bool{ // Given an audio url it will convert it to text
+    private func speechToText() -> Bool { // Given an audio url it will convert it to text
+        
         var isSpeechTranscriptionValid: Bool = false
         guard let isSpeechRecognizer = hasSpeechRecognizer else {return false}
         if !isSpeechRecognizer.isAvailable{
@@ -1744,15 +1911,48 @@ struct cardHomeView: View{
  
     }
     
-    private func isRealTimeSpeechToText()->Bool{ // Not smart and outright bad to pause audio intake for this function
+    private func getuserPhoneme(word: String) {
+        
+        var searchedWord = word.lowercased()
+       
+        let db = Firestore.firestore()
+        
+        print("lets see \(searchedWord)1")
+        db.collection("eng_US") //make this for all languages
+            .whereField("isWord", isEqualTo: searchedWord).limit(to:50)
+            .getDocuments(source: .server) { (snapshot, error) in
+                if let error = error {
+                    print("Error searching decks: \(error)")
+                    return
+                }else{
+                    let document = snapshot?.documents.first
+                    if(document?.documentID == nil){
+                        print("word not found")
+                        print("Error searching decks in getPhenome: \(String(describing: error))")
+                    }else{
+                            userPhoneme = document?.get("isPhonetic") as? String ?? "notFound"
+                        
+                    }
+                }
+            }
+ 
+    }
+    
+    private func isRealTimeSpeechToText() -> Bool { // Not smart and outright bad to pause audio intake for this function
+        
         var isLiveTranslation: Bool = false
-        SFSpeechRecognizer.requestAuthorization{ authStatus in
-            if authStatus == .authorized{hasSpeechRecognizerAccess = true}
+        
+        SFSpeechRecognizer.requestAuthorization { authStatus in
+            if authStatus == .authorized {hasSpeechRecognizerAccess = true}
         }
+        
         if !hasSpeechRecognizerAccess {return false}
+        
         isAudioSession = AVAudioSession.sharedInstance()
-        guard let hasAudioSession = isAudioSession else{return false}
-        do{
+        
+        guard let hasAudioSession = isAudioSession else {return false}
+        
+        do {
             try hasAudioSession.setCategory(.record, mode: .measurement, options: .duckOthers)
             try hasAudioSession.setActive(true, options: .notifyOthersOnDeactivation)
             let isInputNode = isAudioEngine.inputNode
@@ -1773,7 +1973,7 @@ struct cardHomeView: View{
             isAudioEngine.prepare()
             try isAudioEngine.start()
             isLiveTranslation.toggle()
-        } catch{
+        } catch {
             print("Audio Recording Error \(error.localizedDescription)")
         }
         return isLiveTranslation
