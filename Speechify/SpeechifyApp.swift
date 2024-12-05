@@ -30,32 +30,21 @@ struct SpeechifyApp: App{
 }
 
 struct contentPageView: View {
-    
-    @StateObject private var authViewModel = AuthViewModel()
-    
+
     @State var loginNavigate: Bool = false
     @State var signupNavigate: Bool = false
     
     var body: some View {
         NavigationStack {
-            
-            if authViewModel.isLoggedIn {
-                
-                userHomeView()
-                    .navigationBarBackButtonHidden(true)
-            } else {
-                
-                VStack {
-                    Text("Speechify").font(.largeTitle).multilineTextAlignment(.center).padding(10)
-                    Text("Login").font(.title).padding(10).foregroundStyle(.blue).background(Color(UIColor.systemGray5)).clipShape(RoundedRectangle(cornerRadius: 5)).onTapGesture{loginNavigate.toggle()}.navigationDestination(isPresented: $loginNavigate){
-                        authenticationView().navigationBarBackButtonHidden(true)
-                    }
-                    Text("Sign-Up").font(.title).padding(10).foregroundStyle(.blue).background(Color(UIColor.systemGray5)).clipShape(RoundedRectangle(cornerRadius: 5)).onTapGesture{signupNavigate.toggle()}.navigationDestination(isPresented: $signupNavigate){
-                        registrationView().navigationBarBackButtonHidden(true)
-                    }
+            VStack {
+                Text("Speechify").font(.largeTitle).multilineTextAlignment(.center).padding(10)
+                Text("Login").font(.title).padding(10).foregroundStyle(.blue).background(Color(UIColor.systemGray5)).clipShape(RoundedRectangle(cornerRadius: 5)).onTapGesture{loginNavigate.toggle()}.navigationDestination(isPresented: $loginNavigate){
+                    authenticationView().navigationBarBackButtonHidden(true)
+                }
+                Text("Sign-Up").font(.title).padding(10).foregroundStyle(.blue).background(Color(UIColor.systemGray5)).clipShape(RoundedRectangle(cornerRadius: 5)).onTapGesture{signupNavigate.toggle()}.navigationDestination(isPresented: $signupNavigate){
+                    registrationView().navigationBarBackButtonHidden(true)
                 }
             }
-            
         }
     }
 }
@@ -663,9 +652,6 @@ struct initialUserConfigurationView: View{
 }
 
 struct authenticationView: View {
-    
-    @StateObject private var authViewModel = AuthViewModel()
-    
     @State private var isUserEmail: String = ""
     @State private var isUserPassword: String = ""
     @State private var isResetEdit: String = ""
@@ -694,24 +680,23 @@ struct authenticationView: View {
     
     var body: some View {
         
-        NavigationStack {
-            
-            if authViewModel.isLoggedIn {
-                userHomeView()
-                    .navigationBarBackButtonHidden(true)
+        NavigationStack {               
+            ZStack {
                 
-            } else {
-                
-                ZStack {
+                VStack{
                     
-                    VStack{
-                        
-                        Text("Login").font(.largeTitle).frame(maxWidth: .infinity, alignment: .center).padding(.top, 10)
-                        Text("Email").frame(maxWidth: .infinity, alignment: .leading)
-                        HStack{
-                            Image(systemName: "envelope.fill").resizable().scaledToFit().frame(width: 25, height: 25).padding(.leading, 2).foregroundStyle(.gray)
-                            TextField("Email Address", text: $isUserEmail).focused($isEmailFocus).background(Color.white).frame(height:30).textInputAutocapitalization(.never).autocorrectionDisabled(true).onSubmit{
-                                isPasswordFocus = true
+                    Text("Login").font(.largeTitle).frame(maxWidth: .infinity, alignment: .center).padding(.top, 10)
+                    Text("Email").frame(maxWidth: .infinity, alignment: .leading)
+                    HStack{
+                        Image(systemName: "envelope.fill").resizable().scaledToFit().frame(width: 25, height: 25).padding(.leading, 2).foregroundStyle(.gray)
+                        TextField("Email Address", text: $isUserEmail).focused($isEmailFocus).background(Color.white).frame(height:30).textInputAutocapitalization(.never).autocorrectionDisabled(true).onSubmit{
+                            isPasswordFocus = true
+                            if !isUserEmail.isEmpty && emailErrorMessage.contains("enter") && isEmailError{
+                                isEmailError.toggle()
+                            }
+                        }.onChange(of: isEmailFocus, {
+                            if !isEmailFocus{
+
                                 if !isUserEmail.isEmpty && emailErrorMessage.contains("enter") && isEmailError{
                                     isEmailError.toggle()
                                 }
@@ -881,6 +866,7 @@ struct authenticationView: View {
             
             
         }
+        
     }
     
     private func validateCredentials() async-> Bool{
@@ -1159,8 +1145,20 @@ struct userHomeView: View {
                                     .cornerRadius(10)
                                     .font(.headline)
                             }
+                            // Favorites Deck Navigation
+                            if let favoritesDeck = deckModel.decks.first(where: { $0.title == "Favorites" }) {
+                                NavigationLink(destination: cardHomeView(words: favoritesDeck.words)) {
+                                    Text("Favorites")
+                                        .font(.headline)
+                                        .padding()
+                                        .frame(maxWidth: .infinity, alignment: .leading)
+                                        .background(Color(UIColor.systemGray5))
+                                        .cornerRadius(8)
+                                        .foregroundColor(.black)
+                                }
+                            }
                             
-                            ForEach(deckModel.decks, id: \.id) { deck in
+                            ForEach(deckModel.decks.filter { $0.title != "Favorites" }, id: \.id) { deck in
                                 NavigationLink(destination: cardHomeView(words: deckModel.getWords(title: deck.title))) {
                                     Text(deck.title)
                                         .font(.headline)
@@ -1187,9 +1185,7 @@ struct userHomeView: View {
 }
 
 struct cardHomeView: View {
-    
-    @StateObject private var authViewModel = AuthViewModel()
-    
+
     @State private var isInitialLoad:Bool = true
     static let isUser = Auth.auth().currentUser
     @State private var isErrorOccurrence:Bool = false
@@ -1449,8 +1445,7 @@ struct cardHomeView: View {
                             Text("Sign Out").font(.title2)
                         }
                         .onTapGesture {
-                            authViewModel.logout()
-//                            signOutNavigation = userSignOut()
+                         signOutNavigation = userSignOut()
                         }
                     }.padding(10).background(Color(UIColor.systemGray4)).clipShape(RoundedRectangle(cornerRadius: 5)).frame(maxWidth: .infinity, alignment: .trailing).padding(.trailing, 5).offset(y: -215)
                 }
@@ -2052,9 +2047,7 @@ struct cardHomeView: View {
             }
  
     }
-    
-   
-    
+
     private func isRealTimeSpeechToText() -> Bool { // Not smart and outright bad to pause audio intake for this function
         
         var isLiveTranslation: Bool = false
