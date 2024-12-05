@@ -108,6 +108,83 @@ final class SpeechifyUITests: XCTestCase {
         XCTAssertTrue(isHomeUserMenu.exists, "User Home View Should Contain An User Icon")
     }
 
+    func testRegistrationViewNavigation() throws{
+        let isApp = XCUIApplication()
+        isApp.launch()
+        let isViewTitle = isApp.staticTexts["RegistrationView_Title"]
+        XCTAssertTrue(isViewTitle.exists, "Registration View Should Contain A Title Text")
+        XCTAssertEqual(isViewTitle.label, "Sign-Up", "Title Text Should Display 'Sign-Up'")
+        let isLoginNavigation = isApp.staticTexts["RegistrationLogin_Navigation"]
+        XCTAssertTrue(isLoginNavigation.exists, "Registration View Should Contain A Login Text")
+        XCTAssertEqual(isLoginNavigation.label, "Login", "Text Should Display 'Login'")
+        isLoginNavigation.tap()
+        let isAuthenticationViewTitle = isApp.staticTexts["AuthenticationView_Title"]
+        XCTAssertTrue(isAuthenticationViewTitle.exists, "Navigation Should Redirect From Registration View To Authentication View")
+        let isAuthenticationRegistrationNavigation = isApp.staticTexts["AuthenticationSignUp_Navigation"]
+        XCTAssertTrue(isAuthenticationRegistrationNavigation.exists, "Authentication View Should Contain A Sign Up Text")
+        XCTAssertEqual(isAuthenticationRegistrationNavigation.label, "Sign Up", "Text Should Display 'Sign Up'")
+        isAuthenticationRegistrationNavigation.tap()
+        let isUserNameInputHeading = isApp.staticTexts["RegistrationUserName_Heading"]
+        XCTAssertTrue(isUserNameInputHeading.exists, "Registration View Should Contain A Subheading Text 'Username'")
+        XCTAssertEqual(isUserNameInputHeading.label, "Username", "Subheading Text Should Display 'Username'")
+        let isUserNameInputField = isApp.textFields["RegistrationUserName_Input"]
+        XCTAssertTrue(isUserNameInputField.exists, "Registration View Should Contain A Email TextField For User Input")
+        isUserNameInputField.tap()
+        isUserNameInputField.typeText("gheedorah")
+        XCTAssertEqual(isUserNameInputField.value as? String, "gheedorah", "Username TextField Value Should Be 'gheedorah'")
+        let isEmailInputHeading = isApp.staticTexts["RegistrationEmail_Heading"]
+        XCTAssertTrue(isEmailInputHeading.exists, "Registration View Should Contain A Subheading Text 'Email'")
+        XCTAssertEqual(isEmailInputHeading.label, "Email", "Subheading Text Should Display 'Email'")
+        let isEmailInputField = isApp.textFields["RegistrationEmail_Input"]
+        XCTAssertTrue(isEmailInputField.exists, "Registration View Should Contain A Email TextField For User Input")
+        isEmailInputField.tap()
+        isEmailInputField.typeText("gheedorah@gmail.com")
+        XCTAssertEqual(isEmailInputField.value as? String, "gheedorah@gmail.com", "Email TextField Value Should Be 'gheedorah@gmail.com'")
+        let isPasswordInputHeading = isApp.staticTexts["RegistrationPassword_Heading"]
+        XCTAssertTrue(isPasswordInputHeading.exists, "Registration View Should Contain A Subheading Text 'Password'")
+        XCTAssertEqual(isPasswordInputHeading.label, "Password", "Subheading Text Should Display 'Password'")
+        let isPasswordHidden = isApp.secureTextFields["RegistrationPassword_Hidden"]
+        XCTAssertTrue(isPasswordHidden.exists, "Registration View Should Contain A Password Secure TextField For User Input")
+        let isPasswordVisible = isApp.textFields["RegistrationPassword_Visible"]
+        XCTAssertFalse(isPasswordVisible.exists, "Registration View Should Not Contain A Visible Password TextField For User Input")
+        let isPasswordVisibility = isApp.buttons["RegistrationPassword_Visibility"]
+        XCTAssertTrue(isPasswordVisibility.exists, "Registration View Should Contain A Button To Toggle TextField For User Input Visibility")
+        isPasswordHidden.tap()
+        isPasswordHidden.typeText("monsterzero")
+        isPasswordVisibility.tap()
+        XCTAssertTrue(isPasswordVisible.exists, "Registration View Should Have A Visible Password TextField For User Input")
+        XCTAssertFalse(isPasswordHidden.exists, "Registration View Should Not Contain A Visible Password Secure TextField For User Input")
+        XCTAssertEqual(isPasswordVisible.value as? String, "monsterzero", "Password TextField Value Should Be 'monsterzero'")
+        isPasswordVisibility.tap()
+        XCTAssertTrue(isPasswordHidden.exists, "Registration View Should Contain A Password Secure TextField For User Input")
+        XCTAssertFalse(isPasswordVisible.exists, "Registration View Should Not Contain A Visible Password TextField For User Input")
+        let isConfirmPasswordInputHeading = isApp.staticTexts["RegistrationConfirmPassword_Heading"]
+        XCTAssertTrue(isConfirmPasswordInputHeading.exists, "Registration View Should Contain A Subheading Text 'Confirm Password'")
+        XCTAssertEqual(isConfirmPasswordInputHeading.label, "Confirm Password", "Subheading Text Should Display 'Confirm Password'")
+        let isConfirmPasswordHidden = isApp.secureTextFields["RegistrationConfirmPassword_Hidden"]
+        XCTAssertTrue(isConfirmPasswordHidden.exists, "Registration View Should Contain A Confirm Password Secure TextField For User Input")
+        let isConfirmPasswordVisible = isApp.textFields["RegistrationConfirmPassword_Visible"]
+        XCTAssertFalse(isConfirmPasswordVisible.exists, "Registration View Should Not Contain A Visible Confirm Password TextField For User Input")
+        let isConfirmPasswordVisibility = isApp.buttons["RegistrationConfirmPassword_Visibility"]
+        XCTAssertTrue(isConfirmPasswordVisibility.exists, "Registration View Should Contain A Button To Toggle TextField For User Input Visibility")
+        isConfirmPasswordHidden.tap()
+        isConfirmPasswordHidden.typeText("monsterzero")
+        isConfirmPasswordVisibility.tap()
+        XCTAssertTrue(isConfirmPasswordVisible.exists, "Registration View Should Have A Visible Confirm Password TextField For User Input")
+        XCTAssertFalse(isConfirmPasswordHidden.exists, "Registration View Should Not Contain A Visible Confirm Password Secure TextField For User Input")
+        XCTAssertEqual(isConfirmPasswordVisible.value as? String, "monsterzero", "Confirm Password TextField Value Should Be 'monsterzero'")
+        isConfirmPasswordVisibility.tap()
+        XCTAssertTrue(isConfirmPasswordHidden.exists, "Registration View Should Contain A Confirm Password Secure TextField For User Input")
+        XCTAssertFalse(isConfirmPasswordVisible.exists, "Registration View Should Not Contain A Visible Confirm Password TextField For User Input")
+        let isSignUpNavigation = isApp.staticTexts["RegistrationSignUp_Navigation"]
+        XCTAssertTrue(isSignUpNavigation.exists, "Registration View Should Contain A Sign Up Text Button For User Input")
+        XCTAssertEqual(isSignUpNavigation.label, "Sign Up", "Text Button Should Display 'Sign Up'")
+        isSignUpNavigation.tap()
+        let isInitialPersonalizationTitle = isApp.staticTexts["InitialPersonalizationView_Title"]
+        XCTAssertTrue(isInitialPersonalizationTitle.exists, "Initial Personalization View Should Contain A Title Text")
+        XCTAssertEqual(isInitialPersonalizationTitle.label, "Personalization", "Title Text Should Display 'Personalization'")
+    }
+
     func testLaunchPerformance() throws {
         if #available(macOS 10.15, iOS 13.0, tvOS 13.0, watchOS 7.0, *) {
             // This measures how long it takes to launch your application.
