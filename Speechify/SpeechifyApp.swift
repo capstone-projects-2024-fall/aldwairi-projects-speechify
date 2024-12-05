@@ -30,11 +30,85 @@ struct SpeechifyApp: App{
 }
 
 struct contentPageView: View {
-        
+
     @State var loginNavigate: Bool = false
     @State var signupNavigate: Bool = false
     
     var body: some View {
+        NavigationStack {
+            ZStack {
+                // Full-Screen Gradient Background
+                LinearGradient(
+                    gradient: Gradient(colors: [
+                        Color.pink.opacity(0.9),
+                        Color.orange.opacity(0.7),
+                        Color.orange.opacity(0.9),
+                        Color.pink.opacity(0.6)
+                    ]),
+                    startPoint: .topLeading,
+                    endPoint: .bottomTrailing
+                )
+                .edgesIgnoringSafeArea(.all) // Ensures the gradient covers the entire screen
+                
+                // Content
+                VStack(spacing: 40) {
+                    Spacer().frame(height: 200)
+                    
+                    // App Title Styled as a Label
+                    Text("Speechify")
+                        .font(.system(size: 50, weight: .bold)) // Larger font size
+                        .foregroundStyle(
+                            LinearGradient(
+                                gradient: Gradient(colors: [Color.pink, Color.red]),
+                                startPoint: .topLeading,
+                                endPoint: .bottomTrailing
+                            )
+                        )
+                        .padding(.vertical, 30)
+                        .padding(.horizontal, 50)
+                    
+                    Spacer()
+                    
+                    // Login Button
+                    Text("Login")
+                        .font(.headline)
+                        .foregroundColor(.white)
+                        .padding()
+                        .frame(maxWidth: .infinity)
+                        .background(.blue)
+                        .cornerRadius(10)
+                        .shadow(color: .black.opacity(0.2), radius: 4, x: 0, y: 2)
+                        .onTapGesture {
+                            loginNavigate.toggle()
+                        }
+                        .navigationDestination(isPresented: $loginNavigate) {
+                            authenticationView()
+                                .navigationBarBackButtonHidden(true)
+                        }
+                    
+                    // Sign-Up Button
+                    Text("Sign-Up")
+                        .font(.headline)
+                        .foregroundColor(.white)
+                        .padding()
+                        .frame(maxWidth: .infinity)
+                        .background(.green)
+                        .cornerRadius(10)
+                        .shadow(color: .black.opacity(0.2), radius: 4, x: 0, y: 2)
+                        .onTapGesture {
+                            signupNavigate.toggle()
+                        }
+                        .navigationDestination(isPresented: $signupNavigate) {
+                            registrationView()
+                                .navigationBarBackButtonHidden(true)
+                        }
+                }
+                .padding(30)
+                
+            }
+        }
+
+        /*
         NavigationStack {
             VStack {
                 Text("Speechify").font(.largeTitle).multilineTextAlignment(.center).padding(10)
@@ -45,8 +119,8 @@ struct contentPageView: View {
                     registrationView().navigationBarBackButtonHidden(true)
                 }
             }
-
         }
+         */
     }
 }
 
@@ -278,11 +352,13 @@ struct initialUserConfigurationView: View{
     private let ISO639_3: [String:String] = ["Arabic":"ara", "Bengali":"ben", "Bulgarian":"bul", "Czech":"ces", "Dutch":"nid", "English (UK)":"eng_UK", "English (US)":"eng_US", "French":"fra", "German":"deu", "Hindi":"hin", "Indonesian":"ind", "Irish":"gle", "Italian":"ita", "Japanese":"jpn", "Korean":"kor", "Portuguese":"por", "Spanish (ES)":"spa_ES", "Russian":"rus", "Swedish":"swe", "Vietnamese":"vie"]
     @State private var genderOptionSelection: [String:Bool] = ["Female":false, "Male":false, "Other":false]
     private let dateMonthSelection: [String] = ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"]
+
     @State private var nativeOptionSelection: [String: Bool] = ["Arabic":false, "Dutch":false, "English (UK)":false, "English (US)":false, "French":false, "German":false, "Hindi":false, "Italian":false, "Japanese":false, "Korean":false, "Portuguese":false, "Spanish (ES)":false, "Russian":false]
     @State private var learnOptionSelection: [String: Bool] = ["Arabic":false, "Dutch":false, "English (UK)":false, "English (US)":false, "French":false, "German":false, "Hindi":false, "Italian":false, "Japanese":false, "Korean":false, "Portuguese":false, "Spanish (ES)":false, "Russian":false]
     @State private var themeOptionSelection: [String: Bool] = ["Randomize":false, "Greetings":false, "Culture":false]
+
     private let dateDaySelection: Range<Int> = 1..<32
-    private var dateYearSelection: Range<Int> = 1900..<2025
+    private var dateYearSelection: Range<Int> = 1940..<2025 //changed
     @State private var selectedGender: String = ""
     @State private var isGenderInput: String = ""
     @State private var selectedDay: String = ""
@@ -386,6 +462,7 @@ struct initialUserConfigurationView: View{
                             showOverlay.toggle()
                         }
                     }
+                    /* //Theme feature in-complete
                     Text("Select Language Theme(s)").frame(maxWidth: .infinity, alignment: .leading).padding(.leading, 10)
                     HStack{
                         Text("Theme").foregroundStyle(.blue).frame(width: 125, height: 20, alignment: .leading)
@@ -398,6 +475,7 @@ struct initialUserConfigurationView: View{
                             showOverlay.toggle()
                         }
                     }
+                     */
                     Text("Finish").padding(10).foregroundStyle(.blue).background(Color(UIColor.systemGray5)).clipShape(RoundedRectangle(cornerRadius: 5)).padding(.top, 65).onTapGesture{
                         isErrorMessage = ""
                         if selectedGender.isEmpty{
@@ -420,9 +498,11 @@ struct initialUserConfigurationView: View{
                         if selectedLearningLanguage.isEmpty{
                             isErrorMessage.append(isErrorMessage.isEmpty ? "Leaning Languages" : ", Learning Languages")
                         }
+                        /*
                         if selectedLanguageTheme.isEmpty{
                             isErrorMessage.append(isErrorMessage.isEmpty ? "Language Theme" : ", Language Theme")
                         }
+                         */
                         if isErrorMessage.isEmpty{
                             _ = Task{hasUserSettings = await storeUserSettings()}
                         } else{
@@ -588,6 +668,7 @@ struct initialUserConfigurationView: View{
                         }.padding(5).background(Color(UIColor.systemGray4)).clipShape(RoundedRectangle(cornerRadius: 5)).frame(maxWidth: .infinity, alignment: .leading).padding(.leading, 10)
                     }.offset(y: isLayoutChange ? 127 : 108).frame(height: 100)
                 }
+                /* //Theme not implemented
                 if isThemeMenuOpen{
                     ScrollView{
                         VStack{
@@ -612,7 +693,7 @@ struct initialUserConfigurationView: View{
                             }
                         }.padding(5).background(Color(UIColor.systemGray4)).clipShape(RoundedRectangle(cornerRadius: 5)).frame(maxWidth: .infinity, alignment: .leading).padding(.leading, 10)
                     }.offset(y: isLayoutChange ? 204 : 185).frame(height: 100)
-                }
+                }*/
             }
         }
     }
@@ -647,7 +728,6 @@ struct initialUserConfigurationView: View{
 }
 
 struct authenticationView: View {
-    
     @State private var isUserEmail: String = ""
     @State private var isUserPassword: String = ""
     @State private var isResetEdit: String = ""
@@ -676,13 +756,23 @@ struct authenticationView: View {
     
     var body: some View {
         
-        NavigationStack {
-                
+        NavigationStack {               
             ZStack {
                 
                 VStack{
                     
-                    Text("Login").font(.largeTitle).frame(maxWidth: .infinity, alignment: .center).padding(.top, 10)
+                   // Text("Login").font(.largeTitle).frame(maxWidth: .infinity, alignment: .center).padding(.top, 10)
+                    Text("Login")
+                    .font(.system(size: 50, weight: .bold))
+                    .frame(maxWidth: .infinity, alignment: .center)
+                    .padding(.top, 10)
+                    .foregroundStyle(
+                        LinearGradient(
+                            gradient: Gradient(colors: [Color.pink, Color.red]),
+                            startPoint: .topLeading,
+                            endPoint: .bottomTrailing
+                        )
+                    )
                     Text("Email").frame(maxWidth: .infinity, alignment: .leading)
                     HStack{
                         Image(systemName: "envelope.fill").resizable().scaledToFit().frame(width: 25, height: 25).padding(.leading, 2).foregroundStyle(.gray)
@@ -1173,6 +1263,7 @@ struct userHomeView: View {
 }
 
 struct cardHomeView: View {
+
     @State private var isInitialLoad:Bool = true
     static let isUser = Auth.auth().currentUser
     @State private var isErrorOccurrence:Bool = false
@@ -1405,7 +1496,7 @@ struct cardHomeView: View {
                         }.padding(.horizontal, 10).onTapGesture{isFavouritesNavigation.toggle()}.navigationDestination(isPresented: $isFavouritesNavigation){userFavouriteCardsView().navigationBarBackButtonHidden(true)}
                         HStack{
                             Image(systemName:"plus.square.fill").resizable().scaledToFit().frame(width: 50, height: 50)
-                        }.padding(.horizontal, 10).onTapGesture{isWordInputNavigation.toggle()}.navigationDestination(isPresented: $isWordInputNavigation){/*languageThemeView().navigationBarBackButtonHidden(true)*/} // Dont forget to change word redirection to new word input page
+                        }.padding(.horizontal, 10).onTapGesture{isWordInputNavigation.toggle()}.navigationDestination(isPresented: $isWordInputNavigation){addDeckView().navigationBarBackButtonHidden(true)}
                         HStack{
                             Image(systemName:"cart.fill").resizable().scaledToFit().frame(width: 50, height: 50)
                         }.padding(.horizontal, 10).onTapGesture{isStoreNavigation.toggle()}.navigationDestination(isPresented: $isStoreNavigation){userStoreView().navigationBarBackButtonHidden(true)}
@@ -2036,7 +2127,6 @@ struct cardHomeView: View {
        
         let db = Firestore.firestore()
         
-        print("lets see \(searchedWord)1")
         db.collection("eng_US") //make this for all languages
             .whereField("isWord", isEqualTo: searchedWord).limit(to:50)
             .getDocuments(source: .server) { (snapshot, error) in
@@ -2056,8 +2146,7 @@ struct cardHomeView: View {
             }
  
     }
-    
-    
+
     private func isRealTimeSpeechToText() -> Bool { // Not smart and outright bad to pause audio intake for this function
         
         var isLiveTranslation: Bool = false
@@ -2176,7 +2265,7 @@ struct languageThemeView: View{
                     }.padding(.horizontal, 10).onTapGesture{isFavouritesNavigation.toggle()}.navigationDestination(isPresented: $isFavouritesNavigation){userFavouriteCardsView().navigationBarBackButtonHidden(true)}
                     HStack{
                         Image(systemName:"plus.square.fill").resizable().scaledToFit().frame(width: 50, height: 50)
-                    }.padding(.horizontal, 10).onTapGesture{isWordInputNavigation.toggle()}.navigationDestination(isPresented: $isWordInputNavigation){/*languageThemeView().navigationBarBackButtonHidden(true)*/} // Dont forget to change word redirection to new word input page
+                    }.padding(.horizontal, 10).onTapGesture{isWordInputNavigation.toggle()}.navigationDestination(isPresented: $isWordInputNavigation){addDeckView().navigationBarBackButtonHidden(true)}
                     HStack{
                         Image(systemName:"cart.fill").resizable().scaledToFit().frame(width: 50, height: 50)
                     }.padding(.horizontal, 10).onTapGesture{isStoreNavigation.toggle()}.navigationDestination(isPresented: $isStoreNavigation){userStoreView().navigationBarBackButtonHidden(true)}
@@ -2223,8 +2312,12 @@ struct wordSearchView : View{
                             ForEach(isSearchResult.keys.sorted(), id: \.self){ hasLanguageEntry in
                                 ForEach(isSearchResult[hasLanguageEntry] ?? [], id: \.self){ hasLanguageEntryID in
                                     VStack{
-                                        Text(getSearchResult["\(hasLanguageEntry)_\(hasLanguageEntryID)"] ?? "Error)").foregroundStyle(.blue).font(.largeTitle)
-                                    }.frame(maxWidth:.infinity, minHeight: 45).background(Color(UIColor.systemGray5)).clipShape(RoundedRectangle(cornerRadius: 10)).padding(.vertical, 10)
+                                        NavigationLink(destination: cardHomeView(words: [hasLanguageEntryID])) {
+                                            Text(getSearchResult["\(hasLanguageEntry)_\(hasLanguageEntryID)"] ?? "Error)")
+                                                .foregroundStyle(.blue).font(.largeTitle)
+                                                .frame(maxWidth:.infinity, minHeight: 45).background(Color(UIColor.systemGray5)).clipShape(RoundedRectangle(cornerRadius: 10)).padding(.vertical, 10)
+                                        }
+                                     }
                                 }
                             }
                         }
@@ -2240,7 +2333,7 @@ struct wordSearchView : View{
                 }.padding(.horizontal, 10).onTapGesture{isFavouritesNavigation.toggle()}.navigationDestination(isPresented: $isFavouritesNavigation){userFavouriteCardsView().navigationBarBackButtonHidden(true)}
                 HStack{
                     Image(systemName:"plus.square.fill").resizable().scaledToFit().frame(width: 50, height: 50)
-                }.padding(.horizontal, 10).onTapGesture{isWordInputNavigation.toggle()}.navigationDestination(isPresented: $isWordInputNavigation){/*languageThemeView().navigationBarBackButtonHidden(true)*/} // Dont forget to change word redirection to new word input page
+                }.padding(.horizontal, 10).onTapGesture{isWordInputNavigation.toggle()}.navigationDestination(isPresented: $isWordInputNavigation){addDeckView().navigationBarBackButtonHidden(true)}
                 HStack{
                     Image(systemName:"cart.fill").resizable().scaledToFit().frame(width: 50, height: 50)
                 }.padding(.horizontal, 10).onTapGesture{isStoreNavigation.toggle()}.navigationDestination(isPresented: $isStoreNavigation){userStoreView().navigationBarBackButtonHidden(true)}
@@ -2252,7 +2345,7 @@ struct wordSearchView : View{
     }
 
     
-    private func searchQueryThrottled()async{
+    private func searchQueryThrottled() async {
         isSearchResult = [:]
         if isSearchInput.isEmpty{return}
         guard let isUserID = userHomeView.isUser?.uid else{return}
@@ -2263,7 +2356,7 @@ struct wordSearchView : View{
             guard let isUserLearnLanguages = isUserDocument.data()?["learnLanguage"] as? [String] else{return}
             //get server info
             let isLanguageEntrySearch = ["eng_US"]
-            print("test")
+            //print("test")
             for isLanguage in isLanguageEntrySearch{
                 let isEntryDocument = try await Firestore.firestore().collection(isLanguage).whereField("isWord", isEqualTo: isSearchInput).getDocuments() //Modify to search for contains instead of euqalTo
                 for isDocument in isEntryDocument.documents{
@@ -2304,15 +2397,15 @@ struct userProfileView: View{
         case editPassword
         case editPasswordConfirm
     }
-    @State private var isUserName: String = "Testing"
+    @State private var isUserName: String = ""
     @State private var isNameEdit: Bool = false
-    @State private var isUserGender: String = "Male"
+    @State private var isUserGender: String = ""
     @State private var isGenderEdit: Bool = false
-    @State private var isUserBirthday: String = "1/1/2024"
+    @State private var isUserBirthday: String = ""
     @State private var isBirthdayEdit: Bool = false
-    @State private var isUserEmail: String = "demo@testing.com"
+    @State private var isUserEmail: String = ""
     @State private var isEmailEdit: Bool = false
-    @State private var isUserPassword: String = "demo"
+    @State private var isUserPassword: String = ""
     @State private var isPasswordEdit: Bool = false
     @State private var isAccountDeletion: Bool = false
     
@@ -2400,6 +2493,7 @@ struct userProfileView: View{
                             isBirthdayEdit.toggle()
                         }
                     }
+                    /*
                     HStack{
                         VStack{
                             Text("EMAIL ADDRESS").font(.title2).frame(maxWidth: .infinity, alignment: .leading).padding(.leading, 10)
@@ -2428,6 +2522,7 @@ struct userProfileView: View{
                             isPasswordEdit.toggle()
                         }
                     }
+                     */
                     HStack{
                         HStack{
                             Image(systemName:"house.fill").resizable().scaledToFit().frame(width: 50, height: 50)
@@ -2437,7 +2532,7 @@ struct userProfileView: View{
                         }.padding(.horizontal, 10).onTapGesture{isFavouritesNavigation.toggle()}.navigationDestination(isPresented: $isFavouritesNavigation){userFavouriteCardsView().navigationBarBackButtonHidden(true)}
                         HStack{
                             Image(systemName:"plus.square.fill").resizable().scaledToFit().frame(width: 50, height: 50)
-                        }.padding(.horizontal, 10).onTapGesture{isWordInputNavigation.toggle()}.navigationDestination(isPresented: $isWordInputNavigation){/*languageThemeView().navigationBarBackButtonHidden(true)*/} // Dont forget to change word redirection to new word input page
+                        }.padding(.horizontal, 10).onTapGesture{isWordInputNavigation.toggle()}.navigationDestination(isPresented: $isWordInputNavigation){addDeckView().navigationBarBackButtonHidden(true)}
                         HStack{
                             Image(systemName:"cart.fill").resizable().scaledToFit().frame(width: 50, height: 50)
                         }.padding(.horizontal, 10).onTapGesture{isStoreNavigation.toggle()}.navigationDestination(isPresented: $isStoreNavigation){userStoreView().navigationBarBackButtonHidden(true)}
@@ -2888,6 +2983,11 @@ struct userProfileView: View{
                         }
                     }
                 }
+            }.onAppear {
+                Task {
+                    await getUserData() // Fetch user data when view appears
+                   
+                }
             }//END
         }
     
@@ -2911,6 +3011,23 @@ struct userProfileView: View{
             print(error.localizedDescription)
         }
         return isPropertySet
+    }
+    
+    private func getUserData()  async{
+        do{
+            let db = Firestore.firestore()
+            let isUserID = userHomeView.isUser?.uid
+            let userDocument = try await db.collection("users").document(isUserID!).getDocument()
+            
+            let userData = userDocument.data()
+            isUserName = (userData!["userName"] as? String) ?? "error fetching"
+            isUserGender = (userData!["gender"] as? String) ?? "error fetching"
+            isUserBirthday = (userData!["birthday"] as? String) ?? "error fetching"
+        } catch{
+            print("theres been an error reading user profile information: \(error.localizedDescription)")
+        }
+        
+        
     }
     
     private func updateUserName()->Bool{
@@ -2996,10 +3113,10 @@ struct userStoreView: View{
                     }.padding(.horizontal, 10).onTapGesture{isFavouritesNavigation.toggle()}.navigationDestination(isPresented: $isFavouritesNavigation){userFavouriteCardsView().navigationBarBackButtonHidden(true)}
                     HStack{
                         Image(systemName:"plus.square.fill").resizable().scaledToFit().frame(width: 50, height: 50)
-                    }.padding(.horizontal, 10).onTapGesture{isWordInputNavigation.toggle()}.navigationDestination(isPresented: $isWordInputNavigation){/*languageThemeView().navigationBarBackButtonHidden(true)*/} // Dont forget to change word redirection to new word input page
+                    }.padding(.horizontal, 10).onTapGesture{isWordInputNavigation.toggle()}.navigationDestination(isPresented: $isWordInputNavigation){addDeckView().navigationBarBackButtonHidden(true)}
                     HStack{
                         Image(systemName:"cart.fill").resizable().scaledToFit().frame(width: 50, height: 50)
-                    }.padding(.horizontal, 10)
+                    }.padding(.horizontal, 10).onTapGesture{isStoreNavigation.toggle()}.navigationDestination(isPresented: $isStoreNavigation){userStoreView().navigationBarBackButtonHidden(true)}
                     HStack{
                         Image(systemName:"sparkles").resizable().scaledToFit().frame(width: 50, height: 50)
                     }.padding(.horizontal, 10).onTapGesture{isTaskNavigation.toggle()}.navigationDestination(isPresented: $isTaskNavigation){userTaskView().navigationBarBackButtonHidden(true)}
@@ -3063,7 +3180,7 @@ struct userFavouriteCardsView: View{ // add feature when user clicks the star it
                     }.padding(.horizontal, 10)// return to the top of current view
                     HStack{
                         Image(systemName:"plus.square.fill").resizable().scaledToFit().frame(width: 50, height: 50)
-                    }.padding(.horizontal, 10).onTapGesture{isWordInputNavigation.toggle()}.navigationDestination(isPresented: $isWordInputNavigation){/*languageThemeView().navigationBarBackButtonHidden(true)*/} // Dont forget to change word redirection to new word input page
+                    }.padding(.horizontal, 10).onTapGesture{isWordInputNavigation.toggle()}.navigationDestination(isPresented: $isWordInputNavigation){addDeckView().navigationBarBackButtonHidden(true)}
                     HStack{
                         Image(systemName:"cart.fill").resizable().scaledToFit().frame(width: 50, height: 50)
                     }.padding(.horizontal, 10).onTapGesture{isStoreNavigation.toggle()}.navigationDestination(isPresented: $isStoreNavigation){userStoreView().navigationBarBackButtonHidden(true)}
@@ -3220,7 +3337,7 @@ struct userSettingView: View{
                         }.padding(.horizontal, 10).onTapGesture{isFavouritesNavigation.toggle()}.navigationDestination(isPresented: $isFavouritesNavigation){userFavouriteCardsView().navigationBarBackButtonHidden(true)}
                         HStack{
                             Image(systemName:"plus.square.fill").resizable().scaledToFit().frame(width: 50, height: 50)
-                        }.padding(.horizontal, 10).onTapGesture{isWordInputNavigation.toggle()}.navigationDestination(isPresented: $isWordInputNavigation){/*languageThemeView().navigationBarBackButtonHidden(true)*/} // Dont forget to change word redirection to new word input page
+                        }.padding(.horizontal, 10).onTapGesture{isWordInputNavigation.toggle()}.navigationDestination(isPresented: $isWordInputNavigation){addDeckView().navigationBarBackButtonHidden(true)}
                         HStack{
                             Image(systemName:"cart.fill").resizable().scaledToFit().frame(width: 50, height: 50)
                         }.padding(.horizontal, 10).onTapGesture{isStoreNavigation.toggle()}.navigationDestination(isPresented: $isStoreNavigation){userStoreView().navigationBarBackButtonHidden(true)}
@@ -3264,7 +3381,7 @@ struct userTaskView: View{
                     }.padding(.horizontal, 10).onTapGesture{isFavouritesNavigation.toggle()}.navigationDestination(isPresented: $isFavouritesNavigation){userFavouriteCardsView().navigationBarBackButtonHidden(true)}
                     HStack{
                         Image(systemName:"plus.square.fill").resizable().scaledToFit().frame(width: 50, height: 50)
-                    }.padding(.horizontal, 10).onTapGesture{isWordInputNavigation.toggle()}.navigationDestination(isPresented: $isWordInputNavigation){/*languageThemeView().navigationBarBackButtonHidden(true)*/} // Dont forget to change word redirection to new word input page
+                    }.padding(.horizontal, 10).onTapGesture{isWordInputNavigation.toggle()}.navigationDestination(isPresented: $isWordInputNavigation){addDeckView().navigationBarBackButtonHidden(true)}
                     HStack{
                         Image(systemName:"cart.fill").resizable().scaledToFit().frame(width: 50, height: 50)
                     }.padding(.horizontal, 10).onTapGesture{isStoreNavigation.toggle()}.navigationDestination(isPresented: $isStoreNavigation){userStoreView().navigationBarBackButtonHidden(true)}
