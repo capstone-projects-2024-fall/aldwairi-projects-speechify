@@ -281,6 +281,29 @@ final class SpeechifyUITests: XCTestCase {
         XCTAssertTrue(isHomeUserMenu.exists, "User Home View Should Contain An User Icon")
     }
 
+    func testUserHome()throws{
+        let isApp = XCUIApplication()
+        isApp.launch()
+        let isThemeNavigation = isApp.otherElements["UserHomeTheme_Navigation"]
+        XCTAssertTrue(isThemeNavigation.exists, "User Home View Should Contain A 2X2 Grid Icon That Acts As A Link For User Navigation To Theme View")
+        let isSearchNavigation = isApp.otherElements["UserHomeSearch_Navigation"]
+        XCTAssertTrue(isSearchNavigation.exists, "User Home View Should Contain A Magnifying Glass Icon That Acts As A Link For User Navigation To Search View")
+        let isUserMenu = isApp.otherElements["UserHome_Menu"]
+        XCTAssertTrue(isUserMenu.exists, "User Home View Should Contain A Person Icon That Acts As A Trigger To Display User Menu Drop Down Content")
+        let isUserCard = isApp.otherElements["UserHome_Card"]
+        XCTAssertTrue(isUserCard.exists, "User Home View Should Contain An Embedded Card For Display Purposes")
+        let isPrecedingCard = isApp.otherElements["UserHome_Card_Preceding"]
+        XCTAssertTrue(isPrecedingCard.exists, "User Home View Should Contain A Left Arrow Shape Icon That Acts As A Trigger To Navigate To The Preceding Card Display, Updating The Card Display")
+        let isUserAudioPlay = isApp.otherElements["UserHome_Audio_Play"]
+        XCTAssertTrue(isUserAudioPlay.exists, "User Home View Should Contain A Play Icon That Acts As A Trigger To Playback User Audio Recording")
+        let isUserAudioStop = isApp.otherElements["UserHome_Audio_Stop"]
+        XCTAssertTrue(isUserAudioStop.exists, "User Home View Should Contain A Stop Icon That Acts As A Trigger To Stop Any User Audio Related Functionality Occuring")
+        let isUserAudioCapture = isApp.otherElements["UserHome_Audio_Capture"]
+        XCTAssertTrue(isUserAudioCapture.exists, "User Home View Should Contain A Microphone Icon That Acts As A Trigger To Capture User Audio")
+        let isProceedingCard = isApp.otherElements["UserHome_Card_Proceeding"]
+        XCTAssertTrue(isProceedingCard.exists, "User Home View Should Contain A Right Arrow Shape Icon That Acts As A Trigger To Navigate To The Proceeding Card Display, Updating The Card Display")
+    }
+
     func testLaunchPerformance() throws {
         if #available(macOS 10.15, iOS 13.0, tvOS 13.0, watchOS 7.0, *) {
             // This measures how long it takes to launch your application.
