@@ -1268,9 +1268,11 @@ struct cardHomeView: View {
                     }
                     HStack{
                         HStack{
+                            /*
                             HStack{
                                 Image(systemName:"square.grid.2x2.fill").resizable().scaledToFit().frame(width: 50, height: 50)
                             }.padding(.leading, 10).accessibilityIdentifier("UserHomeTheme_Navigation").onTapGesture{isThemeNavigation.toggle()}.navigationDestination(isPresented: $isThemeNavigation){languageThemeView().navigationBarBackButtonHidden(true)}
+                             */
                             HStack{
                                 Image(systemName:"globe").resizable().scaledToFit().frame(width: 50, height: 50)
                             }.padding(.leading, 10).onTapGesture{viewLearnLanguageSelection.toggle()}
@@ -1281,7 +1283,7 @@ struct cardHomeView: View {
                                 .font(.title)
                                 .frame(maxWidth: .infinity, alignment: .leading)
                                 .padding(.leading, 10)
-                        }/*.frame(maxWidth: .infinity, alignment: .leading).padding(.leading, 10).onTapGesture{isThemeNavigation.toggle()}.navigationDestination(isPresented: $isThemeNavigation){languageThemeView().navigationBarBackButtonHidden(true)} */
+                        //}/*.frame(maxWidth: .infinity, alignment: .leading).padding(.leading, 10).onTapGesture{isThemeNavigation.toggle()}.navigationDestination(isPresented: $isThemeNavigation){languageThemeView().navigationBarBackButtonHidden(true)} */
                         Menu {
                             ForEach(availableVoices.filter { $0.language == "en-US" }, id: \.identifier) { voice in
                                 Button(action: {
@@ -1300,15 +1302,19 @@ struct cardHomeView: View {
                                 .foregroundColor(.white)
                                 .cornerRadius(8)
                         }
->
+                        /*
                         HStack{
+                            /*
                             HStack{
                                 Image(systemName:"magnifyingglass").resizable().scaledToFit().frame(width: 50, height: 50)
                             }.padding(.trailing, 10).accessibilityIdentifier("UserHomeSearch_Navigation").onTapGesture{isSearchNavigation.toggle()}.navigationDestination(isPresented: $isSearchNavigation){wordSearchView().navigationBarBackButtonHidden(true)}
                             HStack{
                                 Image(systemName:"person.circle.fill").resizable().scaledToFit().frame(width: 50, height: 50)
                             }.padding(.trailing, 10).accessibilityIdentifier("UserHome_Menu").onTapGesture{viewSettings.toggle()}
+                             */
                         }.frame(maxWidth: .infinity, alignment: .trailing)
+                         */
+                        
                     }.frame(maxHeight: .infinity, alignment:.top).padding(.top, 10)
                     VStack{
                         VStack{
@@ -1997,43 +2003,6 @@ struct cardHomeView: View {
         isAudioURL = nil
     }
     
-    /*
-    private func getUserRecording() async-> Bool {
-        var isRecordingValid: Bool = false
-        if await AVAudioApplication.requestRecordPermission(){
-            hasMicrophoneAccess.toggle()
-        }
-        if !hasMicrophoneAccess{return false}
-        SFSpeechRecognizer.requestAuthorization{ authStatus in
-            if authStatus == .authorized{hasSpeechRecognizerAccess = true}
-        }
-        if !hasSpeechRecognizerAccess {return false}
-        isAudioSession = AVAudioSession.sharedInstance()
-        guard let hasAudioSession = isAudioSession else{return false}
-        do{
-            try hasAudioSession.setCategory(.playAndRecord, mode: .default)
-            try hasAudioSession.setActive(true)
-            let pathURL = FileManager.default.urls(for: .documentDirectory, in: .userDomainMask)[0]
-            isAudioURL = pathURL.appendingPathComponent("userRecording.m4a")
-            let recorderSetting = [AVFormatIDKey: Int(kAudioFormatMPEG4AAC), AVSampleRateKey: 44100, AVNumberOfChannelsKey: 1, AVEncoderAudioQualityKey: AVAudioQuality.high.rawValue]
-            guard let hasAudioURL = isAudioURL else {return false}
-            
-            isAudioRecorder = try AVAudioRecorder(url: hasAudioURL, settings: recorderSetting)
-            isAudioRecorder?.record()
-            isRecordingValid = true
-            ///*isRecordingValid.toggle(*/)
-            isAudioRecording = true
-            
-//            isAudioRecording.toggle()
-        } catch{
-            isAudioRecorder?.stop()
-            isRecordingValid = false
-            isAudioRecording = false
-            print("Audio Recording Error \(error.localizedDescription)")
-        }
-        return isRecordingValid
-    }*/
-    
     private func stopPlayerOrRecorder()->Bool{
         var isStopValid = false
         return isStopValid
@@ -2281,6 +2250,7 @@ struct wordSearchView : View{
             }.frame(maxHeight: .infinity, alignment: .bottom).padding(.bottom, 10)
         }
     }
+
     
     private func searchQueryThrottled()async{
         isSearchResult = [:]
