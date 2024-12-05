@@ -911,40 +911,71 @@ class PointsViewModel: ObservableObject{
         userRef.getDocument { [weak self] (document, error) in
             guard let self = self else { return }
             
+            if let error = error {
+                print("Error fetching document: \(error)")
+                self.setDefaultPoints(for: user)
+                return
+            }
             if let document = document, document.exists {
                 if let points = document.data()? ["points"] as? Int {
                     DispatchQueue.main.async{
-                        self.points = points //why the question mark
+                        self.points = points
                     }
                 }
-                if let lastSignInDate = user.metadata.lastSignInDate{
-                    if !Calendar.current.isDateInToday(lastSignInDate) {
-                        self.giveDailyLoginBonus()
+                if let lastBonusDate = document.data()?["lastDailyBonusDate"] as? Timestamp{
+                    let lastBonusDateValue = lastBonusDate.dateValue()
+                    if !Calendar.current.isDateInToday(lastBonusDateValue) {
+                        self.giveDailyLoginBonus(user: user)
                     }
-              }
+                }else {
+                    self.giveDailyLoginBonus(user: user)
+                }
             } else {
-                self.setDefaultPoints(for: user) //here too
+                self.setDefaultPoints(for: user)
             }
         }
     }
     
-    private func giveDailyLoginBonus(){
-        let dailyBonus = 10
-        updatePoints(by: dailyBonus)
-        
-        self.dailyBonusFeedback = "Welcome Back! You got 10 bonus points for logging in today!"
-        
-        DispatchQueue.main.asyncAfter(deadline: .now() + 3){
-            self.dailyBonusFeedback = nil
-        }
-    }
+    private func giveDailyLoginBonus(user: User){
+        let dailyBonus = 20
+        let userRef = db.collection("users").document(user.uid)
+       
+        userRef.updateData([
+            "points": FieldValue.increment(Int64(dailyBonus)),
+            "lastDailyBonusDate": Timestamp()
+        ]) { error in
+                    if let error = error {
+                        print("Error updating daily bonus date: \(error)")
+                        return
+                    }
+                    DispatchQueue.main.async {
+                        self.points += dailyBonus
+                        self.dailyBonusFeedback = "Welcome! You got 20 bonus points!"
+                    }
+                    DispatchQueue.main.asyncAfter(deadline: .now() + 3){
+                      self.dailyBonusFeedback = nil
+                    }
+                }
+            }
+            
     
     func setDefaultPoints(for user: User){
         let userRef = db.collection("users").document(user.uid)
-        userRef.setData(["points": 0], merge: true) { error in
+        let initialPoints = 10
+        
+        userRef.setData(["points": initialPoints, "lastDailyBonusDate": Timestamp()], merge: true) { error in
             if let error = error {
                 print("Error setting default points: \(error)")
+            } else{
+                DispatchQueue.main.async {
+                    self.points = initialPoints
+                    self.dailyBonusFeedback = "Welcome Back! You got 10 bonus points!"
+                }
+                DispatchQueue.main.asyncAfter(deadline: .now() + 3){
+                    self.dailyBonusFeedback = nil
+                }
             }
+            self.getPoints(for: user)
         }
     }
     
@@ -952,17 +983,36 @@ class PointsViewModel: ObservableObject{
         guard let user = user else {return}
         let userRef = db.collection("users").document(user.uid)
         
-        userRef.updateData(["points": FieldValue.increment(Int64(value))]) {error in
+        userRef.getDocument{ [weak self] (document, error) in
+            guard let self = self else { return }
             if let error = error {
-                print("Error updating the points: \(error)")
-            } else {
-                DispatchQueue.main.async{
-                    self.points += value
+                print("Error fetching document: \(error)")
+                return
+            }
+            if document?.exists == false {
+                self.setDefaultPoints(for: user)
+            }
+            
+            userRef.updateData(["points": FieldValue.increment(Int64(value))]) {error in
+                if let error = error {
+                    print("Error updating the points: \(error)")
+                } else {
+                    userRef.getDocument{ [weak self] (document, error) in
+                        guard let self = self else { return }
+                        if let error = error {
+                            print("Error fetching uodated points: \(error)")
+                        } else if let document = document, let updatedPoints = document.data()?["points"] as? Int {
+                            DispatchQueue.main.async{
+                                self.points = updatedPoints
+                            }
+                        }
+                    }
                 }
             }
         }
     }
 }
+
 
 struct userHomeView: View{
     @State private var isInitialLoad:Bool = true
@@ -1033,7 +1083,7 @@ struct userHomeView: View{
                     if let feedback = pointsViewModel.dailyBonusFeedback{
                         Text(feedback)
                             .font(.headline)
-                            .foregroundColor(.green)
+                            .foregroundColor(.white)
                             .padding()
                             .background(Color.black.opacity(0.7))
                             .cornerRadius(10)
