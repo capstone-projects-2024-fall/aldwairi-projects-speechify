@@ -185,6 +185,102 @@ final class SpeechifyUITests: XCTestCase {
         XCTAssertEqual(isInitialPersonalizationTitle.label, "Personalization", "Title Text Should Display 'Personalization'")
     }
 
+    func testInitialUserPersonalizationNavigation() throws{
+        let isApp = XCUIApplication()
+        isApp.launch()
+        let isViewTitle = isApp.staticTexts["InitialPersonalizationView_Title"]
+        XCTAssertTrue(isViewTitle.exists, "Initial Personalization View Should Contain A Title Text")
+        XCTAssertEqual(isViewTitle.label, "Personalization", "Title Text Should Display 'Personalization'")
+        let isGenderDropDown = isApp.otherElements["InitialPersonalizationGender_DropDown"]
+        let isBirthDayDropDown = isApp.otherElements["InitialPersonalizationBirthDay_DropDown"]
+        let isBirthMonthDropDown = isApp.otherElements["InitialPersonalizationBirthMonth_DropDown"]
+        let isBirthYearDropDown = isApp.otherElements["InitialPersonalizationBirthYear_DropDown"]
+        let isNativeLanguageDropDown = isApp.otherElements["InitialPersonalizationNativeLanguage_DropDown"]
+        let isLearnLanguageDropDown = isApp.otherElements["InitialPersonalizationLearnLanguage_DropDown"]
+        let isLanguageThemeDropDown = isApp.otherElements["InitialPersonalizationLanguageTheme_DropDown"]
+        XCTAssertFalse(isGenderDropDown.exists, "Initial Personalization View Should Not Contain A Gender Drop Down Overlay")
+        XCTAssertFalse(isBirthDayDropDown.exists, "Initial Personalization View Should Not Contain A Birth Day Drop Down Overlay")
+        XCTAssertFalse(isBirthMonthDropDown.exists, "Initial Personalization View Should Not Contain A Birth Month Drop Down Overlay")
+        XCTAssertFalse(isBirthYearDropDown.exists, "Initial Personalization View Should Not Contain A Birth Year Drop Down Overlay")
+        XCTAssertFalse(isNativeLanguageDropDown.exists, "Initial Personalization View Should Not Contain A Native Language Drop Down Overlay")
+        XCTAssertFalse(isLearnLanguageDropDown.exists, "Initial Personalization View Should Not Contain A Learn Language Drop Down Overlay")
+        XCTAssertFalse(isLanguageThemeDropDown.exists, "Initial Personalization View Should Not Contain A Language Theme Drop Down Overlay")
+        let isGenderHeading = isApp.staticTexts["InitialPersonalizationGender_Heading"]
+        XCTAssertTrue(isGenderHeading.exists, "Initial Personalization View Should Contain A Subheading Text 'Select Your Gender'")
+        XCTAssertEqual(isGenderHeading.label, "Select Your Gender", "Subheading Text Should Display 'Select Your Gender'")
+        let isGenderMenu = isApp.otherElements["InitialPersonalizationGender_Menu"]
+        XCTAssertTrue(isGenderMenu.exists, "Initial Personalization View Should Contain A Gender Text Drop Down Button")
+        XCTAssertEqual(isGenderMenu.label, "Gender", "Text Drop Down Button Should Display 'Gender'")
+        isGenderMenu.tap()
+        XCTAssertTrue(isGenderDropDown.exists, "Initial Personalization View Should Contain A Gender Drop Down Overlay")
+        //Checkif other textfield exist
+        let isMaleOption = isApp.otherElements["InitialPersonalizationGender_Male"]
+        XCTAssertTrue(isMaleOption.exists, "Initial Personalization View Should Contain A Male Option In The Gender Drop Down Overlay")
+        isMaleOption.tap()
+        let isDateOfBirthHeading = isApp.staticTexts["InitialPersonalizationDateOfBirth_Heading"]
+        XCTAssertTrue(isDateOfBirthHeading.exists, "Initial Personalization View Should Contain A Subheading Text 'Enter Your Date Of Birth'")
+        XCTAssertEqual(isDateOfBirthHeading.label, "Enter Your Date Of Birth", "Subheading Text Should Display 'Enter Your Date Of Birth'")
+        let isBirthDayMenu = isApp.otherElements["InitialPersonalizationBirthDay_Menu"]
+        XCTAssertTrue(isBirthDayMenu.exists, "Initial Personalization View Should Contain A Day Text Drop Down Button")
+        isBirthDayMenu.tap()
+        XCTAssertTrue(isBirthDayDropDown.exists, "Initial Personalization View Should Contain A Birth Day Drop Down Overlay")
+        let isDayOption = isApp.otherElements["InitialPersonalizationBirthDay_17"]
+        XCTAssertTrue(isDayOption.exists, "Initial Personalization View Should Contain The 17th Day As An Option In The Birth Day Drop Down Overlay")
+        isDayOption.tap()
+        let isBirthMonthMenu = isApp.otherElements["InitialPersonalizationBirthMonth_Menu"]
+        XCTAssertTrue(isBirthMonthMenu.exists, "Initial Personalization View Should Contain A Month Text Drop Down Button")
+        isBirthMonthMenu.tap()
+        XCTAssertTrue(isBirthMonthDropDown.exists, "Initial Personalization View Should Contain A Birth Month Drop Down Overlay")
+        let isMonthOption = isApp.otherElements["InitialPersonalizationBirthMonth_Jun"]
+        XCTAssertTrue(isMonthOption.exists, "Initial Personalization View Should Contain The Month Jun As An Option In The Birth Month Drop Down Overlay")
+        isMonthOption.tap()
+        let isBirthYearMenu = isApp.otherElements["InitialPersonalizationBirthYear_Menu"]
+        XCTAssertTrue(isBirthYearMenu.exists, "Initial Personalization View Should Contain A Year Text Drop Down Button")
+        isBirthYearMenu.tap()
+        XCTAssertTrue(isBirthYearDropDown.exists, "Initial Personalization View Should Contain A Birth Year Drop Down Overlay")
+        let isYearOption = isApp.otherElements["InitialPersonalizationBirthYear_2003"]
+        XCTAssertTrue(isYearOption.exists, "Initial Personalization View Should Contain The Year 2003 As An Option In The Birth Year Drop Down Overlay")
+        isYearOption.tap()
+        let isNativeLanguageHeading = isApp.staticTexts["InitialPersonalizationNativeLanguage_Heading"]
+        XCTAssertTrue(isNativeLanguageHeading.exists, "Initial Personalization View Should Contain A Subheading Text 'Select Your Native Language(s)'")
+        XCTAssertEqual(isNativeLanguageHeading.label, "Select Your Native Language(s)", "Subheading Text Should Display 'Select Your Native Language(s)'")
+        let isNativeLanguageMenu = isApp.otherElements["InitialPersonalizationNativeLanguage_Menu"]
+        XCTAssertTrue(isNativeLanguageMenu.exists, "Initial Personalization View Should Contain A Native Language Text Drop Down Button")
+        isNativeLanguageMenu.tap()
+        XCTAssertTrue(isNativeLanguageDropDown.exists, "Initial Personalization View Should Contain A Native Language Drop Down Overlay")
+        let isNativeLanguageOption = isApp.otherElements["InitialPersonalizationNativeLanguage_Arabic"]
+        XCTAssertTrue(isNativeLanguageOption.exists, "Initial Personalization View Should Contain Arabic As An Option In The Native Language Drop Down Overlay")
+        isNativeLanguageOption.tap()
+        isNativeLanguageMenu.tap()
+        let isLearnLanguageHeading = isApp.staticTexts["InitialPersonalizationLearnLanguage_Heading"]
+        XCTAssertTrue(isLearnLanguageHeading.exists, "Initial Personalization View Should Contain A Subheading Text 'Select Language(s) To Learn'")
+        XCTAssertEqual(isLearnLanguageHeading.label, "Select Language(s) To Learn", "Subheading Text Should Display 'Select Language(s) To Learn'")
+        let isLearnLanguageMenu = isApp.otherElements["InitialPersonalizationLearnLanguage_Menu"]
+        XCTAssertTrue(isLearnLanguageMenu.exists, "Initial Personalization View Should Contain A Learn Language Text Drop Down Button")
+        isLearnLanguageMenu.tap()
+        XCTAssertTrue(isLearnLanguageDropDown.exists, "Initial Personalization View Should Contain A Learn Language Drop Down Overlay")
+        let isLearnLanguageOption = isApp.otherElements["InitialPersonalizationLearnLanguage_English (US)"]
+        XCTAssertTrue(isLearnLanguageOption.exists, "Initial Personalization View Should Contain English (US) As An Option In The Learn Language Drop Down Overlay")
+        isLearnLanguageOption.tap()
+        isLearnLanguageMenu.tap()
+        let isLanguageThemeHeading = isApp.staticTexts["InitialPersonalizationLanguageTheme_Heading"]
+        XCTAssertTrue(isLanguageThemeHeading.exists, "Initial Personalization View Should Contain A Subheading Text 'Select Language Theme(s)'")
+        XCTAssertEqual(isLanguageThemeHeading.label, "Select Language Theme(s)", "Subheading Text Should Display 'Select Language Theme(s)'")
+        let isLanguageThemeMenu = isApp.otherElements["InitialPersonalizationLanguageTheme_Menu"]
+        XCTAssertTrue(isLanguageThemeMenu.exists, "Initial Personalization View Should Contain A Language Theme Text Drop Down Button")
+        isLanguageThemeMenu.tap()
+        XCTAssertTrue(isLanguageThemeDropDown.exists, "Initial Personalization View Should Contain A Language Theme Drop Down Overlay")
+        let isLanguageThemeOption = isApp.otherElements["InitialPersonalizationLanguageTheme_Culture"]
+        XCTAssertTrue(isLanguageThemeOption.exists, "Initial Personalization View Should Contain Culture As An Option In The Language Theme Drop Down Overlay")
+        isLanguageThemeOption.tap()
+        isLanguageThemeMenu.tap()
+        let isInitialPersonalizationNavigation = isApp.staticTexts["InitialPersonalizationCompletion_Navigation"]
+        XCTAssertTrue(isInitialPersonalizationNavigation.exists, "Initial Personalization View Should Contain A Finish Text Button")
+        XCTAssertEqual(isInitialPersonalizationNavigation.label, "Finish", "Text Button Should Display 'Finish'")
+        let isHomeUserMenu = isApp.otherElements["UserHome_Menu"]
+        XCTAssertTrue(isHomeUserMenu.exists, "User Home View Should Contain An User Icon")
+    }
+
     func testLaunchPerformance() throws {
         if #available(macOS 10.15, iOS 13.0, tvOS 13.0, watchOS 7.0, *) {
             // This measures how long it takes to launch your application.
