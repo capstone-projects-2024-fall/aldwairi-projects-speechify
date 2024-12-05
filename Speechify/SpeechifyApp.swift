@@ -1035,7 +1035,7 @@ class PointsViewModel: ObservableObject{
     }
     
     private func giveDailyLoginBonus(user: User){
-        let dailyBonus = 20
+        let dailyBonus = 10
         let userRef = db.collection("users").document(user.uid)
        
         userRef.updateData([
@@ -1048,7 +1048,7 @@ class PointsViewModel: ObservableObject{
                     }
                     DispatchQueue.main.async {
                         self.points += dailyBonus
-                        self.dailyBonusFeedback = "Welcome! You got 20 bonus points!"
+                        self.dailyBonusFeedback = "Welcome! You got 10 bonus points!"
                     }
                     DispatchQueue.main.asyncAfter(deadline: .now() + 3){
                       self.dailyBonusFeedback = nil
@@ -1067,7 +1067,7 @@ class PointsViewModel: ObservableObject{
             } else{
                 DispatchQueue.main.async {
                     self.points = initialPoints
-                    self.dailyBonusFeedback = "Welcome Back! You got 10 bonus points!"
+                    self.dailyBonusFeedback = "Welcome! You got 10 bonus points!"
                 }
                 DispatchQueue.main.asyncAfter(deadline: .now() + 3){
                     self.dailyBonusFeedback = nil
@@ -1108,6 +1108,9 @@ class PointsViewModel: ObservableObject{
                 }
             }
         }
+    }
+    func subtractPoints(by amount: Int){
+        self.points -= amount
     }
 }
 
@@ -1368,12 +1371,14 @@ struct cardHomeView: View {
                                 Image(systemName:"globe").resizable().scaledToFit().frame(width: 50, height: 50)
                             }.padding(.leading, 10).onTapGesture{viewLearnLanguageSelection.toggle()}
                         }.frame(maxWidth: .infinity, alignment: .leading)
-
+                        Spacer()
                             /*Image(systemName:"square.grid.2x2.fill").resizable().scaledToFit().frame(width: 50, height: 50) */
                             Text("Points: \(pointsViewModel.points)")
                                 .font(.title)
-                                .frame(maxWidth: .infinity, alignment: .leading)
-                                .padding(.leading, 10)
+                                .frame(maxWidth: .infinity, alignment: .center)
+                                .padding(.top, 20)
+                        Spacer()
+                            .frame(width: 50)
                         //}/*.frame(maxWidth: .infinity, alignment: .leading).padding(.leading, 10).onTapGesture{isThemeNavigation.toggle()}.navigationDestination(isPresented: $isThemeNavigation){languageThemeView().navigationBarBackButtonHidden(true)} */
                         Menu {
                             ForEach(availableVoices.filter { $0.language == "en-US" }, id: \.identifier) { voice in
@@ -1393,6 +1398,7 @@ struct cardHomeView: View {
                                 .foregroundColor(.white)
                                 .cornerRadius(8)
                         }
+                        .padding(.trailing, 10)
                         /*
                         HStack{
                             /*
@@ -1405,7 +1411,6 @@ struct cardHomeView: View {
                              */
                         }.frame(maxWidth: .infinity, alignment: .trailing)
                          */
-                        
                     }.frame(maxHeight: .infinity, alignment:.top).padding(.top, 10)
                     VStack{
                         VStack{
@@ -3100,10 +3105,52 @@ struct userStoreView: View{
     
    // @ObservedObject var pointsViewModel: PointsViewModel
     
+    let colorOptions: [(Color, String, Int)] = [
+        (.red, "Red\n10", 10),
+        (.green, "Green\n15", 15),
+        (.blue, "Blue\n30", 30),
+        (.yellow, "Yellow\n40", 40),
+        (.orange, "Orange\n50", 50),
+        (.purple, "Purple\n60", 60),
+        (.pink, "Pink\n75", 75),
+        (.brown, "Brown\n85", 85),
+        (.gray, "Gray\n95", 95),
+        (.indigo, "Indigo\n110", 110),
+        (.cyan, "Cyan\n130", 130),
+        (.teal, "Teal\n150", 150)
+    ]
+    
+    let columns: [GridItem] = Array(repeating: GridItem(.flexible(), spacing: 20), count: 3)
+    
     var body: some View{
         NavigationStack{
             VStack{
                 Text("Store").font(.largeTitle)
+                
+                Text("Select Color Theme to Purchase: ")
+                    .font(.caption)
+                    .padding()
+                
+            
+                    LazyVGrid(columns: columns, spacing: 20) {
+                        ForEach(colorOptions, id: \.1) { color, colorName, pointsRequired in
+                            Button(action: {
+                                //subtract points
+                            }){
+                                Text(colorName)
+                                    .font(.title2)
+                                    .foregroundColor(.white)
+                                    .frame(width: 100, height: 100)
+                                    .background(color)
+                                    .clipShape(Circle())
+                                    .overlay(
+                                        Circle().stroke(Color.white, lineWidth: 4)
+                                    )
+                            }
+                        }
+                    }
+                
+                
                 HStack{
                     HStack{
                         Image(systemName:"house.fill").resizable().scaledToFit().frame(width: 50, height: 50)
