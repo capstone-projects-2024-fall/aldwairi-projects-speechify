@@ -30,7 +30,7 @@ struct SpeechifyApp: App{
 }
 
 struct contentPageView: View {
-        
+
     @State var loginNavigate: Bool = false
     @State var signupNavigate: Bool = false
     
@@ -45,7 +45,6 @@ struct contentPageView: View {
                     registrationView().navigationBarBackButtonHidden(true)
                 }
             }
-
         }
     }
 }
@@ -279,10 +278,11 @@ struct initialUserConfigurationView: View{
     @State private var genderOptionSelection: [String:Bool] = ["Female":false, "Male":false, "Other":false]
     private let dateMonthSelection: [String] = ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"]
     @State private var nativeOptionSelection: [String: Bool] = ["Arabic":false, "Dutch":false, "English (UK)":false, "English (US)":false, "French":false, "German":false, "Hindi":false, "Italian":false, "Japanese":false, "Korean":false, "Portuguese":false, "Spanish":false, "Russian":false]
-    @State private var learnOptionSelection: [String: Bool] = ["Arabic":false, "Dutch":false, "English (UK)":false, "English (US)":false, "French":false, "German":false, "Hindi":false, "Italian":false, "Japanese":false, "Korean":false, "Portuguese":false, "Spanish":false, "Russian":false]
-    @State private var themeOptionSelection: [String: Bool] = ["Randomize":false, "Greetings":false, "Culture":false]
+    //@State private var learnOptionSelection: [String: Bool] = ["Arabic":false, "Dutch":false, "English (UK)":false, "English (US)":false, "French":false, "German":false, "Hindi":false, "Italian":false, "Japanese":false, "Korean":false, "Portuguese":false, "Spanish":false, "Russian":false]
+    @State private var learnOptionSelection: [String: Bool] = ["English (US)":false, "Spanish":false]
+    //@State private var themeOptionSelection: [String: Bool] = ["Randomize":false, "Greetings":false, "Culture":false]
     private let dateDaySelection: Range<Int> = 1..<32
-    private var dateYearSelection: Range<Int> = 1900..<2025
+    private var dateYearSelection: Range<Int> = 1940..<2025 //changed
     @State private var selectedGender: String = ""
     @State private var isGenderInput: String = ""
     @State private var selectedDay: String = ""
@@ -386,6 +386,7 @@ struct initialUserConfigurationView: View{
                             showOverlay.toggle()
                         }
                     }
+                    /* //Theme feature in-complete
                     Text("Select Language Theme(s)").frame(maxWidth: .infinity, alignment: .leading).padding(.leading, 10)
                     HStack{
                         Text("Theme").foregroundStyle(.blue).frame(width: 125, height: 20, alignment: .leading)
@@ -398,6 +399,7 @@ struct initialUserConfigurationView: View{
                             showOverlay.toggle()
                         }
                     }
+                     */
                     Text("Finish").padding(10).foregroundStyle(.blue).background(Color(UIColor.systemGray5)).clipShape(RoundedRectangle(cornerRadius: 5)).padding(.top, 65).onTapGesture{
                         isErrorMessage = ""
                         if selectedGender.isEmpty{
@@ -420,9 +422,11 @@ struct initialUserConfigurationView: View{
                         if selectedLearningLanguage.isEmpty{
                             isErrorMessage.append(isErrorMessage.isEmpty ? "Leaning Languages" : ", Learning Languages")
                         }
+                        /*
                         if selectedLanguageTheme.isEmpty{
                             isErrorMessage.append(isErrorMessage.isEmpty ? "Language Theme" : ", Language Theme")
                         }
+                         */
                         if isErrorMessage.isEmpty{
                             _ = Task{hasUserSettings = await storeUserSettings()}
                         } else{
@@ -588,6 +592,7 @@ struct initialUserConfigurationView: View{
                         }.padding(5).background(Color(UIColor.systemGray4)).clipShape(RoundedRectangle(cornerRadius: 5)).frame(maxWidth: .infinity, alignment: .leading).padding(.leading, 10)
                     }.offset(y: isLayoutChange ? 127 : 108).frame(height: 100)
                 }
+                /* //Theme not implemented
                 if isThemeMenuOpen{
                     ScrollView{
                         VStack{
@@ -612,7 +617,7 @@ struct initialUserConfigurationView: View{
                             }
                         }.padding(5).background(Color(UIColor.systemGray4)).clipShape(RoundedRectangle(cornerRadius: 5)).frame(maxWidth: .infinity, alignment: .leading).padding(.leading, 10)
                     }.offset(y: isLayoutChange ? 204 : 185).frame(height: 100)
-                }
+                }*/
             }
         }
     }
@@ -647,7 +652,6 @@ struct initialUserConfigurationView: View{
 }
 
 struct authenticationView: View {
-    
     @State private var isUserEmail: String = ""
     @State private var isUserPassword: String = ""
     @State private var isResetEdit: String = ""
@@ -676,8 +680,7 @@ struct authenticationView: View {
     
     var body: some View {
         
-        NavigationStack {
-                
+        NavigationStack {               
             ZStack {
                 
                 VStack{
@@ -693,166 +696,175 @@ struct authenticationView: View {
                             }
                         }.onChange(of: isEmailFocus, {
                             if !isEmailFocus{
+
                                 if !isUserEmail.isEmpty && emailErrorMessage.contains("enter") && isEmailError{
                                     isEmailError.toggle()
                                 }
-                            }
-                        })
-                    }.overlay(RoundedRectangle(cornerRadius: 5).stroke(lineWidth: 1))
-                    if isEmailError{
-                        Text(emailErrorMessage).foregroundColor(.red).frame(maxWidth: .infinity, alignment: .leading).padding(5)
-                    }
-                    Text("Password").frame(maxWidth: .infinity, alignment: .leading)
-                    HStack{
-                        Image(systemName: "lock.fill").resizable().scaledToFit().frame(width: 25, height: 25).padding(.leading, 1).foregroundStyle(.gray)
-                        if(!isPasswordVisible){
-                            SecureField("Password", text: $isUserPassword).focused($isPasswordFocus).background(Color.white).frame(height:30).textInputAutocapitalization(.never).autocorrectionDisabled(true).onSubmit{
-                                if !isUserPassword.isEmpty && isPasswordError{
-                                    isPasswordError.toggle()
-                                }
-                            }.onChange(of: isPasswordFocus, {
-                                if !isPasswordFocus{
-                                    if !isUserPassword.isEmpty && isPasswordError{
-                                        isPasswordError.toggle()
+                            }.onChange(of: isEmailFocus, {
+                                if !isEmailFocus{
+                                    if !isUserEmail.isEmpty && emailErrorMessage.contains("enter") && isEmailError{
+                                        isEmailError.toggle()
                                     }
-                                }
-                            })
-                        } else{
-                            TextField("Password", text: $isUserPassword).focused($isPasswordFocus).background(Color.white).frame(height:30).textInputAutocapitalization(.never).autocorrectionDisabled(true).onSubmit{
-                                if !isUserPassword.isEmpty && isPasswordError{
-                                    isPasswordError.toggle()
-                                }
-                            }.onChange(of: isPasswordFocus, {
-                                if !isPasswordFocus{
-                                    if !isUserPassword.isEmpty && isPasswordError{
-                                        isPasswordError.toggle()
-                                    }
-                                }
-                            })
-                        }
-                        Button(action:{isPasswordVisible.toggle()}){
-                            Image(systemName: !isPasswordVisible ? "eye.slash" : "eye").resizable().scaledToFit().frame(width: 25, height: 25).padding(.trailing, 2).foregroundStyle(.black)
-                        }
-                    }.overlay(RoundedRectangle(cornerRadius: 5).stroke(lineWidth: 1))
-                    if isPasswordError{
-                        Text(passwordErrorMessage).foregroundColor(.red).frame(maxWidth: .infinity, alignment: .leading).padding(5)
-                    }
-                    Text("Login").padding(10).foregroundStyle(.blue).background(Color(UIColor.systemGray5)).clipShape(RoundedRectangle(cornerRadius: 5)).onTapGesture{
-                        if isUserEmail.isEmpty{
-                            emailErrorMessage = "Please enter your email address"
-                            isEmailError = true
-                        } else{
-                            let isEmailRegex: String = "[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\\.[a-zA-Z]{2,}"
-                            let isEmailPredicate = NSPredicate(format: "SELF MATCHES[c] %@", isEmailRegex)
-                            let isValidAddress = isEmailPredicate.evaluate(with: isUserEmail)
-                            if !isValidAddress{
-                                emailErrorMessage = "Invalid email address"
-                                isEmailError = true
-                            }
-                            if isValidAddress && isEmailError{
-                                isEmailError.toggle()
-                            }
-                        }
-                        if isUserPassword.isEmpty{
-                            passwordErrorMessage = "Please enter your password"
-                            isPasswordError = true
-                        } else if !isUserPassword.isEmpty && isPasswordError{
-                            isPasswordError = false
-                        }
-                        if !isEmailError && !isPasswordError{
-                            print("login reached")
-                            _ = Task{isUserValid = await validateCredentials()}
-                        }
-                    }.padding(10).navigationDestination(isPresented: $isUserValid){
-                        userHomeView().navigationBarBackButtonHidden(true)
-                    }
-                    if isLoginError{
-                        Text("Invalid Email Or Password").foregroundColor(.red).padding(.top, 5)
-                    }
-                    Text("Forgot Password?").onTapGesture{ // highlight blue on hover
-                        isPasswordReset.toggle()
-                    }
-                    HStack{
-                        Text("Don't have an account? ")
-                        NavigationLink(destination: registrationView().navigationBarBackButtonHidden(true)){
-                            Text("Sign Up")
-                        }
-                    }
-                }.padding(15).onTapGesture{
-                    isEmailFocus = false
-                    isPasswordFocus = false
-                }
-            }.overlay(alignment: .center){
-                if isPasswordReset{
-                    VStack{
-                        ZStack{
-                            HStack{
-                                Image(systemName: "x.circle.fill").resizable().scaledToFit().frame(width: 25, height: 25)
-                            }.frame(maxWidth: .infinity, alignment: .topTrailing).onTapGesture{
-                                isPasswordReset.toggle()
-                                isResetEdit = ""
-                                resetEditError = false
-                                resetEditErrorMessage = ""
-                            }
-                        }
-                        Text("Reset Password")
-                        Text("Email").frame(maxWidth: .infinity, alignment: .leading)
-                        HStack{
-                            Image(systemName: "envelope.fill").resizable().scaledToFit().frame(width: 25, height: 25).padding(.leading, 2).foregroundStyle(.gray)
-                            TextField("Email Address", text: $isResetEdit).focused($resetEditFocus).background(Color.white).frame(height:30).textInputAutocapitalization(.never).autocorrectionDisabled(true).onSubmit{
-                                if !isResetEdit.isEmpty && resetEditErrorMessage.contains("enter") && resetEditError{
-                                    resetEditError.toggle()
-                                }
-                            }.onChange(of: resetEditFocus, {
-                                if !resetEditFocus{
-                                    if !isResetEdit.isEmpty && resetEditErrorMessage.contains("enter") && resetEditError{
-                                        resetEditError = false
-                                    }
-                                }
-                                if resetEditFocus && isResetResult{
-                                    isResetResult.toggle()
                                 }
                             })
                         }.overlay(RoundedRectangle(cornerRadius: 5).stroke(lineWidth: 1))
-                        if resetEditError{
-                            Text(resetEditErrorMessage).foregroundColor(.red).frame(maxWidth: .infinity, alignment: .leading).padding(5)
+                        if isEmailError{
+                            Text(emailErrorMessage).foregroundColor(.red).frame(maxWidth: .infinity, alignment: .leading).padding(5)
                         }
-                        Text("Confirm").padding(10).foregroundStyle(.blue).background(Color(UIColor.systemGray5)).clipShape(RoundedRectangle(cornerRadius: 5)).onTapGesture{
-                            resetEditFocus = false
-                            if isResetEdit.isEmpty{
-                                resetEditErrorMessage = "Please enter your email address"
-                                resetEditError = true
+                        Text("Password").frame(maxWidth: .infinity, alignment: .leading)
+                        HStack{
+                            Image(systemName: "lock.fill").resizable().scaledToFit().frame(width: 25, height: 25).padding(.leading, 1).foregroundStyle(.gray)
+                            if(!isPasswordVisible){
+                                SecureField("Password", text: $isUserPassword).focused($isPasswordFocus).background(Color.white).frame(height:30).textInputAutocapitalization(.never).autocorrectionDisabled(true).onSubmit{
+                                    if !isUserPassword.isEmpty && isPasswordError{
+                                        isPasswordError.toggle()
+                                    }
+                                }.onChange(of: isPasswordFocus, {
+                                    if !isPasswordFocus{
+                                        if !isUserPassword.isEmpty && isPasswordError{
+                                            isPasswordError.toggle()
+                                        }
+                                    }
+                                })
+                            } else{
+                                TextField("Password", text: $isUserPassword).focused($isPasswordFocus).background(Color.white).frame(height:30).textInputAutocapitalization(.never).autocorrectionDisabled(true).onSubmit{
+                                    if !isUserPassword.isEmpty && isPasswordError{
+                                        isPasswordError.toggle()
+                                    }
+                                }.onChange(of: isPasswordFocus, {
+                                    if !isPasswordFocus{
+                                        if !isUserPassword.isEmpty && isPasswordError{
+                                            isPasswordError.toggle()
+                                        }
+                                    }
+                                })
+                            }
+                            Button(action:{isPasswordVisible.toggle()}){
+                                Image(systemName: !isPasswordVisible ? "eye.slash" : "eye").resizable().scaledToFit().frame(width: 25, height: 25).padding(.trailing, 2).foregroundStyle(.black)
+                            }
+                        }.overlay(RoundedRectangle(cornerRadius: 5).stroke(lineWidth: 1))
+                        if isPasswordError{
+                            Text(passwordErrorMessage).foregroundColor(.red).frame(maxWidth: .infinity, alignment: .leading).padding(5)
+                        }
+                        Text("Login").padding(10).foregroundStyle(.blue).background(Color(UIColor.systemGray5)).clipShape(RoundedRectangle(cornerRadius: 5)).onTapGesture{
+                            if isUserEmail.isEmpty{
+                                emailErrorMessage = "Please enter your email address"
+                                isEmailError = true
                             } else{
                                 let isEmailRegex: String = "[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\\.[a-zA-Z]{2,}"
                                 let isEmailPredicate = NSPredicate(format: "SELF MATCHES[c] %@", isEmailRegex)
-                                let isValidAddress = isEmailPredicate.evaluate(with: isResetEdit)
+                                let isValidAddress = isEmailPredicate.evaluate(with: isUserEmail)
                                 if !isValidAddress{
-                                    resetEditErrorMessage = "Invalid email address"
-                                    resetEditError = true
+                                    emailErrorMessage = "Invalid email address"
+                                    isEmailError = true
                                 }
-                                if isValidAddress && resetEditError{
-                                    resetEditError.toggle()
-                                }
-                                if !resetEditError{
-                                    _ = Task{isResetValid = await userPasswordReset()}
-                                    if isResetValid{
-                                        isResetEdit = ""
-                                        resetEditError = false
-                                        resetEditErrorMessage = ""
-                                    }
-                                    isResetResult.toggle()
-                                    DispatchQueue.main.asyncAfter(deadline: .now() + 5, execute: {isResetResult.toggle()})
+                                if isValidAddress && isEmailError{
+                                    isEmailError.toggle()
                                 }
                             }
+                            if isUserPassword.isEmpty{
+                                passwordErrorMessage = "Please enter your password"
+                                isPasswordError = true
+                            } else if !isUserPassword.isEmpty && isPasswordError{
+                                isPasswordError = false
+                            }
+                            if !isEmailError && !isPasswordError{
+                                print("login reached")
+                                _ = Task{isUserValid = await validateCredentials()}
+                            }
+                        }.padding(10).navigationDestination(isPresented: $isUserValid){
+                            userHomeView().navigationBarBackButtonHidden(true)
                         }
-                        if isResetResult{
-                            Text(isResetMessage).foregroundColor(.green).padding(.top, 5)
+                        if isLoginError{
+                            Text("Invalid Email Or Password").foregroundColor(.red).padding(.top, 5)
                         }
-                    }.padding(10).background(.white).border(.black, width: 1).clipShape(RoundedRectangle(cornerRadius: 5)).frame(width: 350).onTapGesture{
-                        resetEditFocus = false
+                        Text("Forgot Password?").onTapGesture{ // highlight blue on hover
+                            isPasswordReset.toggle()
+                        }
+                        HStack{
+                            Text("Don't have an account? ")
+                            NavigationLink(destination: registrationView().navigationBarBackButtonHidden(true)){
+                                Text("Sign Up")
+                            }
+                        }
+                    }.padding(15).onTapGesture{
+                        isEmailFocus = false
+                        isPasswordFocus = false
+                    }
+                }.overlay(alignment: .center){
+                    if isPasswordReset{
+                        VStack{
+                            ZStack{
+                                HStack{
+                                    Image(systemName: "x.circle.fill").resizable().scaledToFit().frame(width: 25, height: 25)
+                                }.frame(maxWidth: .infinity, alignment: .topTrailing).onTapGesture{
+                                    isPasswordReset.toggle()
+                                    isResetEdit = ""
+                                    resetEditError = false
+                                    resetEditErrorMessage = ""
+                                }
+                            }
+                            Text("Reset Password")
+                            Text("Email").frame(maxWidth: .infinity, alignment: .leading)
+                            HStack{
+                                Image(systemName: "envelope.fill").resizable().scaledToFit().frame(width: 25, height: 25).padding(.leading, 2).foregroundStyle(.gray)
+                                TextField("Email Address", text: $isResetEdit).focused($resetEditFocus).background(Color.white).frame(height:30).textInputAutocapitalization(.never).autocorrectionDisabled(true).onSubmit{
+                                    if !isResetEdit.isEmpty && resetEditErrorMessage.contains("enter") && resetEditError{
+                                        resetEditError.toggle()
+                                    }
+                                }.onChange(of: resetEditFocus, {
+                                    if !resetEditFocus{
+                                        if !isResetEdit.isEmpty && resetEditErrorMessage.contains("enter") && resetEditError{
+                                            resetEditError = false
+                                        }
+                                    }
+                                    if resetEditFocus && isResetResult{
+                                        isResetResult.toggle()
+                                    }
+                                })
+                            }.overlay(RoundedRectangle(cornerRadius: 5).stroke(lineWidth: 1))
+                            if resetEditError{
+                                Text(resetEditErrorMessage).foregroundColor(.red).frame(maxWidth: .infinity, alignment: .leading).padding(5)
+                            }
+                            Text("Confirm").padding(10).foregroundStyle(.blue).background(Color(UIColor.systemGray5)).clipShape(RoundedRectangle(cornerRadius: 5)).onTapGesture{
+                                resetEditFocus = false
+                                if isResetEdit.isEmpty{
+                                    resetEditErrorMessage = "Please enter your email address"
+                                    resetEditError = true
+                                } else{
+                                    let isEmailRegex: String = "[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\\.[a-zA-Z]{2,}"
+                                    let isEmailPredicate = NSPredicate(format: "SELF MATCHES[c] %@", isEmailRegex)
+                                    let isValidAddress = isEmailPredicate.evaluate(with: isResetEdit)
+                                    if !isValidAddress{
+                                        resetEditErrorMessage = "Invalid email address"
+                                        resetEditError = true
+                                    }
+                                    if isValidAddress && resetEditError{
+                                        resetEditError.toggle()
+                                    }
+                                    if !resetEditError{
+                                        _ = Task{isResetValid = await userPasswordReset()}
+                                        if isResetValid{
+                                            isResetEdit = ""
+                                            resetEditError = false
+                                            resetEditErrorMessage = ""
+                                        }
+                                        isResetResult.toggle()
+                                        DispatchQueue.main.asyncAfter(deadline: .now() + 5, execute: {isResetResult.toggle()})
+                                    }
+                                }
+                            }
+                            if isResetResult{
+                                Text(isResetMessage).foregroundColor(.green).padding(.top, 5)
+                            }
+                        }.padding(10).background(.white).border(.black, width: 1).clipShape(RoundedRectangle(cornerRadius: 5)).frame(width: 350).onTapGesture{
+                            resetEditFocus = false
+                        }
                     }
                 }
             }
+            
+            
         }
         
     }
@@ -1076,7 +1088,7 @@ struct topAndBottomView: View{
                             HStack{
                                 Image(systemName:"person.circle.fill").resizable().scaledToFit().frame(width: 25, height: 25)
                                 Text("Profile").font(.title2)
-                            }.onTapGesture{isProfileNavigation.toggle()}.navigationDestination(isPresented: $isProfileNavigation){userProfileView().navigationBarBackButtonHidden(true)}
+                            }.onTapGesture{isProfileNavigation.toggle()}.navigationDestination(isPresented: $isProfileNavigation){userProfileView()}
                             HStack{
                                 Image(systemName: "cart.fill").resizable().scaledToFit().frame(width: 25, height: 25)
                                 Text("Store").font(.title2)
@@ -1173,6 +1185,7 @@ struct userHomeView: View {
 }
 
 struct cardHomeView: View {
+
     @State private var isInitialLoad:Bool = true
     static let isUser = Auth.auth().currentUser
     @State private var isErrorOccurrence:Bool = false
@@ -1388,7 +1401,7 @@ struct cardHomeView: View {
                         }.padding(.horizontal, 10).onTapGesture{isFavouritesNavigation.toggle()}.navigationDestination(isPresented: $isFavouritesNavigation){userFavouriteCardsView().navigationBarBackButtonHidden(true)}
                         HStack{
                             Image(systemName:"plus.square.fill").resizable().scaledToFit().frame(width: 50, height: 50)
-                        }.padding(.horizontal, 10).onTapGesture{isWordInputNavigation.toggle()}.navigationDestination(isPresented: $isWordInputNavigation){/*languageThemeView().navigationBarBackButtonHidden(true)*/} // Dont forget to change word redirection to new word input page
+                        }.padding(.horizontal, 10).onTapGesture{isWordInputNavigation.toggle()}.navigationDestination(isPresented: $isWordInputNavigation){addDeckView().navigationBarBackButtonHidden(true)}
                         HStack{
                             Image(systemName:"cart.fill").resizable().scaledToFit().frame(width: 50, height: 50)
                         }.padding(.horizontal, 10).onTapGesture{isStoreNavigation.toggle()}.navigationDestination(isPresented: $isStoreNavigation){userStoreView().navigationBarBackButtonHidden(true)}
@@ -2015,7 +2028,6 @@ struct cardHomeView: View {
        
         let db = Firestore.firestore()
         
-        print("lets see \(searchedWord)1")
         db.collection("eng_US") //make this for all languages
             .whereField("isWord", isEqualTo: searchedWord).limit(to:50)
             .getDocuments(source: .server) { (snapshot, error) in
@@ -2035,8 +2047,7 @@ struct cardHomeView: View {
             }
  
     }
-    
-    
+
     private func isRealTimeSpeechToText() -> Bool { // Not smart and outright bad to pause audio intake for this function
         
         var isLiveTranslation: Bool = false
@@ -2155,7 +2166,7 @@ struct languageThemeView: View{
                     }.padding(.horizontal, 10).onTapGesture{isFavouritesNavigation.toggle()}.navigationDestination(isPresented: $isFavouritesNavigation){userFavouriteCardsView().navigationBarBackButtonHidden(true)}
                     HStack{
                         Image(systemName:"plus.square.fill").resizable().scaledToFit().frame(width: 50, height: 50)
-                    }.padding(.horizontal, 10).onTapGesture{isWordInputNavigation.toggle()}.navigationDestination(isPresented: $isWordInputNavigation){/*languageThemeView().navigationBarBackButtonHidden(true)*/} // Dont forget to change word redirection to new word input page
+                    }.padding(.horizontal, 10).onTapGesture{isWordInputNavigation.toggle()}.navigationDestination(isPresented: $isWordInputNavigation){addDeckView().navigationBarBackButtonHidden(true)}
                     HStack{
                         Image(systemName:"cart.fill").resizable().scaledToFit().frame(width: 50, height: 50)
                     }.padding(.horizontal, 10).onTapGesture{isStoreNavigation.toggle()}.navigationDestination(isPresented: $isStoreNavigation){userStoreView().navigationBarBackButtonHidden(true)}
@@ -2202,8 +2213,12 @@ struct wordSearchView : View{
                             ForEach(isSearchResult.keys.sorted(), id: \.self){ hasLanguageEntry in
                                 ForEach(isSearchResult[hasLanguageEntry] ?? [], id: \.self){ hasLanguageEntryID in
                                     VStack{
-                                        Text(getSearchResult["\(hasLanguageEntry)_\(hasLanguageEntryID)"] ?? "Error)").foregroundStyle(.blue).font(.largeTitle)
-                                    }.frame(maxWidth:.infinity, minHeight: 45).background(Color(UIColor.systemGray5)).clipShape(RoundedRectangle(cornerRadius: 10)).padding(.vertical, 10)
+                                        NavigationLink(destination: cardHomeView(words: [hasLanguageEntryID])) {
+                                            Text(getSearchResult["\(hasLanguageEntry)_\(hasLanguageEntryID)"] ?? "Error)")
+                                                .foregroundStyle(.blue).font(.largeTitle)
+                                                .frame(maxWidth:.infinity, minHeight: 45).background(Color(UIColor.systemGray5)).clipShape(RoundedRectangle(cornerRadius: 10)).padding(.vertical, 10)
+                                        }
+                                     }
                                 }
                             }
                         }
@@ -2219,7 +2234,7 @@ struct wordSearchView : View{
                 }.padding(.horizontal, 10).onTapGesture{isFavouritesNavigation.toggle()}.navigationDestination(isPresented: $isFavouritesNavigation){userFavouriteCardsView().navigationBarBackButtonHidden(true)}
                 HStack{
                     Image(systemName:"plus.square.fill").resizable().scaledToFit().frame(width: 50, height: 50)
-                }.padding(.horizontal, 10).onTapGesture{isWordInputNavigation.toggle()}.navigationDestination(isPresented: $isWordInputNavigation){/*languageThemeView().navigationBarBackButtonHidden(true)*/} // Dont forget to change word redirection to new word input page
+                }.padding(.horizontal, 10).onTapGesture{isWordInputNavigation.toggle()}.navigationDestination(isPresented: $isWordInputNavigation){addDeckView().navigationBarBackButtonHidden(true)}
                 HStack{
                     Image(systemName:"cart.fill").resizable().scaledToFit().frame(width: 50, height: 50)
                 }.padding(.horizontal, 10).onTapGesture{isStoreNavigation.toggle()}.navigationDestination(isPresented: $isStoreNavigation){userStoreView().navigationBarBackButtonHidden(true)}
@@ -2229,8 +2244,9 @@ struct wordSearchView : View{
             }.frame(maxHeight: .infinity, alignment: .bottom).padding(.bottom, 10)
         }
     }
+                
     
-    private func searchQueryThrottled()async{
+    private func searchQueryThrottled() async {
         isSearchResult = [:]
         if isSearchInput.isEmpty{return}
         guard let isUserID = userHomeView.isUser?.uid else{return}
@@ -2241,7 +2257,7 @@ struct wordSearchView : View{
             guard let isUserLearnLanguages = isUserDocument.data()?["learnLanguage"] as? [String] else{return}
             //get server info
             let isLanguageEntrySearch = ["eng_US"]
-            print("test")
+            //print("test")
             for isLanguage in isLanguageEntrySearch{
                 let isEntryDocument = try await Firestore.firestore().collection(isLanguage).whereField("isWord", isEqualTo: isSearchInput).getDocuments() //Modify to search for contains instead of euqalTo
                 for isDocument in isEntryDocument.documents{
@@ -2283,15 +2299,15 @@ struct userProfileView: View{
         case editPassword
         case editPasswordConfirm
     }
-    @State private var isUserName: String = "Testing"
+    @State private var isUserName: String = ""
     @State private var isNameEdit: Bool = false
-    @State private var isUserGender: String = "Male"
+    @State private var isUserGender: String = ""
     @State private var isGenderEdit: Bool = false
-    @State private var isUserBirthday: String = "1/1/2024"
+    @State private var isUserBirthday: String = ""
     @State private var isBirthdayEdit: Bool = false
-    @State private var isUserEmail: String = "demo@testing.com"
+    @State private var isUserEmail: String = ""
     @State private var isEmailEdit: Bool = false
-    @State private var isUserPassword: String = "demo"
+    @State private var isUserPassword: String = ""
     @State private var isPasswordEdit: Bool = false
     @State private var isAccountDeletion: Bool = false
     
@@ -2379,6 +2395,7 @@ struct userProfileView: View{
                             isBirthdayEdit.toggle()
                         }
                     }
+                    /*
                     HStack{
                         VStack{
                             Text("EMAIL ADDRESS").font(.title2).frame(maxWidth: .infinity, alignment: .leading).padding(.leading, 10)
@@ -2407,6 +2424,7 @@ struct userProfileView: View{
                             isPasswordEdit.toggle()
                         }
                     }
+                     */
                     HStack{
                         HStack{
                             Image(systemName:"house.fill").resizable().scaledToFit().frame(width: 50, height: 50)
@@ -2416,7 +2434,7 @@ struct userProfileView: View{
                         }.padding(.horizontal, 10).onTapGesture{isFavouritesNavigation.toggle()}.navigationDestination(isPresented: $isFavouritesNavigation){userFavouriteCardsView().navigationBarBackButtonHidden(true)}
                         HStack{
                             Image(systemName:"plus.square.fill").resizable().scaledToFit().frame(width: 50, height: 50)
-                        }.padding(.horizontal, 10).onTapGesture{isWordInputNavigation.toggle()}.navigationDestination(isPresented: $isWordInputNavigation){/*languageThemeView().navigationBarBackButtonHidden(true)*/} // Dont forget to change word redirection to new word input page
+                        }.padding(.horizontal, 10).onTapGesture{isWordInputNavigation.toggle()}.navigationDestination(isPresented: $isWordInputNavigation){addDeckView().navigationBarBackButtonHidden(true)}
                         HStack{
                             Image(systemName:"cart.fill").resizable().scaledToFit().frame(width: 50, height: 50)
                         }.padding(.horizontal, 10).onTapGesture{isStoreNavigation.toggle()}.navigationDestination(isPresented: $isStoreNavigation){userStoreView().navigationBarBackButtonHidden(true)}
@@ -2867,9 +2885,31 @@ struct userProfileView: View{
                         }
                     }
                 }
+            }.onAppear {
+                Task {
+                    await getUserData() // Fetch user data when view appears
+                   
+                }
             }//END
         }
     
+    }
+    
+    private func getUserData()  async{
+        do{
+            let db = Firestore.firestore()
+            let isUserID = userHomeView.isUser?.uid
+            let userDocument = try await db.collection("users").document(isUserID!).getDocument()
+            
+            let userData = userDocument.data()
+            isUserName = (userData!["userName"] as? String) ?? "error fetching"
+            isUserGender = (userData!["gender"] as? String) ?? "error fetching"
+            isUserBirthday = (userData!["birthday"] as? String) ?? "error fetching"
+        } catch{
+            print("theres been an error reading user profile information: \(error.localizedDescription)")
+        }
+        
+        
     }
     
     private func updateUserName()->Bool{
@@ -2952,10 +2992,10 @@ struct userStoreView: View{
                     }.padding(.horizontal, 10).onTapGesture{isFavouritesNavigation.toggle()}.navigationDestination(isPresented: $isFavouritesNavigation){userFavouriteCardsView().navigationBarBackButtonHidden(true)}
                     HStack{
                         Image(systemName:"plus.square.fill").resizable().scaledToFit().frame(width: 50, height: 50)
-                    }.padding(.horizontal, 10).onTapGesture{isWordInputNavigation.toggle()}.navigationDestination(isPresented: $isWordInputNavigation){/*languageThemeView().navigationBarBackButtonHidden(true)*/} // Dont forget to change word redirection to new word input page
+                    }.padding(.horizontal, 10).onTapGesture{isWordInputNavigation.toggle()}.navigationDestination(isPresented: $isWordInputNavigation){addDeckView().navigationBarBackButtonHidden(true)}
                     HStack{
                         Image(systemName:"cart.fill").resizable().scaledToFit().frame(width: 50, height: 50)
-                    }.padding(.horizontal, 10)
+                    }.padding(.horizontal, 10).onTapGesture{isStoreNavigation.toggle()}.navigationDestination(isPresented: $isStoreNavigation){userStoreView().navigationBarBackButtonHidden(true)}
                     HStack{
                         Image(systemName:"sparkles").resizable().scaledToFit().frame(width: 50, height: 50)
                     }.padding(.horizontal, 10).onTapGesture{isTaskNavigation.toggle()}.navigationDestination(isPresented: $isTaskNavigation){userTaskView().navigationBarBackButtonHidden(true)}
@@ -3019,7 +3059,7 @@ struct userFavouriteCardsView: View{ // add feature when user clicks the star it
                     }.padding(.horizontal, 10)// return to the top of current view
                     HStack{
                         Image(systemName:"plus.square.fill").resizable().scaledToFit().frame(width: 50, height: 50)
-                    }.padding(.horizontal, 10).onTapGesture{isWordInputNavigation.toggle()}.navigationDestination(isPresented: $isWordInputNavigation){/*languageThemeView().navigationBarBackButtonHidden(true)*/} // Dont forget to change word redirection to new word input page
+                    }.padding(.horizontal, 10).onTapGesture{isWordInputNavigation.toggle()}.navigationDestination(isPresented: $isWordInputNavigation){addDeckView().navigationBarBackButtonHidden(true)}
                     HStack{
                         Image(systemName:"cart.fill").resizable().scaledToFit().frame(width: 50, height: 50)
                     }.padding(.horizontal, 10).onTapGesture{isStoreNavigation.toggle()}.navigationDestination(isPresented: $isStoreNavigation){userStoreView().navigationBarBackButtonHidden(true)}
@@ -3176,7 +3216,7 @@ struct userSettingView: View{
                         }.padding(.horizontal, 10).onTapGesture{isFavouritesNavigation.toggle()}.navigationDestination(isPresented: $isFavouritesNavigation){userFavouriteCardsView().navigationBarBackButtonHidden(true)}
                         HStack{
                             Image(systemName:"plus.square.fill").resizable().scaledToFit().frame(width: 50, height: 50)
-                        }.padding(.horizontal, 10).onTapGesture{isWordInputNavigation.toggle()}.navigationDestination(isPresented: $isWordInputNavigation){/*languageThemeView().navigationBarBackButtonHidden(true)*/} // Dont forget to change word redirection to new word input page
+                        }.padding(.horizontal, 10).onTapGesture{isWordInputNavigation.toggle()}.navigationDestination(isPresented: $isWordInputNavigation){addDeckView().navigationBarBackButtonHidden(true)}
                         HStack{
                             Image(systemName:"cart.fill").resizable().scaledToFit().frame(width: 50, height: 50)
                         }.padding(.horizontal, 10).onTapGesture{isStoreNavigation.toggle()}.navigationDestination(isPresented: $isStoreNavigation){userStoreView().navigationBarBackButtonHidden(true)}
@@ -3220,7 +3260,7 @@ struct userTaskView: View{
                     }.padding(.horizontal, 10).onTapGesture{isFavouritesNavigation.toggle()}.navigationDestination(isPresented: $isFavouritesNavigation){userFavouriteCardsView().navigationBarBackButtonHidden(true)}
                     HStack{
                         Image(systemName:"plus.square.fill").resizable().scaledToFit().frame(width: 50, height: 50)
-                    }.padding(.horizontal, 10).onTapGesture{isWordInputNavigation.toggle()}.navigationDestination(isPresented: $isWordInputNavigation){/*languageThemeView().navigationBarBackButtonHidden(true)*/} // Dont forget to change word redirection to new word input page
+                    }.padding(.horizontal, 10).onTapGesture{isWordInputNavigation.toggle()}.navigationDestination(isPresented: $isWordInputNavigation){addDeckView().navigationBarBackButtonHidden(true)}
                     HStack{
                         Image(systemName:"cart.fill").resizable().scaledToFit().frame(width: 50, height: 50)
                     }.padding(.horizontal, 10).onTapGesture{isStoreNavigation.toggle()}.navigationDestination(isPresented: $isStoreNavigation){userStoreView().navigationBarBackButtonHidden(true)}
