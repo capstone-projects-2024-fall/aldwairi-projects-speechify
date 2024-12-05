@@ -275,11 +275,11 @@ struct registrationView: View{
 }
 
 struct initialUserConfigurationView: View{
-    private let ISO639_3: [String:String] = ["Arabic":"ara", "Bengali":"ben", "Bulgarian":"bul", "Czech":"ces", "Dutch":"nid", "English (UK)":"eng_UK", "English (US)":"eng_US", "French":"fra", "German":"deu", "Hindi":"hin", "Indonesian":"ind", "Irish":"gle", "Italian":"ita", "Japanese":"jpn", "Korean":"kor", "Portuguese":"por", "Spanish":"spa", "Russian":"rus", "Swedish":"swe", "Vietnamese":"vie"]
+    private let ISO639_3: [String:String] = ["Arabic":"ara", "Bengali":"ben", "Bulgarian":"bul", "Czech":"ces", "Dutch":"nid", "English (UK)":"eng_UK", "English (US)":"eng_US", "French":"fra", "German":"deu", "Hindi":"hin", "Indonesian":"ind", "Irish":"gle", "Italian":"ita", "Japanese":"jpn", "Korean":"kor", "Portuguese":"por", "Spanish (ES)":"spa_ES", "Russian":"rus", "Swedish":"swe", "Vietnamese":"vie"]
     @State private var genderOptionSelection: [String:Bool] = ["Female":false, "Male":false, "Other":false]
     private let dateMonthSelection: [String] = ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"]
-    @State private var nativeOptionSelection: [String: Bool] = ["Arabic":false, "Dutch":false, "English (UK)":false, "English (US)":false, "French":false, "German":false, "Hindi":false, "Italian":false, "Japanese":false, "Korean":false, "Portuguese":false, "Spanish":false, "Russian":false]
-    @State private var learnOptionSelection: [String: Bool] = ["Arabic":false, "Dutch":false, "English (UK)":false, "English (US)":false, "French":false, "German":false, "Hindi":false, "Italian":false, "Japanese":false, "Korean":false, "Portuguese":false, "Spanish":false, "Russian":false]
+    @State private var nativeOptionSelection: [String: Bool] = ["Arabic":false, "Dutch":false, "English (UK)":false, "English (US)":false, "French":false, "German":false, "Hindi":false, "Italian":false, "Japanese":false, "Korean":false, "Portuguese":false, "Spanish (ES)":false, "Russian":false]
+    @State private var learnOptionSelection: [String: Bool] = ["Arabic":false, "Dutch":false, "English (UK)":false, "English (US)":false, "French":false, "German":false, "Hindi":false, "Italian":false, "Japanese":false, "Korean":false, "Portuguese":false, "Spanish (ES)":false, "Russian":false]
     @State private var themeOptionSelection: [String: Bool] = ["Randomize":false, "Greetings":false, "Culture":false]
     private let dateDaySelection: Range<Int> = 1..<32
     private var dateYearSelection: Range<Int> = 1900..<2025
@@ -1179,6 +1179,7 @@ struct cardHomeView: View {
     @State private var isCardWord:Bool = true
     @State private var isFavourite:Bool = false
     @State private var isLearnLanguages:[String] = []
+    @State private var updateLanguage:Bool = false
     @State private var isWordLanguage:String = ""
     @State private var isWord:String = "Word"
     @State private var isPhonetic:String = "Phonetic-Spelling"
@@ -1214,6 +1215,7 @@ struct cardHomeView: View {
     @State private var isAPILoading:Bool = false
     @State private var isAPIError:Bool = false
     @State private var isAPIErrorMessage:String?
+    @State private var viewLearnLanguageSelection:Bool = false
     @State private var viewSettings:Bool = false
     @State private var isThemeNavigation:Bool = false
     @State private var isSearchNavigation:Bool = false
@@ -1266,6 +1268,14 @@ struct cardHomeView: View {
                     }
                     HStack{
                         HStack{
+                            HStack{
+                                Image(systemName:"square.grid.2x2.fill").resizable().scaledToFit().frame(width: 50, height: 50)
+                            }.padding(.leading, 10).accessibilityIdentifier("UserHomeTheme_Navigation").onTapGesture{isThemeNavigation.toggle()}.navigationDestination(isPresented: $isThemeNavigation){languageThemeView().navigationBarBackButtonHidden(true)}
+                            HStack{
+                                Image(systemName:"globe").resizable().scaledToFit().frame(width: 50, height: 50)
+                            }.padding(.leading, 10).onTapGesture{viewLearnLanguageSelection.toggle()}
+                        }.frame(maxWidth: .infinity, alignment: .leading)
+
                             /*Image(systemName:"square.grid.2x2.fill").resizable().scaledToFit().frame(width: 50, height: 50) */
                             Text("Points: \(pointsViewModel.points)")
                                 .font(.title)
@@ -1290,13 +1300,14 @@ struct cardHomeView: View {
                                 .foregroundColor(.white)
                                 .cornerRadius(8)
                         }
+>
                         HStack{
                             HStack{
                                 Image(systemName:"magnifyingglass").resizable().scaledToFit().frame(width: 50, height: 50)
-                            }.padding(.trailing, 10).onTapGesture{isSearchNavigation.toggle()}.navigationDestination(isPresented: $isSearchNavigation){wordSearchView().navigationBarBackButtonHidden(true)}
+                            }.padding(.trailing, 10).accessibilityIdentifier("UserHomeSearch_Navigation").onTapGesture{isSearchNavigation.toggle()}.navigationDestination(isPresented: $isSearchNavigation){wordSearchView().navigationBarBackButtonHidden(true)}
                             HStack{
                                 Image(systemName:"person.circle.fill").resizable().scaledToFit().frame(width: 50, height: 50)
-                            }.padding(.trailing, 10).onTapGesture{viewSettings.toggle()}
+                            }.padding(.trailing, 10).accessibilityIdentifier("UserHome_Menu").onTapGesture{viewSettings.toggle()}
                         }.frame(maxWidth: .infinity, alignment: .trailing)
                     }.frame(maxHeight: .infinity, alignment:.top).padding(.top, 10)
                     VStack{
@@ -1409,6 +1420,26 @@ struct cardHomeView: View {
                     }
                 }
             }.overlay{
+                if viewLearnLanguageSelection{
+                    ScrollView{
+                        VStack{
+                            ForEach(isLearnLanguages, id: \.self){ language in
+                                HStack{
+                                    Text("\(language)").foregroundStyle(.blue).frame(width: 125, height: 20, alignment: .leading)
+                                    Image(systemName: language == isWordLanguage ? "checkmark.circle.fill" : "circle")
+                                }.padding(5).onTapGesture{
+                                    if isWordLanguage != language{
+                                        isWordLanguage = language
+                                    }
+                                    viewLearnLanguageSelection.toggle()
+                                    Task{
+                                        _ = await updateLoading()
+                                    }
+                                }
+                            }
+                        }.padding(10).background(Color(UIColor.systemGray4)).clipShape(RoundedRectangle(cornerRadius: 5)).frame(maxWidth: .infinity, alignment: .leading).padding(.leading, 5)
+                    }.offset(y: -255).frame(maxHeight: 100)
+                }
                 if viewSettings{
                     VStack{
                         HStack{
@@ -1479,8 +1510,8 @@ struct cardHomeView: View {
             guard isUserDocument.exists else{return false}
             guard let getLearnLanguageField = isUserDocument.data()?["learnLanguage"] as? [String] else{return false}
             isLearnLanguages = getLearnLanguageField
-            guard let getWordLanguage = getLearnLanguageField.randomElement() else{return false}
-            isWordLanguage = getWordLanguage
+            //guard let getWordLanguage = getLearnLanguageField.randomElement() else{return false}
+            isWordLanguage = isLearnLanguages[0]
             let isEntriesCount = 39849 + 1 // get actual size
 
             var isRandomID = Int.random(in: 0...isEntriesCount)
@@ -1498,14 +1529,35 @@ struct cardHomeView: View {
             isWord = getWordField
             guard let getPhoneticField = isRandomEntry.data()?["isPhonetic"] as? String else{return false}
             isPhonetic = getPhoneticField
-            guard let getPronunciationField = isRandomEntry.data()?["isPronunciation"] as? String else{return false}
-            isPronunciation = getPronunciationField
+            //guard let getPronunciationField = isRandomEntry.data()?["isPronunciation"] as? String else{return false}
+            //isPronunciation = getPronunciationField
             isPropertySet.toggle()
         } catch{
             print(error.localizedDescription)
         }
         //let isLanguageEntries = try await isDataBase.collection("en_US").getDocuments()
         //let isEntriesCount = isLanguageEntries.count
+        return isPropertySet
+    }
+    
+    private func updateLoading()async->Bool{
+        var isPropertySet: Bool = false
+        do{
+            let isEntriesCount = 39849 + 1 // get actual size
+            let isRandomID = Int.random(in: 0...isEntriesCount)
+            let isRandomEntry = try await Firestore.firestore().collection(isWordLanguage).document(String(isRandomID)).getDocument()
+            guard isRandomEntry.exists else{return false}
+            isLanguageEntryID = isRandomID
+            guard let getWordField = isRandomEntry.data()?["isWord"] as? String else{return false}
+            isWord = getWordField
+            guard let getPhoneticField = isRandomEntry.data()?["isPhonetic"] as? String else{return false}
+            isPhonetic = getPhoneticField
+            //guard let getPronunciationField = isRandomEntry.data()?["isPronunciation"] as? String else{return false}
+            //isPronunciation = getPronunciationField
+            isPropertySet.toggle()
+        } catch{
+            print(error.localizedDescription)
+        }
         return isPropertySet
     }
     
@@ -2276,7 +2328,6 @@ struct wordSearchView : View{
 }
 
 struct userProfileView: View{
-    let isUser = userHomeView.isUser
     enum editFocus: Hashable{
         case editName
         case editEmail
@@ -2396,7 +2447,7 @@ struct userProfileView: View{
                     HStack{
                         VStack{
                             Text("PASSWORD").font(.title2).frame(maxWidth: .infinity, alignment: .leading).padding(.leading, 10)
-                            Text("\(isUserPassword)").font(.title3).frame(maxWidth: .infinity, alignment: .leading).padding(.leading, 10)
+                            Text(String(repeating: "•", count: isUserPassword.count)).font(.title3).frame(maxWidth: .infinity, alignment: .leading).padding(.leading, 10)
                         }
                         Image(systemName:  "chevron.right").frame(maxWidth: .infinity, alignment: .trailing).padding(.trailing, 5)
                     }.padding(10).onTapGesture{
@@ -2871,9 +2922,30 @@ struct userProfileView: View{
         }
     
     }
+
+    private func initialLoading()async->Bool{
+        var isPropertySet: Bool = false
+        guard let isUserID = userHomeView.isUser?.uid else{return false}
+        do{
+            let isUserDocument = try await Firestore.firestore().collection("users").document(isUserID).getDocument()
+            guard isUserDocument.exists else{return false}
+            guard let getUserName = isUserDocument.data()?["userName"] as? String else{return false}
+            isUserName = getUserName
+            guard let getUserGender = isUserDocument.data()?["gender"] as? String else{return false}
+            isUserGender = getUserGender
+            guard let getUserBirthday = isUserDocument.data()?["birthday"] as? String else{return false}
+            isUserBirthday = getUserBirthday
+            isUserEmail = Auth.auth().currentUser?.email ?? ""
+            isPropertySet.toggle()
+        } catch{
+            print(error.localizedDescription)
+        }
+        return isPropertySet
+    }
     
     private func updateUserName()->Bool{
         var isUpdateValid: Bool = true
+        let isUser = userHomeView.isUser
         let isUserProfile = isUser?.createProfileChangeRequest()
         isUserProfile?.displayName = isUserName
         isUserProfile?.commitChanges{ error in
@@ -2890,6 +2962,7 @@ struct userProfileView: View{
     
     private func updateUserEmail()->Bool{
         var isUpdateValid: Bool = true
+        let isUser = userHomeView.isUser
         isUser?.sendEmailVerification(beforeUpdatingEmail: isEditString){ error in
             if let updateEmailError = error{
                 isUpdateValid = false
@@ -2904,6 +2977,7 @@ struct userProfileView: View{
     
     private func updateUserPassword()->Bool{
         var isUpdateValid: Bool = true
+        let isUser = userHomeView.isUser
         isUser?.updatePassword(to: isEditString){ error in
             if let updatePasswordError = error{
                 isUpdateValid = false
