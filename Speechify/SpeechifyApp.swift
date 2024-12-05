@@ -1734,7 +1734,6 @@ struct wordSearchView : View{
 }
 
 struct userProfileView: View{
-    let isUser = userHomeView.isUser
     enum editFocus: Hashable{
         case editName
         case editEmail
@@ -1854,7 +1853,7 @@ struct userProfileView: View{
                     HStack{
                         VStack{
                             Text("PASSWORD").font(.title2).frame(maxWidth: .infinity, alignment: .leading).padding(.leading, 10)
-                            Text("\(isUserPassword)").font(.title3).frame(maxWidth: .infinity, alignment: .leading).padding(.leading, 10)
+                            Text(String(repeating: "•", count: isUserPassword.count)).font(.title3).frame(maxWidth: .infinity, alignment: .leading).padding(.leading, 10)
                         }
                         Image(systemName:  "chevron.right").frame(maxWidth: .infinity, alignment: .trailing).padding(.trailing, 5)
                     }.padding(10).onTapGesture{
@@ -2329,9 +2328,30 @@ struct userProfileView: View{
         }
     
     }
+
+    private func initialLoading()async->Bool{
+        var isPropertySet: Bool = false
+        guard let isUserID = userHomeView.isUser?.uid else{return false}
+        do{
+            let isUserDocument = try await Firestore.firestore().collection("users").document(isUserID).getDocument()
+            guard isUserDocument.exists else{return false}
+            guard let getUserName = isUserDocument.data()?["userName"] as? String else{return false}
+            isUserName = getUserName
+            guard let getUserGender = isUserDocument.data()?["gender"] as? String else{return false}
+            isUserGender = getUserGender
+            guard let getUserBirthday = isUserDocument.data()?["birthday"] as? String else{return false}
+            isUserBirthday = getUserBirthday
+            isUserEmail = Auth.auth().currentUser?.email ?? ""
+            isPropertySet.toggle()
+        } catch{
+            print(error.localizedDescription)
+        }
+        return isPropertySet
+    }
     
     private func updateUserName()->Bool{
         var isUpdateValid: Bool = true
+        let isUser = userHomeView.isUser
         let isUserProfile = isUser?.createProfileChangeRequest()
         isUserProfile?.displayName = isUserName
         isUserProfile?.commitChanges{ error in
@@ -2348,6 +2368,7 @@ struct userProfileView: View{
     
     private func updateUserEmail()->Bool{
         var isUpdateValid: Bool = true
+        let isUser = userHomeView.isUser
         isUser?.sendEmailVerification(beforeUpdatingEmail: isEditString){ error in
             if let updateEmailError = error{
                 isUpdateValid = false
@@ -2362,6 +2383,7 @@ struct userProfileView: View{
     
     private func updateUserPassword()->Bool{
         var isUpdateValid: Bool = true
+        let isUser = userHomeView.isUser
         isUser?.updatePassword(to: isEditString){ error in
             if let updatePasswordError = error{
                 isUpdateValid = false
