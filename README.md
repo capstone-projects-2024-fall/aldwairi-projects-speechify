@@ -1,2 +1,0 @@
-# aldwairi-projects-speechify
-Speechify

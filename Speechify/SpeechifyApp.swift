@@ -12,7 +12,7 @@ import FirebaseFirestore
 import AVFoundation
 import Speech
 
-class AppDelegate: NSObject, UIApplicationDelegate{
+class AppDelegate: NSObject, UIApplicationDelegate {
     func application(_ application: UIApplication, didFinishLaunchingWithOptions launchOptions: [UIApplication.LaunchOptionsKey : Any]? = nil) -> Bool{
         FirebaseApp.configure()
         return true
@@ -29,13 +29,14 @@ struct SpeechifyApp: App{
     }
 }
 
-struct contentPageView: View{
+struct contentPageView: View {
+        
     @State var loginNavigate: Bool = false
     @State var signupNavigate: Bool = false
     
-    var body: some View{
-        NavigationStack{
-            VStack{
+    var body: some View {
+        NavigationStack {
+            VStack {
                 Text("Speechify").font(.largeTitle).multilineTextAlignment(.center).padding(10)
                 Text("Login").font(.title).padding(10).foregroundStyle(.blue).background(Color(UIColor.systemGray5)).clipShape(RoundedRectangle(cornerRadius: 5)).onTapGesture{loginNavigate.toggle()}.navigationDestination(isPresented: $loginNavigate){
                     authenticationView().navigationBarBackButtonHidden(true)
@@ -44,6 +45,7 @@ struct contentPageView: View{
                     registrationView().navigationBarBackButtonHidden(true)
                 }
             }
+
         }
     }
 }
@@ -644,7 +646,8 @@ struct initialUserConfigurationView: View{
     }
 }
 
-struct authenticationView: View{
+struct authenticationView: View {
+    
     @State private var isUserEmail: String = ""
     @State private var isUserPassword: String = ""
     @State private var isResetEdit: String = ""
@@ -671,10 +674,14 @@ struct authenticationView: View{
         self.resetEditFocus = false
     }
     
-    var body: some View{
-        NavigationStack{
-            ZStack{
+    var body: some View {
+        
+        NavigationStack {
+                
+            ZStack {
+                
                 VStack{
+                    
                     Text("Login").font(.largeTitle).frame(maxWidth: .infinity, alignment: .center).padding(.top, 10)
                     Text("Email").frame(maxWidth: .infinity, alignment: .leading)
                     HStack{
@@ -847,6 +854,7 @@ struct authenticationView: View{
                 }
             }
         }
+        
     }
     
     private func validateCredentials() async-> Bool{
@@ -890,8 +898,281 @@ class AudioPlayerDelegate: NSObject, AVAudioPlayerDelegate{
         }
     }
 }
+//For managing point system
+class PointsViewModel: ObservableObject{
+    @Published var points: Int = 0
+    @Published var dailyBonusFeedback: String? = nil
+    private var db = Firestore.firestore()
+    private var user: User?
+    
+    init() {
+        self.user = Auth.auth().currentUser
+        if let user = self.user {
+            getPoints(for: user)
+        } else {
+            print("Error: No authenticated user found")
+        }
+    }
+    
+    func getPoints(for user: User){
+        let userRef = db.collection("users").document(user.uid)
+        userRef.getDocument { [weak self] (document, error) in
+            guard let self = self else { return }
+            
+            if let error = error {
+                print("Error fetching document: \(error)")
+                self.setDefaultPoints(for: user)
+                return
+            }
+            if let document = document, document.exists {
+                if let points = document.data()? ["points"] as? Int {
+                    DispatchQueue.main.async{
+                        self.points = points
+                    }
+                }
+                if let lastBonusDate = document.data()?["lastDailyBonusDate"] as? Timestamp{
+                    let lastBonusDateValue = lastBonusDate.dateValue()
+                    if !Calendar.current.isDateInToday(lastBonusDateValue) {
+                        self.giveDailyLoginBonus(user: user)
+                    }
+                }else {
+                    self.giveDailyLoginBonus(user: user)
+                }
+            } else {
+                self.setDefaultPoints(for: user)
+            }
+        }
+    }
+    
+    private func giveDailyLoginBonus(user: User){
+        let dailyBonus = 20
+        let userRef = db.collection("users").document(user.uid)
+       
+        userRef.updateData([
+            "points": FieldValue.increment(Int64(dailyBonus)),
+            "lastDailyBonusDate": Timestamp()
+        ]) { error in
+                    if let error = error {
+                        print("Error updating daily bonus date: \(error)")
+                        return
+                    }
+                    DispatchQueue.main.async {
+                        self.points += dailyBonus
+                        self.dailyBonusFeedback = "Welcome! You got 20 bonus points!"
+                    }
+                    DispatchQueue.main.asyncAfter(deadline: .now() + 3){
+                      self.dailyBonusFeedback = nil
+                    }
+                }
+            }
+            
+    
+    func setDefaultPoints(for user: User){
+        let userRef = db.collection("users").document(user.uid)
+        let initialPoints = 10
+        
+        userRef.setData(["points": initialPoints, "lastDailyBonusDate": Timestamp()], merge: true) { error in
+            if let error = error {
+                print("Error setting default points: \(error)")
+            } else{
+                DispatchQueue.main.async {
+                    self.points = initialPoints
+                    self.dailyBonusFeedback = "Welcome Back! You got 10 bonus points!"
+                }
+                DispatchQueue.main.asyncAfter(deadline: .now() + 3){
+                    self.dailyBonusFeedback = nil
+                }
+            }
+            self.getPoints(for: user)
+        }
+    }
+    
+    func updatePoints(by value: Int){
+        guard let user = user else {return}
+        let userRef = db.collection("users").document(user.uid)
+        
+        userRef.getDocument{ [weak self] (document, error) in
+            guard let self = self else { return }
+            if let error = error {
+                print("Error fetching document: \(error)")
+                return
+            }
+            if document?.exists == false {
+                self.setDefaultPoints(for: user)
+            }
+            
+            userRef.updateData(["points": FieldValue.increment(Int64(value))]) {error in
+                if let error = error {
+                    print("Error updating the points: \(error)")
+                } else {
+                    userRef.getDocument{ [weak self] (document, error) in
+                        guard let self = self else { return }
+                        if let error = error {
+                            print("Error fetching uodated points: \(error)")
+                        } else if let document = document, let updatedPoints = document.data()?["points"] as? Int {
+                            DispatchQueue.main.async{
+                                self.points = updatedPoints
+                            }
+                        }
+                    }
+                }
+            }
+        }
+    }
+}
 
-struct userHomeView: View{
+
+
+struct topAndBottomView: View{
+    @State private var isErrorOccurrence:Bool = false
+    @State private var isSearchNavigation:Bool = false
+    @State private var viewSettings:Bool = false
+    @State private var isThemeNavigation:Bool = false
+    @State private var isProfileNavigation:Bool = false
+    @State private var isStoreNavigation:Bool = false
+    @State private var isFavouritesNavigation:Bool = false
+    @State private var isSettingNavigation:Bool = false
+    @State private var signOutNavigation:Bool = false
+    @State private var isWordInputNavigation:Bool = false
+    @State private var isTaskNavigation:Bool = false
+    @State private var isHomeView:Bool = false
+    
+    var body: some View{
+        NavigationStack{
+            ZStack{
+                VStack{
+                    HStack{
+                        HStack{
+                            HStack{
+                                Image(systemName:"magnifyingglass").resizable().scaledToFit().frame(width: 50, height: 50)
+                            }.padding(.trailing, 10).onTapGesture{isSearchNavigation.toggle()}.navigationDestination(isPresented: $isSearchNavigation){wordSearchView().navigationBarBackButtonHidden(true)}
+                            HStack{
+                                Image(systemName:"person.circle.fill").resizable().scaledToFit().frame(width: 50, height: 50)
+                            }.padding(.trailing, 10).onTapGesture{viewSettings.toggle()}
+                        }.frame(maxWidth: .infinity, alignment: .trailing)
+                    }.frame(maxHeight: .infinity, alignment:.top).padding(.top, 10)
+                    
+                }
+                HStack{
+                    HStack{
+                        Image(systemName:"house.fill").resizable().scaledToFit().frame(width: 50, height: 50)
+                    }.padding(.horizontal, 10).onTapGesture{isHomeView.toggle()}.navigationDestination(isPresented: $isHomeView){userHomeView().navigationBarBackButtonHidden(true)}
+                    HStack{
+                        Image(systemName:"star.fill").resizable().scaledToFit().frame(width: 50, height: 50)
+                    }.padding(.horizontal, 10).onTapGesture{isFavouritesNavigation.toggle()}.navigationDestination(isPresented: $isFavouritesNavigation){userFavouriteCardsView().navigationBarBackButtonHidden(true)}
+                    HStack{
+                        Image(systemName:"plus.square.fill").resizable().scaledToFit().frame(width: 50, height: 50)
+                    }.padding(.horizontal, 10).onTapGesture{isWordInputNavigation.toggle()}.navigationDestination(isPresented: $isWordInputNavigation){addDeckView().navigationBarBackButtonHidden(true)}
+                    HStack{
+                        Image(systemName:"cart.fill").resizable().scaledToFit().frame(width: 50, height: 50)
+                    }.padding(.horizontal, 10).onTapGesture{isStoreNavigation.toggle()}.navigationDestination(isPresented: $isStoreNavigation){userStoreView().navigationBarBackButtonHidden(true)}
+                    HStack{
+                        Image(systemName:"sparkles").resizable().scaledToFit().frame(width: 50, height: 50)
+                    }.padding(.horizontal, 10).onTapGesture{isTaskNavigation.toggle()}.navigationDestination(isPresented: $isTaskNavigation){userTaskView().navigationBarBackButtonHidden(true)}
+                }.frame(maxHeight: .infinity, alignment: .bottom).padding(.bottom, 10)
+            .overlay{
+                    if viewSettings{
+                        VStack{
+                            HStack{
+                                Image(systemName:"person.circle.fill").resizable().scaledToFit().frame(width: 25, height: 25)
+                                Text("Profile").font(.title2)
+                            }.onTapGesture{isProfileNavigation.toggle()}.navigationDestination(isPresented: $isProfileNavigation){userProfileView().navigationBarBackButtonHidden(true)}
+                            HStack{
+                                Image(systemName: "cart.fill").resizable().scaledToFit().frame(width: 25, height: 25)
+                                Text("Store").font(.title2)
+                            }.onTapGesture{isStoreNavigation.toggle()}.navigationDestination(isPresented: $isStoreNavigation){userStoreView().navigationBarBackButtonHidden(true)}
+                            HStack{
+                                Image(systemName:"star.fill").resizable().scaledToFit().frame(width: 25, height: 25)
+                                Text("Favourites").font(.title2)
+                            }.onTapGesture{isFavouritesNavigation.toggle()}.navigationDestination(isPresented: $isFavouritesNavigation){userFavouriteCardsView().navigationBarBackButtonHidden(true)}
+                            HStack{
+                                Image(systemName: "gear").resizable().scaledToFit().frame(width: 25, height: 25)
+                                Text("Setting").font(.title2)
+                            }.onTapGesture{isSettingNavigation.toggle()}.navigationDestination(isPresented: $isSettingNavigation){userSettingView().navigationBarBackButtonHidden(true)}
+                            HStack{
+                                Image(systemName:"rectangle.portrait.and.arrow.right").resizable().scaledToFit().frame(width: 25, height: 25)
+                                Text("Sign Out").font(.title2)
+                            }.onTapGesture{signOutNavigation = userSignOut()}
+                        }.padding(10).background(Color(UIColor.systemGray4)).clipShape(RoundedRectangle(cornerRadius: 5)).frame(maxWidth: .infinity, alignment: .trailing).padding(.trailing, 5).offset(y: -215)
+                    }
+                }
+            }
+               
+        }
+    }
+    private func userSignOut()->Bool{
+        var isSignOutValid: Bool = true
+        do{
+            try Auth.auth().signOut()
+        } catch{
+            isSignOutValid = false
+            print(error.localizedDescription)
+        }
+        return isSignOutValid
+    }
+    
+}
+
+struct userHomeView: View {
+    
+    @StateObject private var deckModel = deckViewModel()
+    static let isUser = Auth.auth().currentUser
+    
+    var body:some View{
+        ZStack{
+            VStack{
+                Spacer(minLength:50)
+                NavigationView {
+                    ScrollView {
+                        VStack(alignment: .leading, spacing: 15) {
+                            NavigationLink( destination: cardHomeView()) {
+                                Text("Start Practicing")
+                                    .frame(width: 375, height: 100)
+                                    .foregroundColor(.black)
+                                    .background(Color(UIColor.systemGray5))
+                                    .cornerRadius(10)
+                                    .font(.headline)
+                            }
+                            // Favorites Deck Navigation
+                            if let favoritesDeck = deckModel.decks.first(where: { $0.title == "Favorites" }) {
+                                NavigationLink(destination: cardHomeView(words: favoritesDeck.words)) {
+                                    Text("Favorites")
+                                        .font(.headline)
+                                        .padding()
+                                        .frame(maxWidth: .infinity, alignment: .leading)
+                                        .background(Color(UIColor.systemGray5))
+                                        .cornerRadius(8)
+                                        .foregroundColor(.black)
+                                }
+                            }
+                            
+                            ForEach(deckModel.decks.filter { $0.title != "Favorites" }, id: \.id) { deck in
+                                NavigationLink(destination: cardHomeView(words: deckModel.getWords(title: deck.title))) {
+                                    Text(deck.title)
+                                        .font(.headline)
+                                        .padding()
+                                        .frame(maxWidth: .infinity, alignment: .leading) // Align to the left
+                                        .background(Color(UIColor.systemGray5))
+                                        .cornerRadius(8)
+                                        .foregroundColor(.black)
+                                }
+                            }
+                        }
+                        .padding()
+                    }
+                }.onAppear {
+                    Task {
+                        await deckModel.readDecks() // Fetch the decks when the view appears
+                        deckModel.decks = deckModel.decks.sorted { $0.title < $1.title } // sort decks alphabetically
+                    }
+                }
+            }
+            topAndBottomView()
+        }
+    }
+}
+
+struct cardHomeView: View {
     @State private var isInitialLoad:Bool = true
     static let isUser = Auth.auth().currentUser
     @State private var isErrorOccurrence:Bool = false
@@ -945,8 +1226,25 @@ struct userHomeView: View{
     @State private var signOutNavigation:Bool = false
     @State private var isWordInputNavigation:Bool = false
     @State private var isTaskNavigation:Bool = false
+    @State private var userPhoneme: String = ""
+    @State private var isScoring = false
+    @State private var pronunciationScore: Double? = nil
     
-    init(){
+    // SpeechAce service
+    private let speechAceService = NetworkService(apiKey: "9Tj%2Fgrnan4OBTpnMQzKHP5cQTTo35Dbo3VF3emMavxX8QfC6B%2FqxZ6TsD7bvZSzAfTJ7n8DLN6NeXMF4A8boaH9L5IdtqfwDbTcMN%2F%2Fp7PNMXTbUN1QvM5Ey9p6p7mgf")
+    
+    @State private var isVoiceSelectionNavigation: Bool = false
+    @State private var selectedVoiceIdentifier: String = "en-US" // Default voice
+    @State private var availableVoices: [AVSpeechSynthesisVoice] = AVSpeechSynthesisVoice.speechVoices()
+
+
+
+    let words : [Int]?
+    @State private var index: Int = 1
+    @StateObject var pointsViewModel = PointsViewModel()
+
+    init(words: [Int] = []){ //words defaults to empty if no parameter is passed
+        self.words = words
         guard userHomeView.isUser != nil else{
             isErrorOccurrence.toggle()
             return
@@ -957,6 +1255,17 @@ struct userHomeView: View{
         NavigationStack{
             ZStack{
                 VStack{
+                    if let feedback = pointsViewModel.dailyBonusFeedback{
+                        Text(feedback)
+                            .font(.headline)
+                            .foregroundColor(.white)
+                            .padding()
+                            .background(Color.black.opacity(0.7))
+                            .cornerRadius(10)
+                            .transition(.slide)
+                            .animation(.easeInOut(duration: 0.5), value: pointsViewModel.dailyBonusFeedback)
+                            .padding(.top, 20)
+                    }
                     HStack{
                         HStack{
                             HStack{
@@ -966,6 +1275,32 @@ struct userHomeView: View{
                                 Image(systemName:"globe").resizable().scaledToFit().frame(width: 50, height: 50)
                             }.padding(.leading, 10).onTapGesture{viewLearnLanguageSelection.toggle()}
                         }.frame(maxWidth: .infinity, alignment: .leading)
+
+                            /*Image(systemName:"square.grid.2x2.fill").resizable().scaledToFit().frame(width: 50, height: 50) */
+                            Text("Points: \(pointsViewModel.points)")
+                                .font(.title)
+                                .frame(maxWidth: .infinity, alignment: .leading)
+                                .padding(.leading, 10)
+                        }/*.frame(maxWidth: .infinity, alignment: .leading).padding(.leading, 10).onTapGesture{isThemeNavigation.toggle()}.navigationDestination(isPresented: $isThemeNavigation){languageThemeView().navigationBarBackButtonHidden(true)} */
+                        Menu {
+                            ForEach(availableVoices.filter { $0.language == "en-US" }, id: \.identifier) { voice in
+                                Button(action: {
+                                    selectedVoiceIdentifier = voice.identifier
+                                    print("Selected voice: \(voice.language) - \(voice.name)")
+                                }) {
+                                    Text("\(voice.name)")
+                                }
+                            }
+                        } label: {
+                            Text("Voices")
+                                .font(.headline)
+                                .padding(.horizontal, 10)
+                                .frame(height: 40)
+                                .background(Color.black)
+                                .foregroundColor(.white)
+                                .cornerRadius(8)
+                        }
+>
                         HStack{
                             HStack{
                                 Image(systemName:"magnifyingglass").resizable().scaledToFit().frame(width: 50, height: 50)
@@ -983,13 +1318,27 @@ struct userHomeView: View{
                                         _ = Task{ _ = await isWordFavourite()}
                                     }
                                 }
+                                
                             }.frame(maxWidth: .infinity, alignment: .trailing).padding(.trailing, 5)
                         }.frame(maxHeight: .infinity, alignment: .top)
                         Text(isCardWord ? "\(isWord)" : "\(isPhonetic)").rotation3DEffect(.degrees(isCardWord ? 0 : 180), axis: (x: 0, y: 1, z: 0))
+                        // Display pronunciation score or loading indicator
+                        if isScoring && isCardWord {
+                            ProgressView()
+                                .progressViewStyle(CircularProgressViewStyle())
+                                .padding()
+                        } else if let score = pronunciationScore, isCardWord {
+                            Text("Pronunciation Accuracy: \(Int(score))%")
+                                .foregroundColor(getScoreColor(score))
+                                .padding()
+                        }
                         VStack{
                             HStack{
                                 if isCardWord{
                                     Image(systemName: "speaker.wave.3.fill").resizable().scaledToFit().frame(width: 25, height: 25).padding(.bottom, 5)
+                                        .onTapGesture {
+                                            _ = textToSpeech()
+                                        }
                                 }
                             }.frame(maxWidth: .infinity, alignment: .trailing).padding(.trailing, 5)
                         }.frame(maxHeight: .infinity, alignment: .bottom)
@@ -1000,6 +1349,7 @@ struct userHomeView: View{
                         HStack{
                             Image(systemName: "arrowshape.left.fill").resizable().scaledToFit().frame(width: 50, height: 50)
                         }.frame(maxWidth: .infinity, alignment: .leading).padding(.leading, 10).onTapGesture{
+                            pronunciationScore = nil
                             _ = Task{_ = await navigateWordSelection(navigationChoice: "preceding")}
                         }
                         HStack{
@@ -1020,6 +1370,9 @@ struct userHomeView: View{
                             if isAudioRecording{
                                 isAudioRecorder?.stop()
                                 isAudioRecording.toggle()
+                                if let hasAudioURL = isAudioURL {
+                                    scorePronunciation(audioFileURL: hasAudioURL)
+                                }
                                 var isTranslation = speechToText()
                             } else{
                                 _ = Task{hasRecorderError = await getUserRecording()}
@@ -1028,11 +1381,14 @@ struct userHomeView: View{
                         HStack{
                             Image(systemName: "arrowshape.right.fill").resizable().scaledToFit().frame(width: 50, height: 50)
                         }.frame(maxWidth: .infinity, alignment: .trailing).padding(.trailing, 10).onTapGesture{
+                            pronunciationScore = nil
                             _ = Task{_ = await navigateWordSelection(navigationChoice: "proceeding")}
+                            pointsViewModel.updatePoints(by: 1)
                         }
                     }.padding(.vertical, 10)
                     VStack{
                         Text("Transcribed Audio: \(isAudioText)")
+                        Text("Phenome: \(userPhoneme)")
                     }.frame(width: 375, height: 275).background(Color(UIColor.systemGray5)).clipShape(RoundedRectangle(cornerRadius: 5)).padding(.vertical, 10)
                     HStack{
                         HStack{
@@ -1105,13 +1461,47 @@ struct userHomeView: View{
                         HStack{
                             Image(systemName:"rectangle.portrait.and.arrow.right").resizable().scaledToFit().frame(width: 25, height: 25)
                             Text("Sign Out").font(.title2)
-                        }.onTapGesture{signOutNavigation = userSignOut()}
+                        }
+                        .onTapGesture {
+                         signOutNavigation = userSignOut()
+                        }
                     }.padding(10).background(Color(UIColor.systemGray4)).clipShape(RoundedRectangle(cornerRadius: 5)).frame(maxWidth: .infinity, alignment: .trailing).padding(.trailing, 5).offset(y: -215)
                 }
             }
         }
     }
     
+    private func scorePronunciation(audioFileURL: URL) {
+        guard let hasAudioURL = isAudioURL else { return }
+        speechAceService.scorePronunciation(word: isWord, audioFileURL: hasAudioURL) { result in
+            DispatchQueue.main.async {
+                isScoring = false
+                switch result {
+                case .success(let score):
+                    self.pronunciationScore = score
+                case .failure(let error):
+                    print("Pronunciation scoring error: \(error.localizedDescription)")
+                    // Optionally, you could show an error message to the user
+                }
+            }
+        }
+    }
+    
+    // Helper function to color code the score
+    private func getScoreColor(_ score: Double) -> Color {
+        switch score {
+        case 0..<50:
+            return .red
+        case 50..<75:
+            return .orange
+        case 75...100:
+            return .green
+        default:
+            return .gray
+        }
+    }
+    
+
     private func initialLoading()async throws->Bool{
         var isPropertySet: Bool = false
         guard let isUserID = userHomeView.isUser?.uid else{return false}
@@ -1123,7 +1513,15 @@ struct userHomeView: View{
             //guard let getWordLanguage = getLearnLanguageField.randomElement() else{return false}
             isWordLanguage = isLearnLanguages[0]
             let isEntriesCount = 39849 + 1 // get actual size
-            let isRandomID = Int.random(in: 0...isEntriesCount)
+
+            var isRandomID = Int.random(in: 0...isEntriesCount)
+            
+            //If a user is opening their personal deck, then words will be an array containg wordIDs to the words in their deck
+            //In this case, randomID must be a number in the array words
+            if(!words!.isEmpty){
+                isRandomID = words![0]
+            }
+            
             let isRandomEntry = try await Firestore.firestore().collection(isWordLanguage).document(String(isRandomID)).getDocument()
             guard isRandomEntry.exists else{return false}
             isLanguageEntryID = isRandomID
@@ -1195,6 +1593,7 @@ struct userHomeView: View{
                     try await Firestore.firestore().collection("users").document(isUserID).setData(["favouriteWords": isUserWord], merge: true)
                 }
             } else{
+                
                 let isUserWord: [String:[Int]] = [isWordLanguage : [isLanguageEntryID]]
                 try await Firestore.firestore().collection("users").document(isUserID).setData(["favouriteWords": isUserWord], merge: true)
             }
@@ -1352,8 +1751,10 @@ struct userHomeView: View{
             } catch{
                 print(error.localizedDescription)
             }
-        } else if navigationChoice == "proceeding"{
+
+        }else if navigationChoice == "proceeding"  {
             if indexingPreviousWords.isCurrent{
+
                 let isPreviousCount = isPreviousWords.values.reduce(0){$0 + $1.count}
                 if isPreviousCount == 10{
                     guard let firstEntry = isPreviousWords.keys.first else{return false}
@@ -1367,11 +1768,27 @@ struct userHomeView: View{
                 } else{
                     isPreviousWords[isWordLanguage] = [isLanguageEntryID]
                 }
-                do{
+
+                 
+                scope: do{
                     guard let getLanguage = isLearnLanguages.randomElement() else{return false}
                     isWordLanguage = getLanguage
                     let isEntriesCount = 39849 + 1
-                    let isRandomID = Int.random(in: 0...isEntriesCount)
+                    var isRandomID = Int.random(in: 0...isEntriesCount)
+                    
+                    //If a user is opening their personal deck, then words will be an array containg wordIDs to the words in their deck
+                    //In this case, randomID must be in the bounds of the array words
+                    if(!words!.isEmpty){
+                        if(words!.count > index){
+                            isRandomID = words![index]
+                            index = index + 1
+                            //print("within navigatWord: this word is \(isRandomID)")
+                        } else{
+                            break scope
+                        }
+                    }
+                    
+
                     let isRandomEntry = try await Firestore.firestore().collection(isWordLanguage).document(String(isRandomID)).getDocument()
                     guard isRandomEntry.exists else{return false}
                     isLanguageEntryID = isRandomID
@@ -1382,9 +1799,12 @@ struct userHomeView: View{
                     //guard let getPronunciationField = isRandomEntry.data()?["isPronunciation"] as? String else{return false}
                     //isPronunciation = getPronunciationField
                     hasNavigated.toggle()
+
+                    
                 } catch{
                     print(error.localizedDescription)
                 }
+
                 guard let isUserID = userHomeView.isUser?.uid else{return false}
                 do{
                     let isUserDocument = try await Firestore.firestore().collection("users").document(isUserID).getDocument()
@@ -1396,6 +1816,7 @@ struct userHomeView: View{
                 } catch{
                     print(error.localizedDescription)
                 }
+
             } else{
                 var getCurrentWord: Bool = false
                 indexingPreviousWords.isIndex += (indexingPreviousWords.isIndex == -1) ? 2 : (indexingPreviousWords.isIndex < isPreviousWords[indexingPreviousWords.isLanguage]?.count ?? -1) ? 1 : 0
@@ -1445,23 +1866,35 @@ struct userHomeView: View{
     
     private func accessAudioFile(){}
     
-    private func textToSpeech()->Bool{ // Allow user to change male or female voice
-        var isTextSynthesized: Bool = false
-        let isSpeechUtterance = AVSpeechUtterance(string: isWord)
-        for isVoice in AVSpeechSynthesisVoice.speechVoices(){
-            if !speechSynthesizerLanguages.contains(isVoice.language){
-                speechSynthesizerLanguages.append(isVoice.language)
-            }
+    private func textToSpeech() -> Bool {
+        guard !isWord.isEmpty else {
+            print("No word to synthesize.")
+            return false
         }
-        if !speechSynthesizerLanguages.contains(isWordLanguage){return false}
-        isSpeechUtterance.voice = AVSpeechSynthesisVoice(language: isWordLanguage)
-        isSpeechUtterance.rate = 0.5 // Add a function for user to modify
-        isSpeechUtterance.pitchMultiplier = 1.0 // Add function for user to modify
+
+        let speechUtterance = AVSpeechUtterance(string: isWord)
+
+        // Find the selected voice from the available voices
+        if let selectedVoice = availableVoices.first(where: { $0.identifier == selectedVoiceIdentifier }) {
+            speechUtterance.voice = selectedVoice
+        } else {
+            print("Selected voice not found. Using default voice.")
+            speechUtterance.voice = AVSpeechSynthesisVoice(language: "en-US")
+        }
+
+        // Configure utterance properties
+        speechUtterance.rate = 0.5
+        speechUtterance.pitchMultiplier = 1.0
+
         isSpeechSynthesizer = AVSpeechSynthesizer()
-        isSpeechSynthesizer?.speak(isSpeechUtterance)
-        isTextSynthesized.toggle()
-        return isTextSynthesized
+        isSpeechSynthesizer?.speak(speechUtterance)
+
+        print("Speaking the word: \(isWord) with voice: \(speechUtterance.voice?.name ?? "Unknown")")
+        return true
     }
+
+
+
     
     private func endTextToSpeech(){
         //if isSpeechSynthesizer?.isSpeaking{
@@ -1495,7 +1928,77 @@ struct userHomeView: View{
         return isPlayerValid
     }
     
-    private func getUserRecording() async->Bool{
+    private func getUserRecording() async -> Bool {
+        do {
+            // Request microphone permission
+            let microphonePermission = await AVAudioApplication.requestRecordPermission()
+            guard microphonePermission else {
+                print("Microphone access denied")
+                return false
+            }
+            
+            // Request speech recognizer authorization
+            let speechAuthStatus = await withCheckedContinuation { continuation in
+                SFSpeechRecognizer.requestAuthorization { status in
+                    continuation.resume(returning: status)
+                }
+            }
+            
+            guard speechAuthStatus == .authorized else {
+                print("Speech recognizer access denied")
+                return false
+            }
+            
+            // Configure audio session
+            let audioSession = AVAudioSession.sharedInstance()
+            try audioSession.setCategory(.playAndRecord, mode: .default)
+            try audioSession.setActive(true)
+            
+            // Prepare recording URL
+            let documentsPath = FileManager.default.urls(for: .documentDirectory, in: .userDomainMask)[0]
+            let audioURL = documentsPath.appendingPathComponent("userRecording.m4a")
+            
+            // Configure recorder settings
+            let recorderSettings: [String: Any] = [
+                AVFormatIDKey: Int(kAudioFormatMPEG4AAC),
+                AVSampleRateKey: 44100,
+                AVNumberOfChannelsKey: 1,
+                AVEncoderAudioQualityKey: AVAudioQuality.high.rawValue
+            ]
+            
+            // Create and start audio recorder
+            let audioRecorder = try AVAudioRecorder(url: audioURL, settings: recorderSettings)
+            audioRecorder.record()
+            
+            // Update state
+            hasMicrophoneAccess = true
+            hasSpeechRecognizerAccess = true
+            isAudioRecording = true
+            isAudioURL = audioURL
+            isAudioRecorder = audioRecorder
+            
+            return true
+            
+        } catch {
+            // Handle any errors during setup
+            print("Audio Recording Setup Error: \(error.localizedDescription)")
+            stopRecording()
+            return false
+        }
+    }
+
+    // Helper method to stop recording and reset state
+    private func stopRecording() {
+        isAudioRecorder?.stop()
+        isAudioRecording = false
+        hasMicrophoneAccess = false
+        hasSpeechRecognizerAccess = false
+        isAudioRecorder = nil
+        isAudioURL = nil
+    }
+    
+    /*
+    private func getUserRecording() async-> Bool {
         var isRecordingValid: Bool = false
         if await AVAudioApplication.requestRecordPermission(){
             hasMicrophoneAccess.toggle()
@@ -1514,22 +2017,30 @@ struct userHomeView: View{
             isAudioURL = pathURL.appendingPathComponent("userRecording.m4a")
             let recorderSetting = [AVFormatIDKey: Int(kAudioFormatMPEG4AAC), AVSampleRateKey: 44100, AVNumberOfChannelsKey: 1, AVEncoderAudioQualityKey: AVAudioQuality.high.rawValue]
             guard let hasAudioURL = isAudioURL else {return false}
+            
             isAudioRecorder = try AVAudioRecorder(url: hasAudioURL, settings: recorderSetting)
             isAudioRecorder?.record()
-            isRecordingValid.toggle()
-            isAudioRecording.toggle()
+            isRecordingValid = true
+            ///*isRecordingValid.toggle(*/)
+            isAudioRecording = true
+            
+//            isAudioRecording.toggle()
         } catch{
+            isAudioRecorder?.stop()
+            isRecordingValid = false
+            isAudioRecording = false
             print("Audio Recording Error \(error.localizedDescription)")
         }
         return isRecordingValid
-    }
+    }*/
     
     private func stopPlayerOrRecorder()->Bool{
         var isStopValid = false
         return isStopValid
     }
     
-    private func speechToText()->Bool{ // Given an audio url it will convert it to text
+    private func speechToText() -> Bool { // Given an audio url it will convert it to text
+        
         var isSpeechTranscriptionValid: Bool = false
         guard let isSpeechRecognizer = hasSpeechRecognizer else {return false}
         if !isSpeechRecognizer.isAvailable{
@@ -1544,20 +2055,55 @@ struct userHomeView: View{
             }
             guard let hasResult = result else {return}
             isAudioText = hasResult.bestTranscription.formattedString
+            getuserPhoneme(word: isAudioText)
+            
+            
             isSpeechTranscriptionValid.toggle()
         }
         return isSpeechTranscriptionValid
     }
+    private func getuserPhoneme(word: String){
+        var searchedWord = word.lowercased()
+       
+        let db = Firestore.firestore()
+        
+        print("lets see \(searchedWord)1")
+        db.collection("eng_US") //make this for all languages
+            .whereField("isWord", isEqualTo: searchedWord).limit(to:50)
+            .getDocuments(source: .server) { (snapshot, error) in
+                if let error = error {
+                    print("Error searching decks: \(error)")
+                    return
+                }else{
+                    let document = snapshot?.documents.first
+                    if(document?.documentID == nil){
+                        print("word not found")
+                        print("Error searching decks in getPhenome: \(String(describing: error))")
+                    }else{
+                            userPhoneme = document?.get("isPhonetic") as? String ?? "notFound"
+                        
+                    }
+                }
+            }
+ 
+    }
     
-    private func isRealTimeSpeechToText()->Bool{ // Not smart and outright bad to pause audio intake for this function
+    
+    private func isRealTimeSpeechToText() -> Bool { // Not smart and outright bad to pause audio intake for this function
+        
         var isLiveTranslation: Bool = false
-        SFSpeechRecognizer.requestAuthorization{ authStatus in
-            if authStatus == .authorized{hasSpeechRecognizerAccess = true}
+        
+        SFSpeechRecognizer.requestAuthorization { authStatus in
+            if authStatus == .authorized {hasSpeechRecognizerAccess = true}
         }
+        
         if !hasSpeechRecognizerAccess {return false}
+        
         isAudioSession = AVAudioSession.sharedInstance()
-        guard let hasAudioSession = isAudioSession else{return false}
-        do{
+        
+        guard let hasAudioSession = isAudioSession else {return false}
+        
+        do {
             try hasAudioSession.setCategory(.record, mode: .measurement, options: .duckOthers)
             try hasAudioSession.setActive(true, options: .notifyOthersOnDeactivation)
             let isInputNode = isAudioEngine.inputNode
@@ -1578,7 +2124,7 @@ struct userHomeView: View{
             isAudioEngine.prepare()
             try isAudioEngine.start()
             isLiveTranslation.toggle()
-        } catch{
+        } catch {
             print("Audio Recording Error \(error.localizedDescription)")
         }
         return isLiveTranslation
@@ -2463,6 +3009,10 @@ struct userStoreView: View{
     @State private var isStoreNavigation: Bool = false
     @State private var isTaskNavigation: Bool = false
     
+    @State private var showLanguageTheme = false
+    
+   // @ObservedObject var pointsViewModel: PointsViewModel
+    
     var body: some View{
         NavigationStack{
             VStack{
@@ -2657,7 +3207,9 @@ struct isFavouriteCardView: View{ // Add a little section at the bottom that sho
                 }.padding(.horizontal, 10).onTapGesture{isFavouritesNavigation.toggle()}.navigationDestination(isPresented: $isFavouritesNavigation){userFavouriteCardsView().navigationBarBackButtonHidden(true)}
                 HStack{
                     Image(systemName:"plus.square.fill").resizable().scaledToFit().frame(width: 50, height: 50)
-                }.padding(.horizontal, 10).onTapGesture{isWordInputNavigation.toggle()}.navigationDestination(isPresented: $isWordInputNavigation){/*languageThemeView().navigationBarBackButtonHidden(true)*/} // Dont forget to change word redirection to new word input page
+
+                }.padding(.horizontal, 10).onTapGesture{isWordInputNavigation.toggle()}.navigationDestination(isPresented: $isWordInputNavigation){addDeckView().navigationBarBackButtonHidden(true)}
+
                 HStack{
                     Image(systemName:"cart.fill").resizable().scaledToFit().frame(width: 50, height: 50)
                 }.padding(.horizontal, 10).onTapGesture{isStoreNavigation.toggle()}.navigationDestination(isPresented: $isStoreNavigation){userStoreView().navigationBarBackButtonHidden(true)}
