@@ -1035,7 +1035,7 @@ class PointsViewModel: ObservableObject{
     }
     
     private func giveDailyLoginBonus(user: User){
-        let dailyBonus = 20
+        let dailyBonus = 10
         let userRef = db.collection("users").document(user.uid)
        
         userRef.updateData([
@@ -1048,7 +1048,7 @@ class PointsViewModel: ObservableObject{
                     }
                     DispatchQueue.main.async {
                         self.points += dailyBonus
-                        self.dailyBonusFeedback = "Welcome! You got 20 bonus points!"
+                        self.dailyBonusFeedback = "Welcome! You got 10 bonus points!"
                     }
                     DispatchQueue.main.asyncAfter(deadline: .now() + 3){
                       self.dailyBonusFeedback = nil
@@ -1067,7 +1067,7 @@ class PointsViewModel: ObservableObject{
             } else{
                 DispatchQueue.main.async {
                     self.points = initialPoints
-                    self.dailyBonusFeedback = "Welcome Back! You got 10 bonus points!"
+                    self.dailyBonusFeedback = "Welcome! You got 10 bonus points!"
                 }
                 DispatchQueue.main.asyncAfter(deadline: .now() + 3){
                     self.dailyBonusFeedback = nil
@@ -1368,12 +1368,14 @@ struct cardHomeView: View {
                                 Image(systemName:"globe").resizable().scaledToFit().frame(width: 50, height: 50)
                             }.padding(.leading, 10).onTapGesture{viewLearnLanguageSelection.toggle()}
                         }.frame(maxWidth: .infinity, alignment: .leading)
-
+                        Spacer()
                             /*Image(systemName:"square.grid.2x2.fill").resizable().scaledToFit().frame(width: 50, height: 50) */
                             Text("Points: \(pointsViewModel.points)")
                                 .font(.title)
-                                .frame(maxWidth: .infinity, alignment: .leading)
-                                .padding(.leading, 10)
+                                .frame(maxWidth: .infinity, alignment: .center)
+                                .padding(.top, 20)
+                        Spacer()
+                            .frame(width: 50)
                         //}/*.frame(maxWidth: .infinity, alignment: .leading).padding(.leading, 10).onTapGesture{isThemeNavigation.toggle()}.navigationDestination(isPresented: $isThemeNavigation){languageThemeView().navigationBarBackButtonHidden(true)} */
                         Menu {
                             ForEach(availableVoices.filter { $0.language == "en-US" }, id: \.identifier) { voice in
@@ -1393,6 +1395,7 @@ struct cardHomeView: View {
                                 .foregroundColor(.white)
                                 .cornerRadius(8)
                         }
+                        .padding(.trailing, 10)
                         /*
                         HStack{
                             /*
@@ -1405,7 +1408,6 @@ struct cardHomeView: View {
                              */
                         }.frame(maxWidth: .infinity, alignment: .trailing)
                          */
-                        
                     }.frame(maxHeight: .infinity, alignment:.top).padding(.top, 10)
                     VStack{
                         VStack{
