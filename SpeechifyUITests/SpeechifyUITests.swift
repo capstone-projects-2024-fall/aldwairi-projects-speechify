@@ -44,6 +44,20 @@ final class SpeechifyUITests: XCTestCase {
         XCTAssertTrue(isAuthenticationViewTitle.exists, "Navigation Should Redirect From Content View To Authentication View")
     }
 
+    func testContentViewSignUpNavigation() throws{
+        let isApp = XCUIApplication()
+        isApp.launch()
+        let isViewTitle = isApp.staticTexts["ContentView_Title"]
+        XCTAssertTrue(isViewTitle.exists, "Content View Should Contain A Title Text")
+        XCTAssertEqual(isViewTitle.label, "Speechify", "Title Text Should Display 'Speechify'")
+        let isSignUpButton = isApp.staticTexts["SignUp_Navigation"]
+        XCTAssertTrue(isSignUpButton.exists, "Content View Should Contain A Sign-Up Text Button")
+        XCTAssertEqual(isSignUpButton.label, "Sign-Up", "Text Button Should Display 'Sign-Up'")
+        isSignUpButton.tap()
+        let isRegistrationViewTitle = isApp.staticTexts["RegistrationView_Title"]
+        XCTAssertTrue(isRegistrationViewTitle.exists, "Navigation Should Redirect From Content View To Registration View")
+    }
+
     func testLaunchPerformance() throws {
         if #available(macOS 10.15, iOS 13.0, tvOS 13.0, watchOS 7.0, *) {
             // This measures how long it takes to launch your application.
