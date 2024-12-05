@@ -3,12 +3,12 @@
 	archiveVersion = 1;
 	classes = {
 	};
-	objectVersion = 56;
+	objectVersion = 70;
 	objects = {
 
 /* Begin PBXBuildFile section */
-
 		229932422CFD05A600FEAF48 /* deckView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 229932412CFD05A300FEAF48 /* deckView.swift */; };
+		6C0610802D015C92003EB4CA /* GoogleService-Info.plist in Resources */ = {isa = PBXBuildFile; fileRef = 6C06107F2D015C92003EB4CA /* GoogleService-Info.plist */; };
 		BE7B010F2CDEED940050F456 /* SpeechifyApp.swift in Sources */ = {isa = PBXBuildFile; fileRef = BE7B010E2CDEED940050F456 /* SpeechifyApp.swift */; };
 		BE7B01132CDEED950050F456 /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = BE7B01122CDEED950050F456 /* Assets.xcassets */; };
 		BE7B01162CDEED950050F456 /* Preview Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = BE7B01152CDEED950050F456 /* Preview Assets.xcassets */; };
@@ -20,11 +20,6 @@
 		BE7B013E2CDEEE670050F456 /* FirebaseDatabase in Frameworks */ = {isa = PBXBuildFile; productRef = BE7B013D2CDEEE670050F456 /* FirebaseDatabase */; };
 		BE7B01402CDEEE670050F456 /* FirebaseFirestore in Frameworks */ = {isa = PBXBuildFile; productRef = BE7B013F2CDEEE670050F456 /* FirebaseFirestore */; };
 		BE7B01422CDEEE670050F456 /* FirebaseFunctions in Frameworks */ = {isa = PBXBuildFile; productRef = BE7B01412CDEEE670050F456 /* FirebaseFunctions */; };
-
-		BE7B01442CDEF5F70050F456 /* GoogleService-Info.plist in Resources */ = {isa = PBXBuildFile; fileRef = BE7B01432CDEF5F70050F456 /* GoogleService-Info.plist */; };
-		BE7B01452CDEF5F70050F456 /* GoogleService-Info.plist in Resources */ = {isa = PBXBuildFile; fileRef = BE7B01432CDEF5F70050F456 /* GoogleService-Info.plist */; };
-		BE7B01462CDEF5F70050F456 /* GoogleService-Info.plist in Resources */ = {isa = PBXBuildFile; fileRef = BE7B01432CDEF5F70050F456 /* GoogleService-Info.plist */; };
-
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -45,9 +40,9 @@
 /* End PBXContainerItemProxy section */
 
 /* Begin PBXFileReference section */
-	229932402CFD04D100FEAF48 /* deck.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = deck.swift; sourceTree = "<group>"; };
+		229932402CFD04D100FEAF48 /* deck.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = deck.swift; sourceTree = "<group>"; };
 		229932412CFD05A300FEAF48 /* deckView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = deckView.swift; sourceTree = "<group>"; };
-
+		6C06107F2D015C92003EB4CA /* GoogleService-Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = "GoogleService-Info.plist"; sourceTree = "<group>"; };
 		BE7B010B2CDEED940050F456 /* Speechify.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = Speechify.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		BE7B010E2CDEED940050F456 /* SpeechifyApp.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SpeechifyApp.swift; sourceTree = "<group>"; };
 		BE7B01122CDEED950050F456 /* Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Assets.xcassets; sourceTree = "<group>"; };
@@ -57,11 +52,13 @@
 		BE7B01252CDEED960050F456 /* SpeechifyUITests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = SpeechifyUITests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
 		BE7B01292CDEED960050F456 /* SpeechifyUITests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SpeechifyUITests.swift; sourceTree = "<group>"; };
 		BE7B012B2CDEED960050F456 /* SpeechifyUITestsLaunchTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SpeechifyUITestsLaunchTests.swift; sourceTree = "<group>"; };
-
-		BE7B01432CDEF5F70050F456 /* GoogleService-Info.plist */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.plist.xml; name = "GoogleService-Info.plist"; path = "../../speechify ruined/Speechify/GoogleService-Info.plist"; sourceTree = "<group>"; };
-
 		BE7B01472CE1E6520050F456 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist; path = Info.plist; sourceTree = "<group>"; };
 /* End PBXFileReference section */
+
+/* Begin PBXFileSystemSynchronizedRootGroup section */
+		E96F88762D00DBE100F04D75 /* Services */ = {isa = PBXFileSystemSynchronizedRootGroup; explicitFileTypes = {}; explicitFolders = (); path = Services; sourceTree = "<group>"; };
+		E96F887B2D00DC2800F04D75 /* Model */ = {isa = PBXFileSystemSynchronizedRootGroup; explicitFileTypes = {}; explicitFolders = (); path = Model; sourceTree = "<group>"; };
+/* End PBXFileSystemSynchronizedRootGroup section */
 
 /* Begin PBXFrameworksBuildPhase section */
 		BE7B01082CDEED940050F456 /* Frameworks */ = {
@@ -116,14 +113,15 @@
 		BE7B010D2CDEED940050F456 /* Speechify */ = {
 			isa = PBXGroup;
 			children = (
+				6C06107F2D015C92003EB4CA /* GoogleService-Info.plist */,
+				E96F887B2D00DC2800F04D75 /* Model */,
+				E96F88762D00DBE100F04D75 /* Services */,
 				229932412CFD05A300FEAF48 /* deckView.swift */,
 				229932402CFD04D100FEAF48 /* deck.swift */,
 				BE7B01472CE1E6520050F456 /* Info.plist */,
 				BE7B010E2CDEED940050F456 /* SpeechifyApp.swift */,
-				BE7B01432CDEF5F70050F456 /* GoogleService-Info.plist */,
 				BE7B01122CDEED950050F456 /* Assets.xcassets */,
 				BE7B01142CDEED950050F456 /* Preview Content */,
-
 			);
 			path = Speechify;
 			sourceTree = "<group>";
@@ -167,6 +165,10 @@
 			buildRules = (
 			);
 			dependencies = (
+			);
+			fileSystemSynchronizedGroups = (
+				E96F88762D00DBE100F04D75 /* Services */,
+				E96F887B2D00DC2800F04D75 /* Model */,
 			);
 			name = Speechify;
 			packageProductDependencies = (
@@ -269,9 +271,7 @@
 			files = (
 				BE7B01162CDEED950050F456 /* Preview Assets.xcassets in Resources */,
 				BE7B01132CDEED950050F456 /* Assets.xcassets in Resources */,
-
-				BE7B01442CDEF5F70050F456 /* GoogleService-Info.plist in Resources */,
-
+				6C0610802D015C92003EB4CA /* GoogleService-Info.plist in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -279,9 +279,6 @@
 			isa = PBXResourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-
-				BE7B01452CDEF5F70050F456 /* GoogleService-Info.plist in Resources */,
-
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -289,9 +286,6 @@
 			isa = PBXResourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-
-				BE7B01462CDEF5F70050F456 /* GoogleService-Info.plist in Resources */,
-
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -304,7 +298,6 @@
 			files = (
 				BE7B010F2CDEED940050F456 /* SpeechifyApp.swift in Sources */,
 				229932422CFD05A600FEAF48 /* deckView.swift in Sources */,
-
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};

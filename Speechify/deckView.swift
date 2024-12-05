@@ -22,6 +22,7 @@ class deckViewModel: ObservableObject{
     let db = Firestore.firestore()
     let isUserID = userHomeView.isUser?.uid
     @Published var words: [Int] = []
+    @Published var favoriteDeck: Deck? = nil
    
     
     func getWords(title: String) -> [Int]{
@@ -59,8 +60,20 @@ class deckViewModel: ObservableObject{
                               //  print("here printing words \(deck.words)")
                             }
                 self.decks = fetchedDecks
+                if let favoritesData = userDocument.data()?["favouriteWords"] as? [String: [Int]] {
+                    var favoriteWords: [Int] = []
+                    for (_, words) in favoritesData {
+                        favoriteWords.append(contentsOf: words)
+                    }
+
+                    if let favoritesDeckIndex = self.decks.firstIndex(where: { $0.title == "Favorites" }) {
+                        self.decks[favoritesDeckIndex].words = favoriteWords
+                    } else {
+                        let favoritesDeck = Deck(id: "favorites", language: "eng_US", title: "Favorites", words: favoriteWords)
+                        self.decks.append(favoritesDeck)
+                    }
+                }
             }
-            
         }catch{
             print("theres been an error reading deck: \(error.localizedDescription)")
         }
@@ -95,7 +108,54 @@ class deckViewModel: ObservableObject{
        }
         
    }
-  
+    func ensureFavoritesDeck() {
+        if decks.first(where: { $0.title == "Favorites" }) == nil {
+            decks.append(Deck(id: "favorites", language: "eng_US", title: "Favorites", words: []))
+        }
+    }
+
+    // Add word to Favorites
+    func addToFavorites(wordID: Int, language: String) async {
+        guard let isUserID = isUserID else { return }
+
+        do {
+            let userDocument = try await db.collection("users").document(isUserID).getDocument()
+            var favoriteWords = userDocument.data()?["favouriteWords"] as? [String: [Int]] ?? [:]
+
+            if favoriteWords[language] == nil {
+                favoriteWords[language] = []
+            }
+
+            if let index = favoriteWords[language]?.firstIndex(of: wordID) {
+                // Remove the word if it’s already favorited
+                favoriteWords[language]?.remove(at: index)
+            } else {
+                // Add the word if it’s not already favorited
+                favoriteWords[language]?.append(wordID)
+            }
+
+            // Update Firestore
+            try await db.collection("users").document(isUserID).setData(["favouriteWords": favoriteWords], merge: true)
+
+            // Update the local Favorites Deck
+            if let favoritesDeckIndex = decks.firstIndex(where: { $0.title == "Favorites" }) {
+                decks[favoritesDeckIndex].words = favoriteWords.values.flatMap { $0 }
+            }
+        } catch {
+            print("Error adding/removing favorite: \(error.localizedDescription)")
+        }
+    }
+
+
+    // Save Favorites Deck
+    private func saveFavoritesToFirestore() {
+        guard let userID = isUserID else { return }
+        if let favorites = decks.first(where: { $0.title == "Favorites" }) {
+            db.collection("users").document(userID).setData([
+                "favorites": favorites.words
+            ], merge: true)
+        }
+    }
 }
 struct addDeckView: View{
     @State private var deckName: String = "" // State variable for user input
@@ -124,7 +184,9 @@ struct addDeckView: View{
                     .padding()
                     .disableAutocorrection(true)
                 // Search button (optional for manual trigger)
-                Button(action: searchWordDB){
+                Button(action:{
+                    let result = searchWordDB(word: searchedWord)}
+                ){
                     Text("Add")
                 }
                 Button(action: {
@@ -143,8 +205,10 @@ struct addDeckView: View{
         }
     }
     
-    private func searchWordDB(){
-        searchedWord = searchedWord.lowercased()
+    //returns word's phonetic for
+    private func searchWordDB(word: String) -> String{
+        searchedWord = word.lowercased()
+        var phonetic :String?
         
         db.collection("eng_US") //make this for all languages
             .whereField("isWord", isEqualTo: searchedWord).limit(to:50)
@@ -163,14 +227,15 @@ struct addDeckView: View{
                             wordsAdded.append(searchedWord)
                             let wordIDString = document?.documentID ?? "0"
                             let wordID = Int(wordIDString)!
-
                             wordIDAdded.append(wordID)
-                            
+                            phonetic = document?.get("isPhonetic") as? String
+                            print("Phonetic: \(String(describing: phonetic))") // This will print the phonetic representation
                         }
                     }
                     
                 }
             }
+        return phonetic ?? "nil"
     }
     
 }
