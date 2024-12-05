@@ -8,7 +8,8 @@
 
 /* Begin PBXBuildFile section */
 		229932422CFD05A600FEAF48 /* deckView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 229932412CFD05A300FEAF48 /* deckView.swift */; };
-		6C0CD9332CFFA2D000E57875 /* GoogleService-Info.plist in Resources */ = {isa = PBXBuildFile; fileRef = 6C0CD9322CFFA2D000E57875 /* GoogleService-Info.plist */; };
+		3DC23C9F2D0128CB009DE8CA /* GoogleService-Info.plist in Resources */ = {isa = PBXBuildFile; fileRef = 3DC23C9E2D0128CB009DE8CA /* GoogleService-Info.plist */; };
+		6C0CD9332CFFA2D000E57875 /* (null) in Resources */ = {isa = PBXBuildFile; };
 		BE7B010F2CDEED940050F456 /* SpeechifyApp.swift in Sources */ = {isa = PBXBuildFile; fileRef = BE7B010E2CDEED940050F456 /* SpeechifyApp.swift */; };
 		BE7B01132CDEED950050F456 /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = BE7B01122CDEED950050F456 /* Assets.xcassets */; };
 		BE7B01162CDEED950050F456 /* Preview Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = BE7B01152CDEED950050F456 /* Preview Assets.xcassets */; };
@@ -21,7 +22,6 @@
 		BE7B01402CDEEE670050F456 /* FirebaseFirestore in Frameworks */ = {isa = PBXBuildFile; productRef = BE7B013F2CDEEE670050F456 /* FirebaseFirestore */; };
 		BE7B01422CDEEE670050F456 /* FirebaseFunctions in Frameworks */ = {isa = PBXBuildFile; productRef = BE7B01412CDEEE670050F456 /* FirebaseFunctions */; };
 		E96F88812D00F6FD00F04D75 /* AuthViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = E96F88802D00F6FD00F04D75 /* AuthViewModel.swift */; };
-
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -44,6 +44,7 @@
 /* Begin PBXFileReference section */
 		229932402CFD04D100FEAF48 /* deck.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = deck.swift; sourceTree = "<group>"; };
 		229932412CFD05A300FEAF48 /* deckView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = deckView.swift; sourceTree = "<group>"; };
+		3DC23C9E2D0128CB009DE8CA /* GoogleService-Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = "GoogleService-Info.plist"; sourceTree = "<group>"; };
 		BE7B010B2CDEED940050F456 /* Speechify.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = Speechify.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		BE7B010E2CDEED940050F456 /* SpeechifyApp.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SpeechifyApp.swift; sourceTree = "<group>"; };
 		BE7B01122CDEED950050F456 /* Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Assets.xcassets; sourceTree = "<group>"; };
@@ -54,7 +55,6 @@
 		BE7B01292CDEED960050F456 /* SpeechifyUITests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SpeechifyUITests.swift; sourceTree = "<group>"; };
 		BE7B012B2CDEED960050F456 /* SpeechifyUITestsLaunchTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SpeechifyUITestsLaunchTests.swift; sourceTree = "<group>"; };
 		BE7B01472CE1E6520050F456 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist; path = Info.plist; sourceTree = "<group>"; };
-		E96F88582D00B65800F04D75 /* GoogleService-Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = "GoogleService-Info.plist"; sourceTree = "<group>"; };
 		E96F88802D00F6FD00F04D75 /* AuthViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AuthViewModel.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
@@ -125,7 +125,7 @@
 				BE7B010E2CDEED940050F456 /* SpeechifyApp.swift */,
 				BE7B01122CDEED950050F456 /* Assets.xcassets */,
 				BE7B01142CDEED950050F456 /* Preview Content */,
-				6C0CD9322CFFA2D000E57875 /* GoogleService-Info.plist */,
+				3DC23C9E2D0128CB009DE8CA /* GoogleService-Info.plist */,
 			);
 			path = Speechify;
 			sourceTree = "<group>";
@@ -274,8 +274,9 @@
 			buildActionMask = 2147483647;
 			files = (
 				BE7B01162CDEED950050F456 /* Preview Assets.xcassets in Resources */,
+				3DC23C9F2D0128CB009DE8CA /* GoogleService-Info.plist in Resources */,
 				BE7B01132CDEED950050F456 /* Assets.xcassets in Resources */,
-				6C0CD9332CFFA2D000E57875 /* GoogleService-Info.plist in Resources */,
+				6C0CD9332CFFA2D000E57875 /* (null) in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};

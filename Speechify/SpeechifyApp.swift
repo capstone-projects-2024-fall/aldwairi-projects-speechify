@@ -45,20 +45,81 @@ struct contentPageView: View {
                     .navigationBarBackButtonHidden(true)
             } else {
                 
-                VStack {
-                    Text("Speechify").font(.largeTitle).multilineTextAlignment(.center).padding(10)
-                    Text("Login").font(.title).padding(10).foregroundStyle(.blue).background(Color(UIColor.systemGray5)).clipShape(RoundedRectangle(cornerRadius: 5)).onTapGesture{loginNavigate.toggle()}.navigationDestination(isPresented: $loginNavigate){
-                        authenticationView().navigationBarBackButtonHidden(true)
+                ZStack {
+                    // Full-Screen Gradient Background
+                    LinearGradient(
+                                gradient: Gradient(colors: [
+                                    Color.pink.opacity(0.9),
+                                    Color.orange.opacity(0.7),
+                                    Color.orange.opacity(0.9),
+                                    Color.pink.opacity(0.6)
+                                ]),
+                                startPoint: .topLeading,
+                                endPoint: .bottomTrailing
+                    )
+                    .edgesIgnoringSafeArea(.all) // Ensures the gradient covers the entire screen
+
+                    // Content
+                    VStack(spacing: 40) {
+                        Spacer().frame(height: 200)
+                            
+                        // App Title Styled as a Label
+                        Text("Speechify")
+                            .font(.system(size: 50, weight: .bold)) // Larger font size
+                            .foregroundStyle(
+                                LinearGradient(
+                                    gradient: Gradient(colors: [Color.pink, Color.red]),
+                                    startPoint: .topLeading,
+                                    endPoint: .bottomTrailing
+                                )
+                            )
+                            .padding(.vertical, 30)
+                            .padding(.horizontal, 50)
+                        
+                        Spacer()
+                        
+                        // Login Button
+                        Text("Login")
+                            .font(.headline)
+                            .foregroundColor(.white)
+                            .padding()
+                            .frame(maxWidth: .infinity)
+                            .background(.blue)
+                            .cornerRadius(10)
+                            .shadow(color: .black.opacity(0.2), radius: 4, x: 0, y: 2)
+                            .onTapGesture {
+                                loginNavigate.toggle()
+                            }
+                            .navigationDestination(isPresented: $loginNavigate) {
+                                authenticationView()
+                                    .navigationBarBackButtonHidden(true)
+                            }
+                        
+                        // Sign-Up Button
+                        Text("Sign-Up")
+                            .font(.headline)
+                            .foregroundColor(.white)
+                            .padding()
+                            .frame(maxWidth: .infinity)
+                            .background(.green)
+                            .cornerRadius(10)
+                            .shadow(color: .black.opacity(0.2), radius: 4, x: 0, y: 2)
+                            .onTapGesture {
+                                signupNavigate.toggle()
+                            }
+                            .navigationDestination(isPresented: $signupNavigate) {
+                                registrationView()
+                                    .navigationBarBackButtonHidden(true)
+                            }
                     }
-                    Text("Sign-Up").font(.title).padding(10).foregroundStyle(.blue).background(Color(UIColor.systemGray5)).clipShape(RoundedRectangle(cornerRadius: 5)).onTapGesture{signupNavigate.toggle()}.navigationDestination(isPresented: $signupNavigate){
-                        registrationView().navigationBarBackButtonHidden(true)
-                    }
+                    .padding(30)
+                }
+
                 }
             }
             
         }
     }
-}
 
 struct registrationView: View{
     @State private var isUserName: String = ""
@@ -700,7 +761,17 @@ struct authenticationView: View {
                     
                     VStack{
                         
-                        Text("Login").font(.largeTitle).frame(maxWidth: .infinity, alignment: .center).padding(.top, 10)
+                        Text("Login")
+                            .font(.system(size: 50, weight: .bold))
+                            .frame(maxWidth: .infinity, alignment: .center)
+                            .padding(.top, 10)
+                            .foregroundStyle(
+                                LinearGradient(
+                                    gradient: Gradient(colors: [Color.pink, Color.red]),
+                                    startPoint: .topLeading,
+                                    endPoint: .bottomTrailing
+                                )
+                            )
                         Text("Email").frame(maxWidth: .infinity, alignment: .leading)
                         HStack{
                             Image(systemName: "envelope.fill").resizable().scaledToFit().frame(width: 25, height: 25).padding(.leading, 2).foregroundStyle(.gray)
@@ -1911,33 +1982,8 @@ struct cardHomeView: View {
  
     }
     
-    private func getuserPhoneme(word: String) {
-        
-        var searchedWord = word.lowercased()
-       
-        let db = Firestore.firestore()
-        
-        print("lets see \(searchedWord)1")
-        db.collection("eng_US") //make this for all languages
-            .whereField("isWord", isEqualTo: searchedWord).limit(to:50)
-            .getDocuments(source: .server) { (snapshot, error) in
-                if let error = error {
-                    print("Error searching decks: \(error)")
-                    return
-                }else{
-                    let document = snapshot?.documents.first
-                    if(document?.documentID == nil){
-                        print("word not found")
-                        print("Error searching decks in getPhenome: \(String(describing: error))")
-                    }else{
-                            userPhoneme = document?.get("isPhonetic") as? String ?? "notFound"
-                        
-                    }
-                }
-            }
- 
-    }
     
+                          
     private func isRealTimeSpeechToText() -> Bool { // Not smart and outright bad to pause audio intake for this function
         
         var isLiveTranslation: Bool = false
