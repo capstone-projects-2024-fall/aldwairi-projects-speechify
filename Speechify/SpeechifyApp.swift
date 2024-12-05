@@ -36,6 +36,80 @@ struct contentPageView: View {
     
     var body: some View {
         NavigationStack {
+            ZStack {
+                // Full-Screen Gradient Background
+                LinearGradient(
+                    gradient: Gradient(colors: [
+                        Color.pink.opacity(0.9),
+                        Color.orange.opacity(0.7),
+                        Color.orange.opacity(0.9),
+                        Color.pink.opacity(0.6)
+                    ]),
+                    startPoint: .topLeading,
+                    endPoint: .bottomTrailing
+                )
+                .edgesIgnoringSafeArea(.all) // Ensures the gradient covers the entire screen
+                
+                // Content
+                VStack(spacing: 40) {
+                    Spacer().frame(height: 200)
+                    
+                    // App Title Styled as a Label
+                    Text("Speechify")
+                        .font(.system(size: 50, weight: .bold)) // Larger font size
+                        .foregroundStyle(
+                            LinearGradient(
+                                gradient: Gradient(colors: [Color.pink, Color.red]),
+                                startPoint: .topLeading,
+                                endPoint: .bottomTrailing
+                            )
+                        )
+                        .padding(.vertical, 30)
+                        .padding(.horizontal, 50)
+                    
+                    Spacer()
+                    
+                    // Login Button
+                    Text("Login")
+                        .font(.headline)
+                        .foregroundColor(.white)
+                        .padding()
+                        .frame(maxWidth: .infinity)
+                        .background(.blue)
+                        .cornerRadius(10)
+                        .shadow(color: .black.opacity(0.2), radius: 4, x: 0, y: 2)
+                        .onTapGesture {
+                            loginNavigate.toggle()
+                        }
+                        .navigationDestination(isPresented: $loginNavigate) {
+                            authenticationView()
+                                .navigationBarBackButtonHidden(true)
+                        }
+                    
+                    // Sign-Up Button
+                    Text("Sign-Up")
+                        .font(.headline)
+                        .foregroundColor(.white)
+                        .padding()
+                        .frame(maxWidth: .infinity)
+                        .background(.green)
+                        .cornerRadius(10)
+                        .shadow(color: .black.opacity(0.2), radius: 4, x: 0, y: 2)
+                        .onTapGesture {
+                            signupNavigate.toggle()
+                        }
+                        .navigationDestination(isPresented: $signupNavigate) {
+                            registrationView()
+                                .navigationBarBackButtonHidden(true)
+                        }
+                }
+                .padding(30)
+                
+            }
+        }
+
+        /*
+        NavigationStack {
             VStack {
                 Text("Speechify").font(.largeTitle).multilineTextAlignment(.center).padding(10)
                 Text("Login").font(.title).padding(10).foregroundStyle(.blue).background(Color(UIColor.systemGray5)).clipShape(RoundedRectangle(cornerRadius: 5)).onTapGesture{loginNavigate.toggle()}.navigationDestination(isPresented: $loginNavigate){
@@ -46,6 +120,7 @@ struct contentPageView: View {
                 }
             }
         }
+         */
     }
 }
 
@@ -685,7 +760,18 @@ struct authenticationView: View {
                 
                 VStack{
                     
-                    Text("Login").font(.largeTitle).frame(maxWidth: .infinity, alignment: .center).padding(.top, 10)
+                   // Text("Login").font(.largeTitle).frame(maxWidth: .infinity, alignment: .center).padding(.top, 10)
+                    Text("Login")
+                    .font(.system(size: 50, weight: .bold))
+                    .frame(maxWidth: .infinity, alignment: .center)
+                    .padding(.top, 10)
+                    .foregroundStyle(
+                        LinearGradient(
+                            gradient: Gradient(colors: [Color.pink, Color.red]),
+                            startPoint: .topLeading,
+                            endPoint: .bottomTrailing
+                        )
+                    )
                     Text("Email").frame(maxWidth: .infinity, alignment: .leading)
                     HStack{
                         Image(systemName: "envelope.fill").resizable().scaledToFit().frame(width: 25, height: 25).padding(.leading, 2).foregroundStyle(.gray)
@@ -696,175 +782,166 @@ struct authenticationView: View {
                             }
                         }.onChange(of: isEmailFocus, {
                             if !isEmailFocus{
-
                                 if !isUserEmail.isEmpty && emailErrorMessage.contains("enter") && isEmailError{
                                     isEmailError.toggle()
                                 }
-                            }.onChange(of: isEmailFocus, {
-                                if !isEmailFocus{
-                                    if !isUserEmail.isEmpty && emailErrorMessage.contains("enter") && isEmailError{
-                                        isEmailError.toggle()
+                            }
+                        })
+                    }.overlay(RoundedRectangle(cornerRadius: 5).stroke(lineWidth: 1))
+                    if isEmailError{
+                        Text(emailErrorMessage).foregroundColor(.red).frame(maxWidth: .infinity, alignment: .leading).padding(5)
+                    }
+                    Text("Password").frame(maxWidth: .infinity, alignment: .leading)
+                    HStack{
+                        Image(systemName: "lock.fill").resizable().scaledToFit().frame(width: 25, height: 25).padding(.leading, 1).foregroundStyle(.gray)
+                        if(!isPasswordVisible){
+                            SecureField("Password", text: $isUserPassword).focused($isPasswordFocus).background(Color.white).frame(height:30).textInputAutocapitalization(.never).autocorrectionDisabled(true).onSubmit{
+                                if !isUserPassword.isEmpty && isPasswordError{
+                                    isPasswordError.toggle()
+                                }
+                            }.onChange(of: isPasswordFocus, {
+                                if !isPasswordFocus{
+                                    if !isUserPassword.isEmpty && isPasswordError{
+                                        isPasswordError.toggle()
                                     }
                                 }
                             })
-                        }.overlay(RoundedRectangle(cornerRadius: 5).stroke(lineWidth: 1))
-                        if isEmailError{
-                            Text(emailErrorMessage).foregroundColor(.red).frame(maxWidth: .infinity, alignment: .leading).padding(5)
-                        }
-                        Text("Password").frame(maxWidth: .infinity, alignment: .leading)
-                        HStack{
-                            Image(systemName: "lock.fill").resizable().scaledToFit().frame(width: 25, height: 25).padding(.leading, 1).foregroundStyle(.gray)
-                            if(!isPasswordVisible){
-                                SecureField("Password", text: $isUserPassword).focused($isPasswordFocus).background(Color.white).frame(height:30).textInputAutocapitalization(.never).autocorrectionDisabled(true).onSubmit{
+                        } else{
+                            TextField("Password", text: $isUserPassword).focused($isPasswordFocus).background(Color.white).frame(height:30).textInputAutocapitalization(.never).autocorrectionDisabled(true).onSubmit{
+                                if !isUserPassword.isEmpty && isPasswordError{
+                                    isPasswordError.toggle()
+                                }
+                            }.onChange(of: isPasswordFocus, {
+                                if !isPasswordFocus{
                                     if !isUserPassword.isEmpty && isPasswordError{
                                         isPasswordError.toggle()
                                     }
-                                }.onChange(of: isPasswordFocus, {
-                                    if !isPasswordFocus{
-                                        if !isUserPassword.isEmpty && isPasswordError{
-                                            isPasswordError.toggle()
-                                        }
-                                    }
-                                })
-                            } else{
-                                TextField("Password", text: $isUserPassword).focused($isPasswordFocus).background(Color.white).frame(height:30).textInputAutocapitalization(.never).autocorrectionDisabled(true).onSubmit{
-                                    if !isUserPassword.isEmpty && isPasswordError{
-                                        isPasswordError.toggle()
-                                    }
-                                }.onChange(of: isPasswordFocus, {
-                                    if !isPasswordFocus{
-                                        if !isUserPassword.isEmpty && isPasswordError{
-                                            isPasswordError.toggle()
-                                        }
-                                    }
-                                })
-                            }
-                            Button(action:{isPasswordVisible.toggle()}){
-                                Image(systemName: !isPasswordVisible ? "eye.slash" : "eye").resizable().scaledToFit().frame(width: 25, height: 25).padding(.trailing, 2).foregroundStyle(.black)
-                            }
-                        }.overlay(RoundedRectangle(cornerRadius: 5).stroke(lineWidth: 1))
-                        if isPasswordError{
-                            Text(passwordErrorMessage).foregroundColor(.red).frame(maxWidth: .infinity, alignment: .leading).padding(5)
+                                }
+                            })
                         }
-                        Text("Login").padding(10).foregroundStyle(.blue).background(Color(UIColor.systemGray5)).clipShape(RoundedRectangle(cornerRadius: 5)).onTapGesture{
-                            if isUserEmail.isEmpty{
-                                emailErrorMessage = "Please enter your email address"
+                        Button(action:{isPasswordVisible.toggle()}){
+                            Image(systemName: !isPasswordVisible ? "eye.slash" : "eye").resizable().scaledToFit().frame(width: 25, height: 25).padding(.trailing, 2).foregroundStyle(.black)
+                        }
+                    }.overlay(RoundedRectangle(cornerRadius: 5).stroke(lineWidth: 1))
+                    if isPasswordError{
+                        Text(passwordErrorMessage).foregroundColor(.red).frame(maxWidth: .infinity, alignment: .leading).padding(5)
+                    }
+                    Text("Login").padding(10).foregroundStyle(.blue).background(Color(UIColor.systemGray5)).clipShape(RoundedRectangle(cornerRadius: 5)).onTapGesture{
+                        if isUserEmail.isEmpty{
+                            emailErrorMessage = "Please enter your email address"
+                            isEmailError = true
+                        } else{
+                            let isEmailRegex: String = "[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\\.[a-zA-Z]{2,}"
+                            let isEmailPredicate = NSPredicate(format: "SELF MATCHES[c] %@", isEmailRegex)
+                            let isValidAddress = isEmailPredicate.evaluate(with: isUserEmail)
+                            if !isValidAddress{
+                                emailErrorMessage = "Invalid email address"
                                 isEmailError = true
+                            }
+                            if isValidAddress && isEmailError{
+                                isEmailError.toggle()
+                            }
+                        }
+                        if isUserPassword.isEmpty{
+                            passwordErrorMessage = "Please enter your password"
+                            isPasswordError = true
+                        } else if !isUserPassword.isEmpty && isPasswordError{
+                            isPasswordError = false
+                        }
+                        if !isEmailError && !isPasswordError{
+                            print("login reached")
+                            _ = Task{isUserValid = await validateCredentials()}
+                        }
+                    }.padding(10).navigationDestination(isPresented: $isUserValid){
+                        userHomeView().navigationBarBackButtonHidden(true)
+                    }
+                    if isLoginError{
+                        Text("Invalid Email Or Password").foregroundColor(.red).padding(.top, 5)
+                    }
+                    Text("Forgot Password?").onTapGesture{ // highlight blue on hover
+                        isPasswordReset.toggle()
+                    }
+                    HStack{
+                        Text("Don't have an account? ")
+                        NavigationLink(destination: registrationView().navigationBarBackButtonHidden(true)){
+                            Text("Sign Up")
+                        }
+                    }
+                }.padding(15).onTapGesture{
+                    isEmailFocus = false
+                    isPasswordFocus = false
+                }
+            }.overlay(alignment: .center){
+                if isPasswordReset{
+                    VStack{
+                        ZStack{
+                            HStack{
+                                Image(systemName: "x.circle.fill").resizable().scaledToFit().frame(width: 25, height: 25)
+                            }.frame(maxWidth: .infinity, alignment: .topTrailing).onTapGesture{
+                                isPasswordReset.toggle()
+                                isResetEdit = ""
+                                resetEditError = false
+                                resetEditErrorMessage = ""
+                            }
+                        }
+                        Text("Reset Password")
+                        Text("Email").frame(maxWidth: .infinity, alignment: .leading)
+                        HStack{
+                            Image(systemName: "envelope.fill").resizable().scaledToFit().frame(width: 25, height: 25).padding(.leading, 2).foregroundStyle(.gray)
+                            TextField("Email Address", text: $isResetEdit).focused($resetEditFocus).background(Color.white).frame(height:30).textInputAutocapitalization(.never).autocorrectionDisabled(true).onSubmit{
+                                if !isResetEdit.isEmpty && resetEditErrorMessage.contains("enter") && resetEditError{
+                                    resetEditError.toggle()
+                                }
+                            }.onChange(of: resetEditFocus, {
+                                if !resetEditFocus{
+                                    if !isResetEdit.isEmpty && resetEditErrorMessage.contains("enter") && resetEditError{
+                                        resetEditError = false
+                                    }
+                                }
+                                if resetEditFocus && isResetResult{
+                                    isResetResult.toggle()
+                                }
+                            })
+                        }.overlay(RoundedRectangle(cornerRadius: 5).stroke(lineWidth: 1))
+                        if resetEditError{
+                            Text(resetEditErrorMessage).foregroundColor(.red).frame(maxWidth: .infinity, alignment: .leading).padding(5)
+                        }
+                        Text("Confirm").padding(10).foregroundStyle(.blue).background(Color(UIColor.systemGray5)).clipShape(RoundedRectangle(cornerRadius: 5)).onTapGesture{
+                            resetEditFocus = false
+                            if isResetEdit.isEmpty{
+                                resetEditErrorMessage = "Please enter your email address"
+                                resetEditError = true
                             } else{
                                 let isEmailRegex: String = "[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\\.[a-zA-Z]{2,}"
                                 let isEmailPredicate = NSPredicate(format: "SELF MATCHES[c] %@", isEmailRegex)
-                                let isValidAddress = isEmailPredicate.evaluate(with: isUserEmail)
+                                let isValidAddress = isEmailPredicate.evaluate(with: isResetEdit)
                                 if !isValidAddress{
-                                    emailErrorMessage = "Invalid email address"
-                                    isEmailError = true
-                                }
-                                if isValidAddress && isEmailError{
-                                    isEmailError.toggle()
-                                }
-                            }
-                            if isUserPassword.isEmpty{
-                                passwordErrorMessage = "Please enter your password"
-                                isPasswordError = true
-                            } else if !isUserPassword.isEmpty && isPasswordError{
-                                isPasswordError = false
-                            }
-                            if !isEmailError && !isPasswordError{
-                                print("login reached")
-                                _ = Task{isUserValid = await validateCredentials()}
-                            }
-                        }.padding(10).navigationDestination(isPresented: $isUserValid){
-                            userHomeView().navigationBarBackButtonHidden(true)
-                        }
-                        if isLoginError{
-                            Text("Invalid Email Or Password").foregroundColor(.red).padding(.top, 5)
-                        }
-                        Text("Forgot Password?").onTapGesture{ // highlight blue on hover
-                            isPasswordReset.toggle()
-                        }
-                        HStack{
-                            Text("Don't have an account? ")
-                            NavigationLink(destination: registrationView().navigationBarBackButtonHidden(true)){
-                                Text("Sign Up")
-                            }
-                        }
-                    }.padding(15).onTapGesture{
-                        isEmailFocus = false
-                        isPasswordFocus = false
-                    }
-                }.overlay(alignment: .center){
-                    if isPasswordReset{
-                        VStack{
-                            ZStack{
-                                HStack{
-                                    Image(systemName: "x.circle.fill").resizable().scaledToFit().frame(width: 25, height: 25)
-                                }.frame(maxWidth: .infinity, alignment: .topTrailing).onTapGesture{
-                                    isPasswordReset.toggle()
-                                    isResetEdit = ""
-                                    resetEditError = false
-                                    resetEditErrorMessage = ""
-                                }
-                            }
-                            Text("Reset Password")
-                            Text("Email").frame(maxWidth: .infinity, alignment: .leading)
-                            HStack{
-                                Image(systemName: "envelope.fill").resizable().scaledToFit().frame(width: 25, height: 25).padding(.leading, 2).foregroundStyle(.gray)
-                                TextField("Email Address", text: $isResetEdit).focused($resetEditFocus).background(Color.white).frame(height:30).textInputAutocapitalization(.never).autocorrectionDisabled(true).onSubmit{
-                                    if !isResetEdit.isEmpty && resetEditErrorMessage.contains("enter") && resetEditError{
-                                        resetEditError.toggle()
-                                    }
-                                }.onChange(of: resetEditFocus, {
-                                    if !resetEditFocus{
-                                        if !isResetEdit.isEmpty && resetEditErrorMessage.contains("enter") && resetEditError{
-                                            resetEditError = false
-                                        }
-                                    }
-                                    if resetEditFocus && isResetResult{
-                                        isResetResult.toggle()
-                                    }
-                                })
-                            }.overlay(RoundedRectangle(cornerRadius: 5).stroke(lineWidth: 1))
-                            if resetEditError{
-                                Text(resetEditErrorMessage).foregroundColor(.red).frame(maxWidth: .infinity, alignment: .leading).padding(5)
-                            }
-                            Text("Confirm").padding(10).foregroundStyle(.blue).background(Color(UIColor.systemGray5)).clipShape(RoundedRectangle(cornerRadius: 5)).onTapGesture{
-                                resetEditFocus = false
-                                if isResetEdit.isEmpty{
-                                    resetEditErrorMessage = "Please enter your email address"
+                                    resetEditErrorMessage = "Invalid email address"
                                     resetEditError = true
-                                } else{
-                                    let isEmailRegex: String = "[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\\.[a-zA-Z]{2,}"
-                                    let isEmailPredicate = NSPredicate(format: "SELF MATCHES[c] %@", isEmailRegex)
-                                    let isValidAddress = isEmailPredicate.evaluate(with: isResetEdit)
-                                    if !isValidAddress{
-                                        resetEditErrorMessage = "Invalid email address"
-                                        resetEditError = true
+                                }
+                                if isValidAddress && resetEditError{
+                                    resetEditError.toggle()
+                                }
+                                if !resetEditError{
+                                    _ = Task{isResetValid = await userPasswordReset()}
+                                    if isResetValid{
+                                        isResetEdit = ""
+                                        resetEditError = false
+                                        resetEditErrorMessage = ""
                                     }
-                                    if isValidAddress && resetEditError{
-                                        resetEditError.toggle()
-                                    }
-                                    if !resetEditError{
-                                        _ = Task{isResetValid = await userPasswordReset()}
-                                        if isResetValid{
-                                            isResetEdit = ""
-                                            resetEditError = false
-                                            resetEditErrorMessage = ""
-                                        }
-                                        isResetResult.toggle()
-                                        DispatchQueue.main.asyncAfter(deadline: .now() + 5, execute: {isResetResult.toggle()})
-                                    }
+                                    isResetResult.toggle()
+                                    DispatchQueue.main.asyncAfter(deadline: .now() + 5, execute: {isResetResult.toggle()})
                                 }
                             }
-                            if isResetResult{
-                                Text(isResetMessage).foregroundColor(.green).padding(.top, 5)
-                            }
-                        }.padding(10).background(.white).border(.black, width: 1).clipShape(RoundedRectangle(cornerRadius: 5)).frame(width: 350).onTapGesture{
-                            resetEditFocus = false
                         }
+                        if isResetResult{
+                            Text(isResetMessage).foregroundColor(.green).padding(.top, 5)
+                        }
+                    }.padding(10).background(.white).border(.black, width: 1).clipShape(RoundedRectangle(cornerRadius: 5)).frame(width: 350).onTapGesture{
+                        resetEditFocus = false
                     }
                 }
             }
-            
-            
         }
         
     }
@@ -1088,7 +1165,7 @@ struct topAndBottomView: View{
                             HStack{
                                 Image(systemName:"person.circle.fill").resizable().scaledToFit().frame(width: 25, height: 25)
                                 Text("Profile").font(.title2)
-                            }.onTapGesture{isProfileNavigation.toggle()}.navigationDestination(isPresented: $isProfileNavigation){userProfileView()}
+                            }.onTapGesture{isProfileNavigation.toggle()}.navigationDestination(isPresented: $isProfileNavigation){userProfileView().navigationBarBackButtonHidden(true)}
                             HStack{
                                 Image(systemName: "cart.fill").resizable().scaledToFit().frame(width: 25, height: 25)
                                 Text("Store").font(.title2)
