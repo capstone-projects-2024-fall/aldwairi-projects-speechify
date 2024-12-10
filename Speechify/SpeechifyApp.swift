@@ -1168,21 +1168,13 @@ struct topAndBottomView: View{
                                 Text("Profile").font(.title2)
                             }.onTapGesture{isProfileNavigation.toggle()}.navigationDestination(isPresented: $isProfileNavigation){userProfileView().navigationBarBackButtonHidden(true)}
                             HStack{
-                                Image(systemName: "cart.fill").resizable().scaledToFit().frame(width: 25, height: 25)
-                                Text("Store").font(.title2)
-                            }.onTapGesture{isStoreNavigation.toggle()}.navigationDestination(isPresented: $isStoreNavigation){userStoreView().navigationBarBackButtonHidden(true)}
-                            HStack{
-                                Image(systemName:"star.fill").resizable().scaledToFit().frame(width: 25, height: 25)
-                                Text("Favourites").font(.title2)
-                            }.onTapGesture{isFavouritesNavigation.toggle()}.navigationDestination(isPresented: $isFavouritesNavigation){userFavouriteCardsView().navigationBarBackButtonHidden(true)}
-                            HStack{
                                 Image(systemName: "gear").resizable().scaledToFit().frame(width: 25, height: 25)
                                 Text("Setting").font(.title2)
                             }.onTapGesture{isSettingNavigation.toggle()}.navigationDestination(isPresented: $isSettingNavigation){userSettingView().navigationBarBackButtonHidden(true)}
                             HStack{
                                 Image(systemName:"rectangle.portrait.and.arrow.right").resizable().scaledToFit().frame(width: 25, height: 25)
                                 Text("Sign Out").font(.title2)
-                            }.onTapGesture{signOutNavigation = userSignOut()}
+                            }.onTapGesture{signOutNavigation = userSignOut()}.navigationDestination(isPresented: $signOutNavigation){contentPageView().navigationBarBackButtonHidden(true)}
                         }.padding(10).background(Color(UIColor.systemGray4)).clipShape(RoundedRectangle(cornerRadius: 5)).frame(maxWidth: .infinity, alignment: .trailing).padding(.trailing, 5).offset(y: -215)
                     }
                 }
@@ -1336,7 +1328,7 @@ struct cardHomeView: View {
 
     init(words: [Int] = []){ //words defaults to empty if no parameter is passed
         self.words = words
-        guard userHomeView.isUser != nil else{
+        guard cardHomeView.isUser != nil else{
             isErrorOccurrence.toggle()
             return
         }
@@ -1544,14 +1536,6 @@ struct cardHomeView: View {
                             Text("Profile").font(.title2)
                         }.onTapGesture{isProfileNavigation.toggle()}.navigationDestination(isPresented: $isProfileNavigation){userProfileView().navigationBarBackButtonHidden(true)}
                         HStack{
-                            Image(systemName: "cart.fill").resizable().scaledToFit().frame(width: 25, height: 25)
-                            Text("Store").font(.title2)
-                        }.onTapGesture{isStoreNavigation.toggle()}.navigationDestination(isPresented: $isStoreNavigation){userStoreView().navigationBarBackButtonHidden(true)}
-                        HStack{
-                            Image(systemName:"star.fill").resizable().scaledToFit().frame(width: 25, height: 25)
-                            Text("Favourites").font(.title2)
-                        }.onTapGesture{isFavouritesNavigation.toggle()}.navigationDestination(isPresented: $isFavouritesNavigation){userFavouriteCardsView().navigationBarBackButtonHidden(true)}
-                        HStack{
                             Image(systemName: "gear").resizable().scaledToFit().frame(width: 25, height: 25)
                             Text("Setting").font(.title2)
                         }.onTapGesture{isSettingNavigation.toggle()}.navigationDestination(isPresented: $isSettingNavigation){userSettingView().navigationBarBackButtonHidden(true)}
@@ -1561,7 +1545,7 @@ struct cardHomeView: View {
                         }
                         .onTapGesture {
                          signOutNavigation = userSignOut()
-                        }
+                        }.navigationDestination(isPresented: $signOutNavigation){contentPageView().navigationBarBackButtonHidden(true)}
                     }.padding(10).background(Color(UIColor.systemGray4)).clipShape(RoundedRectangle(cornerRadius: 5)).frame(maxWidth: .infinity, alignment: .trailing).padding(.trailing, 5).offset(y: -215)
                 }
             }
@@ -1598,10 +1582,10 @@ struct cardHomeView: View {
         }
     }
     
-
+    
     private func initialLoading()async throws->Bool{
         var isPropertySet: Bool = false
-        guard let isUserID = userHomeView.isUser?.uid else{return false}
+        guard let isUserID = cardHomeView.isUser?.uid else{return false}
         do{
             let isUserDocument = try await Firestore.firestore().collection("users").document(isUserID).getDocument()
             guard isUserDocument.exists else{return false}
@@ -1609,6 +1593,7 @@ struct cardHomeView: View {
             isLearnLanguages = getLearnLanguageField
             //guard let getWordLanguage = getLearnLanguageField.randomElement() else{return false}
             isWordLanguage = isLearnLanguages[0]
+            print(isWordLanguage)
             let isEntriesCount = 39849 + 1 // get actual size
 
             var isRandomID = Int.random(in: 0...isEntriesCount)
@@ -1661,7 +1646,7 @@ struct cardHomeView: View {
     private func isWordFavourite() async -> Bool{
         var isFavouriteSet: Bool = false
         var hasFavouriteField: Bool = false
-        guard let isUserID = userHomeView.isUser?.uid else{return false}
+        guard let isUserID = cardHomeView.isUser?.uid else{return false}
         do{
             let isUserDocument = try await Firestore.firestore().collection("users").document(isUserID).getDocument()
             guard isUserDocument.exists else{return false}
@@ -1837,7 +1822,7 @@ struct cardHomeView: View {
             } catch{
                 print(error.localizedDescription)
             }
-            guard let isUserID = userHomeView.isUser?.uid else{return false}
+            guard let isUserID = cardHomeView.isUser?.uid else{return false}
             do{
                 let isUserDocument = try await Firestore.firestore().collection("users").document(isUserID).getDocument()
                 guard isUserDocument.exists else{return false}
@@ -1902,7 +1887,7 @@ struct cardHomeView: View {
                     print(error.localizedDescription)
                 }
 
-                guard let isUserID = userHomeView.isUser?.uid else{return false}
+                guard let isUserID = cardHomeView.isUser?.uid else{return false}
                 do{
                     let isUserDocument = try await Firestore.firestore().collection("users").document(isUserID).getDocument()
                     guard isUserDocument.exists else{return false}
@@ -1945,7 +1930,7 @@ struct cardHomeView: View {
                     indexingPreviousWords.isIndex = -1
                     indexingPreviousWords.isCurrent.toggle()
                 }
-                guard let isUserID = userHomeView.isUser?.uid else{return false}
+                guard let isUserID = cardHomeView.isUser?.uid else{return false}
                 do{
                     let isUserDocument = try await Firestore.firestore().collection("users").document(isUserID).getDocument()
                     guard isUserDocument.exists else{return false}
@@ -3314,6 +3299,7 @@ struct userSettingView: View{
     @State private var isWordInputNavigation: Bool = false
     @State private var isStoreNavigation: Bool = false
     @State private var isTaskNavigation: Bool = false
+    @State private var isDeleted: Bool = false
     
     var body: some View{
         NavigationStack{
@@ -3327,7 +3313,7 @@ struct userSettingView: View{
                     HStack{
                         Text("Delete Account").font(.title3).frame(maxWidth: .infinity, alignment: .leading).padding(.leading, 10)
                         Image(systemName:  "chevron.right").frame(maxWidth: .infinity, alignment: .trailing).padding(.trailing, 5)
-                    }.padding(10)
+                    }.padding(10).onTapGesture{isDeleted = userAccountDeletion()}.navigationDestination(isPresented: $isDeleted){contentPageView().navigationBarBackButtonHidden(true)}
                     HStack{
                         HStack{
                             Image(systemName:"house.fill").resizable().scaledToFit().frame(width: 50, height: 50)
